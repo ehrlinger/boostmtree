@@ -1,9 +1,17 @@
 Package: boostmtree
-Version: 1.0.0
-BUILD: bld20160317
+Version: 1.1.0
+BUILD: bld20160411
 
 ---------------------------------------------------------------------------------
-CHANGES TO RELEASE 1.0.0
+CHANGES TO RELEASE 1.1.0
+---------------------------------------------------------------------------------
+RELEASE 1.1.0
+---------------------------------------------------------------------------------
+This update includes an "in sample" cross-validation method for
+determining the optimal boosting iteration.  See the help file of
+boostmtree for more details.  Various bugs and fixes are also addressed.
+
+  
 ---------------------------------------------------------------------------------
 RELEASE 1.0.0
 ---------------------------------------------------------------------------------

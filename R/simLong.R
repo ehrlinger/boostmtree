@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.0.0 (_PROJECT_BUILD_ID_)
+####  Version 1.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -70,13 +70,13 @@ simLong <- function(n = 100,
                      N = 5,
                      rho = 0.8,
                      type = c("corCompSym", "corAR1", "corSymm", "iid"),
-                     model = c(1, 2, 3),
+                     model = c(0, 1, 2, 3),
                      phi = 1,
                      q = 0,
                      ...)
 {
   type <- match.arg(type, c("corCompSym", "corAR1", "corSymm", "iid"))
-  model <- as.numeric(match.arg(as.character(model), as.character(1:3)))
+  model <- as.numeric(match.arg(as.character(model), as.character(0:3)))
   dta <- data.frame(do.call("rbind", lapply(1:(n+ntest), function(i) {
     Ni <- round(runif(1, 1, 3 * N))
     type <- match.arg(type, c("corCompSym", "corAR1", "corSymm", "iid"))
@@ -109,6 +109,9 @@ simLong <- function(n = 100,
       x <- c(x, xnoise)
     }
     tm <- sample((1:(3 * N))/N, size = Ni, replace = TRUE)
+    if (model == 0) {
+      y <- 1.5 + 2.5 * x1 - 1.2 * x3 - .6 * x4 + eps
+    }
     if (model == 1) {
       y <- 1.5 + 2.5 * x1 - 1.2 * x3 - .2 * x4 - .65 * tm  * x2   + eps
     }
@@ -124,6 +127,9 @@ simLong <- function(n = 100,
   d <- q + 4
   colnames(dta) <- c(paste("x", 1:d, sep = ""), "time", "id", "y")
   dtaL <- list(features = dta[, 1:d], time = dta$time, id = dta$id, y = dta$y) 
+  if (model == 0) {
+    f.true <- "y ~ x1 + x3 + x4"
+  }
   if (model == 1) {
     f.true <- "y ~ x1 + x3 + x4 + I(time * x2)"
   }

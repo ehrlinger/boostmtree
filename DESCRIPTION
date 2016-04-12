@@ -1,6 +1,6 @@
 Package: boostmtree
-Version: 1.0.0
-Date: 2016-03-17
+Version: 1.1.0
+Date: 2016-04-12
 Title: Boosted Multivariate Trees for Longitudinal Data
 Author: Hemant Ishwaran <hemant.ishwaran@gmail.com>, Amol Pande <amoljpande@gmail.com>
 Maintainer: Udaya B. Kogalur <ubk@kogalur.com>
@@ -10,6 +10,6 @@ Description: Implements Friedman's gradient descent boosting algorithm for longi
 License: GPL (>= 3)
 URL: http://web.ccs.miami.edu/~hishwaran http://www.kogalur.com
 NeedsCompilation: no
-Packaged: 2016-03-17 14:01:58 UTC; kogalur
+Packaged: 2016-04-12 14:09:25 UTC; kogalur
 Repository: CRAN
-Date/Publication: 2016-03-17 18:59:33
+Date/Publication: 2016-04-12 17:01:36

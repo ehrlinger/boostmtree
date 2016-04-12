@@ -12,10 +12,8 @@
  y,
  M,
  importance = TRUE,
- proximity = FALSE,
  verbose = TRUE,
- eps = 1e-4,
- forest.tol = 1e-3,
+ eps = 1e-5,
  ...)
 }
 \arguments{
@@ -37,12 +35,9 @@
   \item{M}{Fixed value for the boosting step number.  Leave this empty 
     to determine the optimized value obtained by minimizing test-set error.}
   \item{importance}{Calculate importance values for the x-variables?}
-  \item{proximity}{Calculate proximity of the test data to the training data?}
   \item{verbose}{Should verbose output be printed?}
-  \item{eps}{Tolerance value used for determing the optimal \code{M}.
+  \item{eps}{Tolerance value used for determining the optimal \code{M}.
     For experts only.}
-  \item{forest.tol}{Tolerance used for forest weighted least squares
-      solution.  Experimental and for experts only.}
   \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
@@ -60,7 +55,14 @@
   
   However, this can create high RAM usage, especially when using
   function \command{partialPlot} which calls the \command{predict}
-  function.  
+  function.
+
+  Note that all performance values (prediction error, variable
+  importance) are standardized by the overall y-standard deviation.
+  Thus, reported RMSE (root-mean-squared-error) is actually standardized
+  RMSE.  Furthermore, variable importance (VIMP) is standardized by
+  RMSE.  Thus, VIMP measures the relative importance of a variable at
+  the optimized boosting iteration. 
 }
 \value{
      An object of class \code{(boostmtree, predict)}, which is a list with the
@@ -78,10 +80,9 @@
        evaluated at the the optimized \code{M}.}
      \item{phi}{Variance parameter at the optimized \code{M}.}
      \item{rho}{Correlation parameter at the optimized \code{M}.}
-     \item{err.rate}{Test set l1-error and RMSE.}
-     \item{mse}{Test set RMSE at the optimized \code{M}.}
-     \item{vimp}{Variable importance values.}
-     \item{proximity}{Proximity matrix.}
+     \item{err.rate}{Test set standardized l1-error and RMSE.}
+     \item{rmse}{Test set standardized RMSE at the optimized \code{M}.}
+     \item{vimp}{RMSE standardized variable importance (VIMP) values.}
      \item{Mopt}{The optimized \code{M}.}
 }
 \author{
@@ -124,25 +125,22 @@ f.linr <- "y~x1+x2+x3+x4+x1*time+x2*time+x3*time+x4*time"
 
 
 ##adaptive rho
-grow.1 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
-             M = 500)
-pred.1 <- predict(grow.1,
-   dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
+o.1 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn], M = 500)
+p.1 <- predict(o.1, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
 ##fixed rho = 0
-grow.2 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
+o.2 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
              M = 500, rho = 0)
-pred.2 <- predict(grow.2,
-   dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
+p.2 <- predict(o.2, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
-##mse values
+##rmse values
 cat("true model        :", boostmtree:::gls.mse(f.true,dta,trn),"\n")
 cat("linear GLS        :", boostmtree:::gls.mse(f.linr,dta,trn),"\n")
-cat("boostmtree        :", pred.1$mse,"\n")
-cat("boostmtree (rho=0):", pred.2$mse,"\n")
+cat("boostmtree        :", p.1$mse,"\n")
+cat("boostmtree (rho=0):", p.2$mse,"\n")
 
 ##predicted value plot
-plot(pred.1)
+plot(p.1)
 }
 }
 \keyword{predict}

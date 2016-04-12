@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.0.0 (_PROJECT_BUILD_ID_)
+####  Version 1.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -91,6 +91,15 @@ print.boostmtree <- function (x, ...)
     else {
       cat("univariate family           :", TRUE, "\n")
     }
+    cat("boosting iterations         :", x$M, "\n")
+    if (!is.null(x$err.rate)) {
+      cat("optimized number iterations :", x$Mopt, "\n")      
+      if (!univariate) {
+        cat("optimized rho               :", round(x$rho[x$Mopt], 4),  "\n")
+        cat("optimized phi               :", round(x$phi[x$Mopt], 4),  "\n")
+      }
+      cat("in-sample cv RMSE           :", round(x$rmse, 4), "\n")
+    }
   }
   else {
     univariate <- length(x$boost.obj$id) == length(unique(x$boost.obj$id))
@@ -111,7 +120,7 @@ print.boostmtree <- function (x, ...)
     else {
       if (!is.null(x$err.rate)) {
         cat("optimized number iterations :", x$Mopt, "\n")
-        cat("test set RMSE               :", round(x$err.rate[x$Mopt, "l2"], 4), "\n")
+        cat("test set RMSE               :", round(x$rmse, 4), "\n")
       }
       cat("univariate family           :", TRUE, "\n")
     }

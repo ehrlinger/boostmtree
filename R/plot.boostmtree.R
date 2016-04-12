@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.0.0 (_PROJECT_BUILD_ID_)
+####  Version 1.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -77,7 +77,7 @@ plot.boostmtree <- function (x, ...)
     M <- x$M
     univariate <- length(x$id) == length(unique(x$id))
     if (!univariate) {
-      if (is.null(x$vimp)) {
+      if (is.null(x$err.rate)) {
         layout(rbind(c(1, 4), c(2, 5), c(3, 6)), widths = c(1, 1))
       }
       else {
@@ -85,43 +85,39 @@ plot.boostmtree <- function (x, ...)
       }
     }
     else {
-      if (!is.null(x$vimp)) {
+      if (!is.null(x$err.rate)) {
         layout(rbind(c(1, 2)), widths = c(1, 1))
       }
     }
     if (!univariate) {
       plot(unlist(x$time), unlist(x$mu), xlab = "time", ylab = "predicted", type = "n")
-      for (i in 1:n) {
-        lines(x$time[[i]], x$mu[[i]], col = "gray", lty = 2)
-      }
+      line.plot(x$time, x$mu)
     }
     if (!univariate) {
-      if (is.null(x$vimp)) {
+      if (is.null(x$err.rate)) {
         plot(unlist(x$time), unlist(x$y) - unlist(x$mu), xlab = "time", ylab = "residual", type = "n")
-        for (i in 1:n) {
-          lines(x$time[[i]], x$y[[i]] - x$mu[[i]], col = "gray", lty = 2)
-        }
+        line.plot(x$time, lapply(1:n, function(i) {x$y[[i]] - x$mu[[i]]}))
         plot(unlist(x$y), unlist(x$mu), xlab = "y", ylab = "predicted", type = "n")
-        for (i in 1:n) {
-          lines(x$y[[i]], x$mu[[i]], col = "gray", lty = 2)
-        }
+        line.plot(x$y, x$mu)
       }
-      else {#vimp
-        vimp <- 100 * x$vimp
-        barplot(vimp, las = 2, ylab = "vimp (%)", cex.names = 1.0)
+      else {#error rate
+        plot(1:M, x$err.rate[, "l2"],
+           xlab = "iteration", 
+           ylab = "In-sample estimated RMSE",
+           type = "l", lty = 1)
+        abline(v = x$Mopt, lty = 2, col = 2, lwd = 2)
       }
     }
     else {
-      if (is.null(x$vimp)) {
-        plot(unlist(x$y), unlist(x$mu), xlab = "y", ylab = "predicted", type = "n")
-        for (i in 1:n) {
-          points(x$y[[i]], x$mu[[i]], pch = 16)
-        }
-        abline(0, 1, col = "gray", lty = 2)
-      }
-      else {#vimp
-        vimp <- 100 * x$vimp
-        barplot(vimp, las = 2, ylab = "vimp (%)", cex.names = 1.0)
+      plot(unlist(x$y), unlist(x$mu), xlab = "y", ylab = "predicted", type = "n")
+      point.plot(x$y, x$mu)
+      abline(0, 1, col = "gray", lty = 2)
+      if (!is.null(x$err.rate)) {
+        plot(1:M, x$err.rate[, "l2"],
+             xlab = "iteration", 
+             ylab = "In-sample estimated RMSE",
+             type = "l", lty = 1)
+        abline(v = x$Mopt, lty = 2, col = 2, lwd = 2)
       }
     }
     if (!univariate) {
@@ -144,9 +140,7 @@ plot.boostmtree <- function (x, ...)
     }
     if (!univariate && is.null(x$err.rate)) {
       plot(unlist(x$time), unlist(x$mu), xlab = "time", ylab = "predicted", type = "n")
-      for (i in 1:length(x$mu)) {
-          lines(x$time[[i]], x$mu[[i]], col = "gray", lty = 2)
-      }
+      line.plot(x$time, x$mu)
     }
     else if (!is.null(x$err.rate)) {
       M <- x$boost.obj$M
@@ -175,9 +169,7 @@ plot.boostmtree <- function (x, ...)
       }
       if (!univariate) {
         plot(unlist(x$time), unlist(x$mu), xlab = "time", ylab = "predicted", type = "n")
-        for (i in 1:length(x$mu)) {
-          lines(x$time[[i]], x$mu[[i]], col = "gray", lty = 2)
-        }
+        line.plot(x$time, x$mu)
         plot(1:M, x$boost.obj$rho, ylim = range(lowess.mod(1:M, x$boost.obj$rho)$y), 
              xlab = "iterations", ylab = expression(rho), type = "n")
         lines(lowess.mod(1:M, x$boost.obj$rho, f = 5/10))

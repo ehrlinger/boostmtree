@@ -22,10 +22,12 @@
    lambda,
    lambda.max = 1e6,
    lambda.iter = 2,
-   importance = FALSE,
    svd.tol = 1e-6,
    forest.tol = 1e-3,
    verbose = TRUE,
+   cv.flag = FALSE,
+   eps = 1e-5,
+   importance = FALSE,
    ...)
 }
 \arguments{
@@ -54,18 +56,22 @@
     \item{lambda.iter}{Number of iterations used to estimate lambda
       (only applies when lambda is not supplied and adaptive smoothing
       is employed).}
-    \item{importance}{Calculate importance values for the x-variables?
-      Currently not implemented (use \command{predict.boostmtree} instead).}
     \item{svd.tol}{Tolerance value used in the SVD calculation of the
       penalty matrix.  For experts only.}
     \item{forest.tol}{Tolerance used for forest weighted least squares
       solution.  Experimental and for experts only.}
     \item{verbose}{Should verbose output be printed?}
+    \item{cv.flag}{Should in-sample cross-validation (CV) be used to determine
+      optimal stopping?}
+     \item{eps}{Tolerance value used for determining the optimal
+       \code{M}. Applies only if \command{cv.flag} = TRUE.  For experts only.}
+    \item{importance}{Should variable importance (VIMP) be determined?  Not currently
+      implemented.}
     \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
   Each individual has observed y-values over possibly different time
-  points, and with possibly differing number of time points.  Given the
+  points and with possibly differing number of time points.  Given the
   observed y-values, the time points, and the x-value for each
   individual, the conditional mean time profile of y is estimated using
   gradient boosting in which the gradient is derived from a criterion
@@ -85,7 +91,7 @@
   out-of-sample data (out-of-bag, OOB) can be used to calculate
   variable importance (VIMP).  This feature will be implemented in
   future releases.
-
+  
    The package implements R-side parallel processing by replacing
   the R function \command{lapply} with \command{mclapply} found in the
   \pkg{parallel} package.  You can set the number of cores accessed by
@@ -103,6 +109,13 @@
   However, be cautious when setting \command{mc.cores}.  This can create
   not only high CPU usage but also high RAM usage, especially when using
   functions \command{partialPlot} and \command{predict}.
+
+  Finally note that \code{cv.flag} can be used for an in-sample
+  cross-validated estimate of prediction error.  This is used to
+  determine the optimized number of boosting iterations \emph{Mopt}.
+  The final mu predictor is evaluated at this value and is
+  cross-validated.  The prediction error returned via \command{err.rate}
+  is standardized by the overall standard deviation of y.
 }
 \value{
      An object of class \code{(boostmtree, grow)} with the following
@@ -120,11 +133,12 @@
      \item{ysd}{Overall standard deviation of y-values for all individuals.}
      \item{gamma}{List of length \emph{M}, with each component
        containing the boosted tree fitted values.}
-     \item{beta}{Matrix of estimated coefficient values for each
-       individual.}
      \item{mu}{List with each component containing the estimated mean
        values for an individual.  That is, each component contains the
-       estimated time-profile for an individual.}
+       estimated time-profile for an individual.  When in-sample
+       cross-validation is requested using \command{cv.flag}=TRUE, the
+       estimated mean is cross-validated and evaluated at the optimal
+       number of iterations \code{Mopt}.}
      \item{lambda}{Smoothing parameter.}
      \item{phi}{Variance parameter.}
      \item{rho}{Correlation parameter.}
@@ -132,7 +146,6 @@
      \item{membership}{List of length \emph{M}, with each component
        containing the terminal node membership for a given boosting
        iteration.}
-     \item{vimp}{Variable importance (relative RMSE).  Not currently implemented}
      \item{D}{Design matrix for time.}
      \item{d}{Degree of the piecewise B-spline polynomial.}
      \item{pen.ord}{Penalization difference order.}
@@ -140,6 +153,11 @@
      \item{M}{Number of boosting iterations.}
      \item{nu}{Boosting regularization parameter.}
      \item{ntree}{Number of trees.}
+     \item{err.rate}{In-sample standardized estimate of l1-error and RMSE.}
+     \item{rmse}{In-sample standardized RMSE at optimized \code{M}.}
+     \item{Mopt}{The optimized \code{M}.}	  
+     \item{vimp}{Variable importance.  Not currently implemented.}
+     \item{forest.tol}{Forest tolerance value (needed for prediction).}
 }
 \author{
   Hemant Ishwaran, Pande A. and Udaya B. Kogalur
@@ -165,12 +183,12 @@
 \examples{
 ##------------------------------------------------------------
 ## Synthetic example
-## high correlation, quadratic time with quadratic interaction
+## 0.8 correlation, quadratic time with quadratic interaction
 ##-------------------------------------------------------------
-#simulate the data
+#simulate the data (use a small sample size for illustration)
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2)$dtaL
 
-#basic boosting call (M is set to a small value here purely for illustration)
+#basic boosting call (M set to a small value only for illustration)
 boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, M = 20)
 
 #print results
@@ -180,6 +198,16 @@ print(boost.grow)
 plot(boost.grow)
 
 \dontrun{
+##------------------------------------------------------------
+## Same synthetic example as above but with in-sample cross-validation
+## estimate for RMSE
+##-------------------------------------------------------------
+dta <- simLong(n = 100, N = 5, rho =.80, model = 2)$dtaL
+boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
+                        M = 500, nu = 0.1, cv.flag = TRUE)
+plot(boost.cv.grow)
+print(boost.cv.grow)
+
 ##----------------------------------------------------------------------------
 ## spirometry data
 ##----------------------------------------------------------------------------

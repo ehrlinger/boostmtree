@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.0.0 (_PROJECT_BUILD_ID_)
+####  Version 1.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -78,10 +78,12 @@ boostmtree <- function(x,
                        lambda,
                        lambda.max = 1e6,
                        lambda.iter = 2,
-                       importance = FALSE,
                        svd.tol = 1e-6,
                        forest.tol = 1e-3,
                        verbose = TRUE,
+                       cv.flag = FALSE,
+                       eps = 1e-5,
+                       importance = FALSE,
                        ...)
 {
   univariate <- FALSE
@@ -91,6 +93,9 @@ boostmtree <- function(x,
     univariate <- TRUE
     tm <- rep(0, n)
     d <- -1
+  }
+  if (univariate) {
+    lambda.vec <- phi.vec <- rho.vec <- NULL
   }
   user.option <- list(...)
   if (any(is.na(id)) || any(is.na(y)) || any(is.na(x)) || any(is.na(tm))) {
@@ -159,18 +164,15 @@ boostmtree <- function(x,
       lambda <- 0
     }
   }
-  importance <- FALSE
-  vimpFlag <- bootstrap == "by.root" && importance && ntree == 1
-  vimp <- NULL
   if (ntree > 1) {
-    learnerUsed <- "mforest"
+    learnerUsed <- "mforest learner"
   }
   else {
     if (df.D == 1) {
-      learnerUsed <- "mtree"
+      learnerUsed <- "mtree learner"
     }
     else {
-      learnerUsed <- "mtree-Pspline"
+      learnerUsed <- "mtree-Pspline learner"
     }
   }
   lambda.est.flag <- FALSE
@@ -193,11 +195,6 @@ boostmtree <- function(x,
     }
   }
   mu <- lapply(1:n, function(i) {rep(0, ni[i])})
-  beta <- matrix(0, n, df.D)
-  if (vimpFlag) {
-    vimp <- matrix(0, M, p)
-    colnames(vimp) <- xvar.names
-  }
   if (ntree == 1) {
     baselearner <- membership.list <- gamma.list <- vector("list", length = M)
   }
@@ -205,7 +202,9 @@ boostmtree <- function(x,
    membership.list <- gamma.list <- NULL
    baselearner <- vector("list", length = M)
   }
-  lambda.vec <- phi.vec <- rho.vec <- rep(0, M)
+  if (!univariate) {
+    lambda.vec <- phi.vec <- rho.vec <- rep(0, M)
+  }
   lambda.initial <- var(unlist(Y), na.rm = TRUE)
   rho.fit.flag <- is.hidden.rho(user.option)
   if (rho.fit.flag == TRUE) {
@@ -220,10 +219,46 @@ boostmtree <- function(x,
   }
   sigma <- phi <- 1
   if (!lambda.est.flag) {
-    sigma <- lambda * (1 - rho)
+    sigma <- sigma.robust(lambda, rho)
   }
   Y.names <- paste("Y", 1:df.D, sep = "")
   rfsrc.f <- as.formula(paste("Multivar(", paste(Y.names, collapse = ","), paste(") ~ ."), sep = ""))
+  cv.flag <- cv.flag && (ntree == 1)
+  cv.lambda <- cv.flag && is.hidden.CVlambda(user.option) && lambda.est.flag
+  cv.rho <- cv.flag && is.hidden.CVrho(user.option) && rho.fit.flag 
+  vimp.flag <- importance && cv.flag
+  vimp.flag <- FALSE
+  if (cv.flag) {
+    mu.cv.list <- vector("list", M)
+    mu.cv <- lapply(1:n, function(i) {rep(0, ni[i])})
+    mu.i <- lapply(1:n, function(i) {
+      lapply(1:n, function(j) {rep(0, ni[j])})
+    })
+    err.rate <- matrix(NA, M, 2)
+    colnames(err.rate) <- c("l1", "l2")
+    Ymean.i <- sapply(1:n, function(i) {
+      mean(unlist(Yorg[-i]), na.rm = TRUE) 
+    })
+    Ysd.i <- sapply(1:n, function(i) {
+      sd.i <- sd(unlist(Yorg[-i]), na.rm = TRUE)
+      if (sd.i < 1e-6) {
+        1
+      }
+      else {
+        sd.i
+      }
+    })
+    if (vimp.flag) {
+      vimp <- matrix(0, M, p)
+      colnames(vimp) <- xvar.names
+    }
+    else {
+      vimp <- NULL
+    }
+  }
+  else {
+    err.rate <- rmse <- Mopt <- vimp <- NULL
+  }
   if (verbose) cat("  implementing multivariate boosting...\n")
   for (m in 1:M) {
     if (verbose) {
@@ -267,7 +302,7 @@ boostmtree <- function(x,
       membership <- as.numeric(factor(membership))
       ptn.id <- unique(membership)
       Kmax <-  length(ptn.id)
-      if (vimpFlag) {
+      if (vimp.flag) {
         oob <- which(rfsrc.obj$inbag == 0)
         n.oob <- length(oob)
         Xnoise <- do.call(rbind, lapply(1:p, function(k) {
@@ -293,7 +328,12 @@ boostmtree <- function(x,
           else {
             R.inv.sqrt <- cbind(1)
           }
-          Ynew <- R.inv.sqrt %*% (Y[[i]] - mu[[i]])
+          if (cv.lambda) {
+            Ynew <- R.inv.sqrt %*% (Y[[i]] - mu.cv[[i]])
+          }
+          else {
+            Ynew <- R.inv.sqrt %*% (Y[[i]] - mu[[i]])
+          }
           Xnew <- R.inv.sqrt %*% D[[i]][, 1, drop = FALSE]
           Znew <- R.inv.sqrt %*% D[[i]][, -1, drop = FALSE] %*% pen.inv.sqrt.matx
           list(Ynew = Ynew, Xnew = Xnew, Znew = Znew)
@@ -326,7 +366,7 @@ boostmtree <- function(x,
           lambda.hat <- min(lambda.hat, lambda.max)
         }
         lambda <- lambda.hat 
-        sigma <- lambda * (1 - rho) 
+        sigma <- sigma.robust(lambda, rho) 
       }
       Xnew <- mclapply(1:n, function(i) {
         rmi <- rho.inv(ni[i], rho)
@@ -351,32 +391,63 @@ boostmtree <- function(x,
           rep(0, df.D)
         }
       })
-      gamma.matx <- matrix(0, Kmax, df.D+1)
+      gamma.matx <- matrix(0, Kmax, df.D + 1)
       gamma.matx[, 1] <- sort(unique(membership.org))
       gamma.matx[, 2:(df.D+1)] <- matrix(unlist(gamma), ncol = df.D, byrow = TRUE)
       gamma.list[[m]] <- gamma.matx
-      beta.update <- matrix(unlist(lapply(1:n, function(i) {
-        gamma[[membership[i]]]})), nrow = df.D)
-      beta.old <- beta
-      beta <- beta.old + t(beta.update * nu.vec)
-      mu.old <- mu
-      mu <- lapply(1:n, function(i) {D[[i]] %*% beta[i, ]})
-      if (vimpFlag) {
-        beta.std <- beta[oob,, drop = FALSE] * Ysd
-        beta.std[, 1] <- beta.std[, 1] + Ymean
-        err.oob <- l2Dist(Yorg[oob], lapply(1:n.oob, function(i) {D[[oob[i]]] %*% beta.std[i, ]}))
-        beta.update.vimp <- lapply(1:p, function(k) {
-          membership.k <- membershipNoise[((k-1) * n.oob + 1):(k * n.oob)]
-          matrix(unlist(lapply(1:n.oob, function(i) {
-            gamma[[membership.k[i]]]})), nrow = df.D)
+      bhat <- t(matrix(unlist(lapply(1:n, function(i) {
+        gamma[[membership[i]]]})), nrow = df.D) * nu.vec)
+      mu <- lapply(1:n, function(i) {mu[[i]] + D[[i]] %*% bhat[i, ]})
+      if (cv.flag) {
+        mu.i <- lapply(1:n,function(i) {
+          mem.i <- membership[i]  
+          mu.ij <- mu.i[[i]]
+          grad.i <- t(matrix(unlist(lapply(1:n, function(i) {
+            rmi <- rho.inv(ni[i], rho)
+            cmi <- rmi * sum(Y[[i]] - mu.ij[[i]], na.rm = TRUE)
+            t(D[[i]]) %*% (Y[[i]] - mu.ij[[i]] - cbind(rep(cmi, ni[i])))
+          })), nrow = df.D))
+          gamma.i <- lapply(1:Kmax, function(k) {
+            pt.k <- (membership == k)
+            YnewSum <- colSums(grad.i[pt.k, , drop = FALSE])
+            XnewSum <- Reduce("+", lapply(which(pt.k), function(j) {Xnew[[j]]}))
+            if (is.null(XnewSum)) {
+              XnewSum <- matrix(0,df.D,df.D)
+            }
+            else {
+              XnewSum <- XnewSum
+            }
+            if (k == mem.i){
+              XnewSum <- XnewSum - Xnew[[i]]
+              YnewSum <- YnewSum - grad.i[i, ]
+            }
+            else {
+              XnewSum <- XnewSum
+              YnewSum <- YnewSum
+            }
+            XnewSum <- XnewSum + sigma * pen.lsq.matx
+            qr.obj <- tryCatch({qr.solve(XnewSum, YnewSum)}, error = function(ex){NULL})
+            if (!is.null(qr.obj)) {
+              qr.obj
+            }
+            else {
+              rep(0, df.D)
+            }
+          })
+          gamma.matx.i <- matrix(0, Kmax, df.D + 1)
+          gamma.matx.i[, 1] <- 1:Kmax
+          gamma.matx.i[, 2:(df.D+1)] <- matrix(unlist(gamma.i), ncol = df.D, byrow = TRUE)
+          lapply(1:n,function(j) {
+            which.j <- which(gamma.matx.i[, 1] == membership[j])
+            mu.i[[i]][[j]] + c(D[[j]] %*% (gamma.matx.i[which.j, -1] * nu.vec))
+          })
         })
-        err.vimp <- sapply(1:p, function(k) {
-          beta.vimp.k <- beta.old[oob,, drop = FALSE] + t(beta.update.vimp[[k]] * nu.vec)
-          beta.vimp.k <- beta.vimp.k * Ysd
-          beta.vimp.k[, 1] <- beta.vimp.k[, 1] + Ymean
-          l2Dist(Yorg[oob], lapply(1:n.oob, function(i) {D[[oob[i]]] %*% beta.vimp.k[i, ]}))
-        })
-        vimp[m, ] <- 100 * (err.vimp - err.oob) / Ysd
+        mu.cv <- lapply(1:n,function(i){mu.i[[i]][[i]]})
+        mu.cv.list[[m]] <- mu.cv
+        mu.cv.org <- lapply(1:n,function(i){mu.cv[[i]] * Ysd.i[i] + Ymean.i[i]})
+        err.rate[m, ] <- c(l1Dist(Yorg, mu.cv.org), l2Dist(Yorg, mu.cv.org))
+        if (vimp.flag) {
+        }
       }
     }
     else{
@@ -407,18 +478,26 @@ boostmtree <- function(x,
           rep(0, df.D)
         }
       }))
-      beta <- beta + t(bhat * nu.vec)
-      mu <- lapply(1:n, function(i) {D[[i]] %*% beta[i, ]})
+      bhat <- t(bhat * nu.vec)
+      mu <- lapply(1:n, function(i) {mu[[i]] + D[[i]] %*% bhat[i, ]})
       baselearner[[m]] <- c(baselearner[[m]],
                             list(gm = gm),
                             list(Xnew = Xnew),
                             list(pen = sigma * pen.lsq.matx))
     }
     if (!univariate) {
-      resid.data <- data.frame(y  = unlist(lapply(1:n, function(i) {Y[[i]] - mu[[i]]})),
-                               x,
-                               tm = unlist(lapply(1:n, function(i) {tm[id == id.unq[i]]})),
-                               id = unlist(lapply(1:n, function(i) {rep(id.unq[i], ni[i])})))
+      if (cv.rho) {
+        resid.data <- data.frame(y  = unlist(lapply(1:n, function(i) {Y[[i]] - mu.cv[[i]]})),
+                                 x,
+                                 tm = unlist(lapply(1:n, function(i) {tm[id == id.unq[i]]})),
+                                 id = unlist(lapply(1:n, function(i) {rep(id.unq[i], ni[i])})))
+      }
+      else {
+        resid.data <- data.frame(y  = unlist(lapply(1:n, function(i) {Y[[i]] - mu[[i]]})),
+                                 x,
+                                 tm = unlist(lapply(1:n, function(i) {tm[id == id.unq[i]]})),
+                                 id = unlist(lapply(1:n, function(i) {rep(id.unq[i], ni[i])})))
+      }
       gls.obj <- tryCatch({gls(y ~ ., data = resid.data,
                                correlation = corCompSymm(form = ~ 1 | id))},
                           error = function(ex){NULL})
@@ -440,17 +519,35 @@ boostmtree <- function(x,
         cat("phi   :", phi.vec[m], "\n")
         cat("rho   :", rho.vec[m], "\n")
       }
-      sigma <- lambda * (1 - rho) 
+      sigma <- sigma.robust(lambda, rho)
       lambda.vec[m] <- lambda
       if (verbose) {
         cat("lambda:", lambda.vec[m], "\n")
+        if (cv.flag) {
+          cat("rmse  :", err.rate[m, 2] / Ysd, "\n")
+        }
+      }
+    }
+    else {
+      if (verbose && cv.flag) {
+        cat("rmse  :", err.rate[m, 2] / Ysd, "\n")
       }
     }
   }
-  beta <- beta * Ysd
-  beta[, 1] <- beta[, 1] + Ymean
   mu <- lapply(1:n, function(i) {c(mu[[i]] * Ysd + Ymean)})
   y <- lapply(1:n, function(i) {y[id == id.unq[i]]})
+  if (cv.flag) {
+    diff.err <- abs(err.rate[, "l2"] - min(err.rate[, "l2"], na.rm = TRUE))
+    diff.err[is.na(diff.err)] <- 1
+      if (sum(diff.err < Ysd * eps) > 0) {
+        Mopt <- min(which(diff.err < eps))
+      }
+      else {
+        Mopt <- M
+      }
+    rmse <- err.rate[Mopt, "l2"]
+    mu <- lapply(1:n,function(i){mu.cv.list[[Mopt]][[i]] * Ysd.i[i] + Ymean.i[i]})
+  }
   obj <- list(x = X,
               xvar.names = xvar.names,
               time = lapply(1:n, function(i) {tm[id == id.unq[i]]}),
@@ -459,21 +556,24 @@ boostmtree <- function(x,
               ymean = Ymean,
               ysd = Ysd,
               gamma = gamma.list,
-              beta = beta,
               mu = mu,
               lambda = lambda.vec,
               phi = phi.vec,
               rho = rho.vec,
               baselearner = baselearner,
               membership = membership.list,
-              vimp = if (!is.null(vimp)) colSums(vimp, na.rm = TRUE) else NULL,
               D = X.tm,
               d = d,
               pen.ord = pen.ord,
               K = K,
               M = M,
               nu = nu,
-              ntree = ntree)
+              ntree = ntree,
+              err.rate = if (!is.null(err.rate)) err.rate / Ysd else NULL,
+              rmse = if (!is.null(rmse)) rmse / Ysd else NULL,
+              Mopt = Mopt,
+              vimp = if (!is.null(vimp)) colSums(vimp, na.rm = TRUE) else NULL,
+              forest.tol = forest.tol)
   class(obj) <- c("boostmtree", "grow", learnerUsed)
   invisible(obj)
 }

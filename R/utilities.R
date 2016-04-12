@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.0.0 (_PROJECT_BUILD_ID_)
+####  Version 1.1.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -141,6 +141,22 @@ is.hidden.bootstrap <-  function (user.option) {
     as.character(user.option$bootstrap)
   }
 }
+is.hidden.CVlambda <-  function (user.option) {
+  if (is.null(user.option$CVlambda)) {
+    FALSE
+  }
+  else {
+    user.option$CVlambda
+  }
+}
+is.hidden.CVrho <-  function (user.option) {
+  if (is.null(user.option$CVrho)) {
+    TRUE
+  }
+  else {
+    user.option$CVrho
+  }
+}
 is.hidden.ntree <-  function (user.option) {
   if (is.null(user.option$ntree)) {
     1
@@ -180,6 +196,13 @@ l2Dist <- function(y1, y2) {
   sqrt(mean(unlist(lapply(1:length(y1), function(i) {
     mean((unlist(y1[[i]]) - unlist(y2[[i]]))^2, na.rm = TRUE)
   })), na.rm = TRUE))
+}
+line.plot <- function(x, y, ...) {
+#  n <- length(x)
+#  o <- lapply(1:n, function(i) {
+#    lines(x[[i]], y[[i]], col = "gray", lty = 2)
+#  })
+  mapply(lines, x, y = y, col = "gray", lty = 2)
 }
 lowess.mod <- function(x, y, ...) {
   na.pt <- is.na(x) | is.na(y)
@@ -285,6 +308,13 @@ plot.profile.prx <- function(obj, col = NULL, rnd.case = NULL, cut = .95, restri
   legend("bottomleft", bty = "n", legend = c(paste("avg prx.", format(mean(rnd.prx, na.rm = TRUE), digits=3))))
   invisible(obj$boost.obj$x[rnd.match,, drop = FALSE])
 }
+point.plot <- function(x, y, ...) {
+#  n <- length(x)
+#  o <- lapply(1:n, function(i) {
+#    points(x[[i]], y[[i]], pch = 16)
+#  })
+  mapply(points, x, y = y, pch = 16)
+}
 rho.inv <- function(ni, rho, tol = 1e-2) {
   m <- ni - 1
   if (m == 0) {
@@ -309,4 +339,7 @@ rho.inv.sqrt <- function(ni, rho, tol = 1e-2) {
     ri <- rho / (1 + m * rho)
     as.numeric(Re(polyroot(c(ri, -2, ni))))[1]
   }
+}
+sigma.robust <- function(lambda, rho) {
+  lambda
 }
