@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.1.0 (_PROJECT_BUILD_ID_)
+####  Version 1.2.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -73,18 +73,16 @@ predict.boostmtree <-
            y,
            M,
            importance = TRUE,
-           verbose = TRUE,
            eps = 1e-5,
            ...)
 {
   result.predict <- generic.predict.boostmtree(object = object,
-                                               x = x,
-                                               tm = tm,
-                                               id = id,
-                                               y = y,
-                                               M = M,
+                                               x,
+                                               tm,
+                                               id,
+                                               y,
+                                               M,
                                                importance = importance,
-                                               verbose = verbose,
                                                eps = eps,
                                                ...)
   return(result.predict)

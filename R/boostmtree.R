@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.1.0 (_PROJECT_BUILD_ID_)
+####  Version 1.2.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -84,9 +84,13 @@ boostmtree <- function(x,
                        cv.flag = FALSE,
                        eps = 1e-5,
                        importance = FALSE,
+                       mod.grad = TRUE,
                        ...)
 {
   univariate <- FALSE
+  if (missing(tm)) {
+    id <- 1:nrow(x)
+  }
   id.unq <- sort(unique(id))
   n <- length(id.unq)
   if (length(id.unq) == length(id)) {
@@ -95,6 +99,8 @@ boostmtree <- function(x,
     d <- -1
   }
   if (univariate) {
+    mod.grad <- FALSE
+    rho <- 0
     lambda.vec <- phi.vec <- rho.vec <- NULL
   }
   user.option <- list(...)
@@ -157,7 +163,7 @@ boostmtree <- function(x,
     mtry <- df.D + p
   }
   else {
-    nodedepth <- max(0, log(max(0, K - 1), base = 2))
+    nodedepth <- max(0, log(max(0, K), base = 2))
     nodesize <- 1
     mtry <- NULL
     if (missing(lambda) || lambda < 0) {
@@ -165,11 +171,16 @@ boostmtree <- function(x,
     }
   }
   if (ntree > 1) {
-    learnerUsed <- "mforest learner"
+    if (univariate) {
+      learnerUsed <- "forest learner"
+    }
+    else {
+      learnerUsed <- "mforest learner"
+    }
   }
   else {
     if (df.D == 1) {
-      learnerUsed <- "mtree learner"
+      learnerUsed <- "tree learner"
     }
     else {
       learnerUsed <- "mtree-Pspline learner"
@@ -206,16 +217,15 @@ boostmtree <- function(x,
     lambda.vec <- phi.vec <- rho.vec <- rep(0, M)
   }
   lambda.initial <- var(unlist(Y), na.rm = TRUE)
-  rho.fit.flag <- is.hidden.rho(user.option)
-  if (rho.fit.flag == TRUE) {
-    rho <- 0
+  rho.fit.flag <- TRUE
+  rho.tree.grad <- 0
+  rho.hide <- is.hidden.rho(user.option)
+  if (!is.null(rho.hide) && (rho.hide >= 0 && rho.hide < 1)) {
+    rho.fit.flag <- FALSE
+    rho <- rho.hide
   }
   else {
-    rho <- rho.fit.flag
-    rho.fit.flag <- FALSE
-    if (rho < 0 || rho > 1) {
-      stop("user specified rho is not valid:", rho)
-    }
+    rho <- 0
   }
   sigma <- phi <- 1
   if (!lambda.est.flag) {
@@ -224,8 +234,8 @@ boostmtree <- function(x,
   Y.names <- paste("Y", 1:df.D, sep = "")
   rfsrc.f <- as.formula(paste("Multivar(", paste(Y.names, collapse = ","), paste(") ~ ."), sep = ""))
   cv.flag <- cv.flag && (ntree == 1)
-  cv.lambda <- cv.flag && is.hidden.CVlambda(user.option) && lambda.est.flag
-  cv.rho <- cv.flag && is.hidden.CVrho(user.option) && rho.fit.flag 
+  cv.lambda.flag <- cv.flag && is.hidden.CVlambda(user.option) && lambda.est.flag
+  cv.rho.flag <- cv.flag && is.hidden.CVrho(user.option) && rho.fit.flag
   vimp.flag <- importance && cv.flag
   vimp.flag <- FALSE
   if (cv.flag) {
@@ -259,17 +269,30 @@ boostmtree <- function(x,
   else {
     err.rate <- rmse <- Mopt <- vimp <- NULL
   }
-  if (verbose) cat("  implementing multivariate boosting...\n")
+  if (verbose) pb <- txtProgressBar(min = 0, max = M, style = 3)
   for (m in 1:M) {
-    if (verbose) {
-      cat("\t-- iteration:", m, "\n")
+    if (verbose) setTxtProgressBar(pb, m)
+    if (verbose && m == M) cat("\n")
+    if (mod.grad == FALSE) {
+      gm <- gm.mod <- t(matrix(unlist(lapply(1:n, function(i) {
+        rmi <- rho.inv(ni[i], rho)
+        cmi <- rmi * sum(Y[[i]] - mu[[i]], na.rm = TRUE)
+        t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
+      })), nrow = df.D))
     }
-    gm <- t(matrix(unlist(lapply(1:n, function(i) {
-      rmi <- rho.inv(ni[i], rho)
-      cmi <- rmi * sum(Y[[i]] - mu[[i]], na.rm = TRUE)
-      t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
-    })), nrow = df.D))
-    incoming.data <- cbind(gm, X)
+    else {
+      gm.mod <- t(matrix(unlist(lapply(1:n, function(i) {
+        rmi <- rho.inv(ni[i], rho.tree.grad)
+        cmi <- rmi * sum(Y[[i]] - mu[[i]], na.rm = TRUE)
+        t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
+      })), nrow = df.D))
+      gm <- t(matrix(unlist(lapply(1:n, function(i) {
+        rmi <- rho.inv(ni[i], rho)
+        cmi <- rmi * sum(Y[[i]] - mu[[i]], na.rm = TRUE)
+        t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
+      })), nrow = df.D))
+    }
+    incoming.data <- cbind(gm.mod, X)
     names(incoming.data) = c(Y.names, names(X))
     if (ntree > 1) {
       rfsrc.obj <- rfsrc(rfsrc.f,
@@ -280,7 +303,8 @@ boostmtree <- function(x,
                          importance = "none",
                          bootstrap = bootstrap,
                          ntree = ntree,
-                         forest.wt = TRUE)
+                         forest.wt = TRUE, 
+                         memebership = TRUE)
       Kmax <- max(rfsrc.obj$leaf.count, na.rm = TRUE)
       baselearner[[m]] <- list(forest = rfsrc.obj)
     }
@@ -291,7 +315,8 @@ boostmtree <- function(x,
                          mtry = mtry,
                          nodesize = nodesize,
                          importance = "none",
-                         bootstrap = bootstrap)
+                         bootstrap = bootstrap,
+                         membership = TRUE)
       baselearner[[m]] <- rfsrc.obj
       result.pred <- predict.rfsrc(rfsrc.obj,
                                    membership = TRUE,
@@ -328,7 +353,7 @@ boostmtree <- function(x,
           else {
             R.inv.sqrt <- cbind(1)
           }
-          if (cv.lambda) {
+          if (cv.lambda.flag) {
             Ynew <- R.inv.sqrt %*% (Y[[i]] - mu.cv[[i]])
           }
           else {
@@ -485,8 +510,8 @@ boostmtree <- function(x,
                             list(Xnew = Xnew),
                             list(pen = sigma * pen.lsq.matx))
     }
-    if (!univariate) {
-      if (cv.rho) {
+    if (!univariate && rho.fit.flag) {
+      if (cv.rho.flag) {
         resid.data <- data.frame(y  = unlist(lapply(1:n, function(i) {Y[[i]] - mu.cv[[i]]})),
                                  x,
                                  tm = unlist(lapply(1:n, function(i) {tm[id == id.unq[i]]})),
@@ -508,30 +533,17 @@ boostmtree <- function(x,
       }
       if (!is.null(gls.obj)) {
         phi <- gls.obj$sigma^2
-        if (rho.fit.flag) {
-          rho <- as.numeric(coef(gls.obj$modelStruct$corStruc, unconstrained = FALSE))
-          rho <- max(min(0.999, rho, na.rm = TRUE), -0.999)
-        }
-      }
-      phi.vec[m] <- phi * Ysd ^ 2
-      rho.vec[m] <- rho
-      if (verbose) {
-        cat("phi   :", phi.vec[m], "\n")
-        cat("rho   :", rho.vec[m], "\n")
-      }
-      sigma <- sigma.robust(lambda, rho)
-      lambda.vec[m] <- lambda
-      if (verbose) {
-        cat("lambda:", lambda.vec[m], "\n")
-        if (cv.flag) {
-          cat("rmse  :", err.rate[m, 2] / Ysd, "\n")
-        }
+        rho <- as.numeric(coef(gls.obj$modelStruct$corStruc, unconstrained = FALSE))
+        rho <- max(min(0.999, rho, na.rm = TRUE), -0.999)
       }
     }
-    else {
-      if (verbose && cv.flag) {
-        cat("rmse  :", err.rate[m, 2] / Ysd, "\n")
-      }
+    if (!univariate) {
+      phi.vec[m] <- phi * Ysd ^ 2
+      rho.vec[m] <- rho
+    }
+    if (!univariate) {
+      sigma <- sigma.robust(lambda, rho)
+      lambda.vec[m] <- lambda
     }
   }
   mu <- lapply(1:n, function(i) {c(mu[[i]] * Ysd + Ymean)})

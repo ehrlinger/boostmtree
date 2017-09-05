@@ -36,7 +36,7 @@
     \item \emph{\code{model=3}:} Quadratic time-quadratic two-way
     covariate interaction.
   }
-  For details see Pande et al. (2016).
+  For details see Pande et al. (2017).
 }
 \value{
   An invisible list with the following components:
@@ -51,8 +51,8 @@
 }
 \references{
   Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
-  Blackstone E.H., Ishwaran H. (2016).  Boosted multivariate trees for
-  longitudinal data.
+  Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
+  longitudinal data, \emph{Machine Learning}, 106(2): 277--305. 
 }
 \examples{
 \dontrun{

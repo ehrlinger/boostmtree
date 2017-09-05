@@ -3,9 +3,9 @@
 \alias{boostmtree}
 \title{Boosted multivariate trees for longitudinal data}
 \description{
-  Multivariate extension of Friedman's (2001) gradient descent boosting
-  method to longitudinal data using multivariate tree base
-  learners.  Covariate-time interactions are modeled using penalized
+  Multivariate extension of Friedman's gradient descent boosting method
+  to longitudinal data using multivariate tree base learners (Pande et
+  al., 2017).  Covariate-time interactions are modeled using penalized
   B-splines (P-splines) with estimated adaptive smoothing parameter.
 }
 \usage{
@@ -28,6 +28,7 @@
    cv.flag = FALSE,
    eps = 1e-5,
    importance = FALSE,
+   mod.grad = TRUE,
    ...)
 }
 \arguments{
@@ -67,22 +68,39 @@
        \code{M}. Applies only if \command{cv.flag} = TRUE.  For experts only.}
     \item{importance}{Should variable importance (VIMP) be determined?  Not currently
       implemented.}
+    \item{mod.grad}{Use a modified gradient? See details below.}
     \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
-  Each individual has observed y-values over possibly different time
-  points and with possibly differing number of time points.  Given the
-  observed y-values, the time points, and the x-value for each
-  individual, the conditional mean time profile of y is estimated using
-  gradient boosting in which the gradient is derived from a criterion
-  function involving a working variance matrix for y specified as an
-  equicorrelation matrix with parameter \emph{rho} multiplied by a
-  variance parameter \emph{phi}.  Multivariate trees are used for the
-  base learner and weighted least squares are used to approximate the
-  matching pursuit optimization.  A mixed-model formulation is used to
-  estimate the smoothing parameter associated with the B-splines used
-  for the time-interaction effect, although the user can manually set
-  the smoothing parameter as well.
+  
+  Each individual has observed y-values, over possibly different time
+  points, with possibly differing number of time points.  Given y, the
+  time points, and x, the conditional mean time profile of y is
+  estimated using gradient boosting in which the gradient is derived
+  from a criterion function involving a working variance matrix for y
+  specified as an equicorrelation matrix with parameter \emph{rho}
+  multiplied by a variance parameter \emph{phi}. Multivariate trees are
+  used for base learners and weighted least squares is used for solving
+  the terminal node optimization problem.  This provides solutions to
+  the core parameters of the algorithm.  For ancillary parameters, a
+  mixed-model formulation is used to estimate the smoothing parameter
+  associated with the B-splines used for the time-interaction effect,
+  although the user can manually set the smoothing parameter as well.
+  Ancillary parameters \emph{rho} and \emph{phi} are estimated using GLS
+  (generalized least squares).
+
+  In the original boostmtree algorithm (Pande et al., 2017), the
+  equicorrelation parameter \emph{rho} is used in two places in the
+  algorithm: (1) for growing trees using the gradient, which depends
+  upon \emph{rho}; and (2) for solving the terminal node optimization
+  problem which also uses the gradient.  However, Pande (2017) observed
+  that setting \emph{rho} to zero in the gradient used for growing trees
+  improved performance of the algorithm, especially in high dimensions.
+  For this reason the default setting used in this algorithm is to set
+  \emph{rho} to zero in the gradient for (1).  The \code{rho} in the
+  gradient for (2) is not touched.  The option \code{mod.grad} specifies
+  whether a modified gradient is used in the tree growing process and is
+  TRUE by default.
 
   By default, trees are grown from a bootstrap sample of the data --
   thus the boosting method employed here is a modified example of
@@ -115,7 +133,7 @@
   determine the optimized number of boosting iterations \emph{Mopt}.
   The final mu predictor is evaluated at this value and is
   cross-validated.  The prediction error returned via \command{err.rate}
-  is standardized by the overall standard deviation of y.
+  is standardized by the overall standard deviation of y.  
 }
 \value{
      An object of class \code{(boostmtree, grow)} with the following
@@ -170,8 +188,11 @@
   \emph{Comp. Statist. Data Anal.}, 38(4):367--378.
 
   Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
-  Blackstone E.H., Ishwaran H. (2016).  Boosted multivariate trees for
-  longitudinal data.
+  Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
+  longitudinal data, \emph{Machine Learning}, 106(2): 277--305. 
+
+  Pande A. (2017).  \emph{Boosting for longitudinal data}.  Ph.D. Dissertation,
+  Miller School of Medicine, University of Miami.
 }
 \seealso{
   \command{\link{partialPlot}},
@@ -182,13 +203,13 @@
 }
 \examples{
 ##------------------------------------------------------------
-## Synthetic example
+## synthetic example
 ## 0.8 correlation, quadratic time with quadratic interaction
 ##-------------------------------------------------------------
 #simulate the data (use a small sample size for illustration)
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2)$dtaL
 
-#basic boosting call (M set to a small value only for illustration)
+#basic boosting call (M set to a small value for illustration)
 boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, M = 20)
 
 #print results
@@ -199,12 +220,12 @@ plot(boost.grow)
 
 \dontrun{
 ##------------------------------------------------------------
-## Same synthetic example as above but with in-sample cross-validation
+## same synthetic example as above but with in-sample cross-validation
 ## estimate for RMSE
 ##-------------------------------------------------------------
 dta <- simLong(n = 100, N = 5, rho =.80, model = 2)$dtaL
 boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-                        M = 500, nu = 0.1, cv.flag = TRUE)
+                        M = 150, nu = 0.1, cv.flag = TRUE)
 plot(boost.cv.grow)
 print(boost.cv.grow)
 
@@ -217,7 +238,27 @@ data(spirometry, package = "boostmtree")
 spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spirometry$y,
                         M = 100, nu = .025, nknots = 15)
 plot(spr.obj)
+
+
+##----------------------------------------------------------------------------
+## sneaky way to use boostmtree for (univariate) regression: boston housing
+##----------------------------------------------------------------------------
+
+if (library("mlbench", logical.return = TRUE)) {
+
+  ## assemble the data
+  data(BostonHousing)
+  x <- BostonHousing; x$medv <- NULL
+  y <- BostonHousing$medv
+  trn <- sample(1:nrow(x), size = nrow(x) * (2 / 3), replace = FALSE)
+
+  ## run boosting in univariate mode
+  o <- boostmtree(x = x[trn,], y = y[trn])
+  o.p <- predict(o, x = x[-trn, ], y = y[-trn])
+  print(o)
+  plot(o.p)
 }
-}
+
+}}
 \keyword{boosting}
 

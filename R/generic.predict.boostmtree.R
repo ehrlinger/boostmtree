@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.1.0 (_PROJECT_BUILD_ID_)
+####  Version 1.2.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -72,7 +72,6 @@ generic.predict.boostmtree <- function(object,
                                        y,
                                        M,
                                        importance = TRUE,
-                                       verbose = TRUE,
                                        eps = 1e-5,
                                        ...)
 {
@@ -82,7 +81,6 @@ generic.predict.boostmtree <- function(object,
   if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2) {
     stop("this function only works for objects of class `(boostmtree, grow)'")
   }
-  if (verbose) cat("  running prediction mode for multivariate boosting\n")
   user.option <- match.call(expand.dots = TRUE)
   partial <- is.hidden.partial(user.option)
   if (!partial) {
@@ -185,7 +183,7 @@ generic.predict.boostmtree <- function(object,
     rf.cores.old <- getOption("rf.cores")
     mc.cores.old <- getOption("mc.cores")
     membership <- mclapply(1:M, function(m) {
-      options(rf.cores = 0, mc.cores = 1)
+      options(rf.cores = 1, mc.cores = 1)
       c(predict.rfsrc(baselearner[[m]],
                       newdata = X,
                       membership = TRUE,
@@ -241,7 +239,7 @@ generic.predict.boostmtree <- function(object,
           X.k[, k] <- sample(X.k[, k])
           X.k
         }))
-        options(rf.cores = 0, mc.cores = 1)
+        options(rf.cores = 1, mc.cores = 1)
         c(predict.rfsrc(baselearner[[m]],
                         newdata = Xnoise,
                         membership = TRUE,
@@ -407,7 +405,7 @@ generic.predict.boostmtree <- function(object,
         })
         l2Dist(Y, mu.k) - err.rate[Mopt, "l2"]
       }))
-      mu.time <- sapply(1:n, function(i) {
+      mu.time <- lapply(1:n, function(i) {
         DbetaT[, i][sample(match(tm[[i]], tm.unq, tm[[i]]))]
       })
       vimp.time <- l2Dist(Y, mu.time) - err.rate[Mopt, "l2"]

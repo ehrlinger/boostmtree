@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.1.0 (_PROJECT_BUILD_ID_)
+####  Version 1.2.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -65,7 +65,7 @@
 ####**********************************************************************
 
 
-plot.boostmtree <- function (x, ...)
+plot.boostmtree <- function (x, use.rmse = TRUE, ...)
 {
   if (sum(inherits(x, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2 &
       sum(inherits(x, c("boostmtree", "predict"), TRUE) == c(1, 2)) != 2) {
@@ -93,6 +93,13 @@ plot.boostmtree <- function (x, ...)
       plot(unlist(x$time), unlist(x$mu), xlab = "time", ylab = "predicted", type = "n")
       line.plot(x$time, x$mu)
     }
+    if (!use.rmse) {
+      x$err.rate[, "l2"] <- (x$err.rate[, "l2"] * x$ysd)^2
+      y.lab <- "In-sample MSE"
+    }
+    else {
+      y.lab <- "In-sample standardized RMSE"
+    }
     if (!univariate) {
       if (is.null(x$err.rate)) {
         plot(unlist(x$time), unlist(x$y) - unlist(x$mu), xlab = "time", ylab = "residual", type = "n")
@@ -103,7 +110,7 @@ plot.boostmtree <- function (x, ...)
       else {#error rate
         plot(1:M, x$err.rate[, "l2"],
            xlab = "iteration", 
-           ylab = "In-sample estimated RMSE",
+           ylab = y.lab,
            type = "l", lty = 1)
         abline(v = x$Mopt, lty = 2, col = 2, lwd = 2)
       }
@@ -115,7 +122,7 @@ plot.boostmtree <- function (x, ...)
       if (!is.null(x$err.rate)) {
         plot(1:M, x$err.rate[, "l2"],
              xlab = "iteration", 
-             ylab = "In-sample estimated RMSE",
+             ylab = y.lab,
              type = "l", lty = 1)
         abline(v = x$Mopt, lty = 2, col = 2, lwd = 2)
       }
@@ -158,14 +165,26 @@ plot.boostmtree <- function (x, ...)
           layout(rbind(c(1, 2)), widths = c(1, 1))
         }
       }
+      if (!use.rmse) {
+        x$err.rate[, "l2"] <- (x$err.rate[, "l2"] * x$boost.obj$ysd)^2
+        if (!is.null(x$vimp)) {
+          x$vimp <- (x$vimp * x$boost.obj$ysd)^2
+        }
+        y.lab.err <- "Out-of-sample MSE"
+        y.lab.vimp <- "Variable Importance (MSE)"
+      }
+      else {
+        y.lab.err <- "Out-of-sample standardized RMSE"
+        y.lab.vimp <- "Variable Importance (standardized RMSE)"
+      }
       plot(1:M, x$err.rate[, "l2"],
            xlab = "iteration", 
-           ylab = "RMSE prediction error",
+           ylab = y.lab.err,
            type = "l", lty = 1)
       abline(v = Mopt, lty = 2, col = 2, lwd = 2)
       if (!is.null(x$vimp)) {
-        vimp <- 100 * (x$vimp / x$err.rate[Mopt, "l2"])
-        barplot(vimp, las = 2, ylab = "vimp (%)", cex.names = 1.0)
+        vimp <- x$vimp
+        barplot(vimp, las = 2, ylab = y.lab.vimp, cex.names = 1.0)
       }
       if (!univariate) {
         plot(unlist(x$time), unlist(x$mu), xlab = "time", ylab = "predicted", type = "n")

@@ -4,9 +4,13 @@
 \description{
   Plot summary analysis of the boosting analysis.
 }
-\usage{\method{plot}{boostmtree}(x, ...)}
+\usage{\method{plot}{boostmtree}(x, use.rmse = TRUE, ...)}
 \arguments{
-  \item{x}{An object of class \code{(boostmtree, grow)} or \code{(boostmtree, predict)}.}
+  \item{x}{An object of class \code{(boostmtree, grow)} or
+    \code{(boostmtree, predict)}.}
+  \item{use.rmse}{Report performance values in terms of standardized
+    root-mean-squared-error (RMSE) or mean-squared-error (MSE)?  Default
+  is standardized RMSE.}
   \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
@@ -18,7 +22,7 @@
 }
 \references{
   Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
-  Blackstone E.H., Ishwaran H. (2016).  Boosted multivariate trees for
-  longitudinal data.
+  Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
+  longitudinal data, \emph{Machine Learning}, 106(2): 277--305. 
 }
 \keyword{plot}

@@ -12,7 +12,6 @@
  y,
  M,
  importance = TRUE,
- verbose = TRUE,
  eps = 1e-5,
  ...)
 }
@@ -35,7 +34,6 @@
   \item{M}{Fixed value for the boosting step number.  Leave this empty 
     to determine the optimized value obtained by minimizing test-set error.}
   \item{importance}{Calculate importance values for the x-variables?}
-  \item{verbose}{Should verbose output be printed?}
   \item{eps}{Tolerance value used for determining the optimal \code{M}.
     For experts only.}
   \item{...}{Further arguments passed to or from other methods.}
@@ -60,9 +58,7 @@
   Note that all performance values (prediction error, variable
   importance) are standardized by the overall y-standard deviation.
   Thus, reported RMSE (root-mean-squared-error) is actually standardized
-  RMSE.  Furthermore, variable importance (VIMP) is standardized by
-  RMSE.  Thus, VIMP measures the relative importance of a variable at
-  the optimized boosting iteration. 
+  RMSE.  Values are reported at the optimal stopping time.
 }
 \value{
      An object of class \code{(boostmtree, predict)}, which is a list with the
@@ -90,8 +86,8 @@
 }
 \references{
   Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
-  Blackstone E.H., Ishwaran H. (2016).  Boosted multivariate trees for
-  longitudinal data.
+  Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
+  longitudinal data, \emph{Machine Learning}, 106(2): 277--305. 
 }
 \seealso{
   \command{\link{plot.boostmtree}},
@@ -103,44 +99,56 @@
 ## Synthetic example
 ##
 ##  high correlation, quadratic time with quadratic interaction
-##  noisy variables
+##  largish number of noisy variables
 ##
-##  calculate test set error under adaptive rho and mispecified rho
-##  compare to GLS (generalized least-squares)
+##  illustrates how modified gradient improves performance
+##  also compares performance to ideal and well specified linear models 
 ##----------------------------------------------------------------------------
 
 ## simulate the data
-dtaO <- simLong(n = 100, ntest = 100, model = 2, q = 5)
+## simulation 2: main effects (x1, x3, x4), quad-time-interaction (x2)
+dtaO <- simLong(n = 100, ntest = 100, model = 2, q = 25)
 
-## save both the list and data frame formatted data
+## save the data as both a list and data frame
 dtaL <- dtaO$dtaL
 dta <- dtaO$dta
 
-## identify the training data
+## get the training data
 trn <- dtaO$trn
 
-## save formulas for GLS analysis
+## save formulas for linear model comparisons
 f.true <- dtaO$f.true
 f.linr <- "y~x1+x2+x3+x4+x1*time+x2*time+x3*time+x4*time"
 
 
-##adaptive rho
-o.1 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn], M = 500)
+## modified tree gradient (default)
+o.1 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn],dtaL$y[trn],
+         M = 350)
 p.1 <- predict(o.1, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
-##fixed rho = 0
+## non-modified tree gradient (nmtg)
 o.2 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
-             M = 500, rho = 0)
+             M = 350, mod.grad = FALSE)
 p.2 <- predict(o.2, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
-##rmse values
-cat("true model        :", boostmtree:::gls.mse(f.true,dta,trn),"\n")
-cat("linear GLS        :", boostmtree:::gls.mse(f.linr,dta,trn),"\n")
-cat("boostmtree        :", p.1$mse,"\n")
-cat("boostmtree (rho=0):", p.2$mse,"\n")
+## set rho = 0
+o.3 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
+             M = 350, rho = 0)
+p.3 <- predict(o.3, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
-##predicted value plot
+
+##rmse values compared to generalized least squares (GLS)
+##for true model and well specified linear models (LM)
+cat("true LM           :", boostmtree:::gls.rmse(f.true,dta,trn),"\n")
+cat("well specified LM :", boostmtree:::gls.rmse(f.linr,dta,trn),"\n")
+cat("boostmtree        :", p.1$rmse,"\n")
+cat("boostmtree  (nmtg):", p.2$rmse,"\n")
+cat("boostmtree (rho=0):", p.3$rmse,"\n")
+
+##predicted value plots
 plot(p.1)
+plot(p.2)
+plot(p.3)
 }
 }
 \keyword{predict}

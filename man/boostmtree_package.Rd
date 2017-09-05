@@ -36,29 +36,15 @@
   Hemant Ishwaran, Pande A. and Udaya B. Kogalur
 }
 \references{
-    Breiman L. (2001). Random forests, \emph{Machine Learning}, 45:5-32.
+  Friedman J.H. (2001). Greedy function approximation: a gradient
+  boosting machine, \emph{Ann. of Statist.}, 5:1189-1232.
+  
+  Friedman J.H. (2002). Stochastic gradient boosting.
+  \emph{Comp. Statist. Data Anal.}, 38(4):367--378.
 
-    Friedman J.H. (2001). Greedy function approximation: a gradient
-    boosting machine, \emph{Ann. of Statist.}, 5:1189-1232.
-     
-    Ishwaran H. and Kogalur U.B. (2007).  Random survival forests for R,
-    \emph{Rnews}, 7(2):25-31.
-
-    Ishwaran H., Kogalur U.B., Blackstone E.H. and Lauer M.S.
-    (2008).  Random survival forests, \emph{Ann. App.
-    Statist.}, 2:841-860.
-
-    Ishwaran H., Kogalur U.B., Gorodeski E.Z, Minn A.J. and
-    Lauer M.S. (2010).  High-dimensional variable selection for survival
-    data.  \emph{J. Amer. Statist. Assoc.}, 105:205-217.
-
-    Ishwaran H., Gerds T.A., Kogalur U.B., Moore R.D., Gange S.J. and Lau
-    B.M. (2014). Random survival forests for competing risks.  To appear
-    in \emph{Biostatistics}.
-
-    Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
-    Blackstone E.H., Ishwaran H. (2016).  Boosted multivariate trees for
-    longitudinal data.
+  Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
+  Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
+  longitudinal data, \emph{Machine Learning}, 106(2): 277--305. 
 }
 \seealso{
   \command{\link{partialPlot}},

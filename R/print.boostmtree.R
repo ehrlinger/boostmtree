@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.1.0 (_PROJECT_BUILD_ID_)
+####  Version 1.2.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -73,7 +73,7 @@ print.boostmtree <- function (x, ...)
   }
   if (sum(inherits(x, c("boostmtree", "grow"), TRUE) == c(1, 2)) == 2) {
     univariate <- length(x$id) == length(unique(x$id))
-    cat("model                       :", class(x)[1], class(x)[3], "\n")
+    cat("model                       :", class(x)[3], "\n")
     cat("fitting mode                :", class(x)[2], "\n")
     if (x$ntree > 1) {
       cat("ntree                       :", x$ntree, "\n")
@@ -103,7 +103,7 @@ print.boostmtree <- function (x, ...)
   }
   else {
     univariate <- length(x$boost.obj$id) == length(unique(x$boost.obj$id))
-    cat("model                       :", class(x)[1], class(x)[3], "\n")
+    cat("model                       :", class(x)[3], "\n")
     cat("fitting mode                :", class(x)[2], "\n")
     cat("sample size                 :", nrow(x$x), "\n")
     cat("number of variables         :", ncol(x$x), "\n")
