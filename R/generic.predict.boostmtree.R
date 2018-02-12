@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.2.0 (_PROJECT_BUILD_ID_)
+####  Version 1.2.1 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -80,6 +80,12 @@ generic.predict.boostmtree <- function(object,
   }
   if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2) {
     stop("this function only works for objects of class `(boostmtree, grow)'")
+  }
+  if (grepl("Debian", Sys.info()["version"])) {
+    papply <- lapply
+  }
+  else {
+    papply <- mclapply
   }
   user.option <- match.call(expand.dots = TRUE)
   partial <- is.hidden.partial(user.option)
@@ -182,7 +188,7 @@ generic.predict.boostmtree <- function(object,
   if (ntree == 1) {
     rf.cores.old <- getOption("rf.cores")
     mc.cores.old <- getOption("mc.cores")
-    membership <- mclapply(1:M, function(m) {
+    membership <- papply(1:M, function(m) {
       options(rf.cores = 1, mc.cores = 1)
       c(predict.rfsrc(baselearner[[m]],
                       newdata = X,
@@ -233,7 +239,7 @@ generic.predict.boostmtree <- function(object,
       Mopt <- M
     }
     if (vimpFlag) {
-      membershipNoise <- mclapply(1:Mopt, function(m) {
+      membershipNoise <- papply(1:Mopt, function(m) {
         Xnoise <- do.call(rbind, lapply(1:p, function(k) {
           X.k <- X
           X.k[, k] <- sample(X.k[, k])
@@ -309,7 +315,7 @@ generic.predict.boostmtree <- function(object,
                                  newdata = X,
                                  importance = "none",
                                  forest.wt = TRUE)$forest.wt
-      beta.m.org <- do.call("cbind", mclapply(1:n, function(i) {
+      beta.m.org <- do.call("cbind", papply(1:n, function(i) {
         fwt.i <- forest.wt[i, ]
         fwt.i[fwt.i <= forest.tol] <- 0
         pt.i <- (fwt.i != 0)
@@ -381,7 +387,7 @@ generic.predict.boostmtree <- function(object,
   muhat <- lapply(1:n, function(i) {DbetaT[, i]})
   if (vimpFlag) {
     if (df.D <= 1) {
-      vimp <- unlist(mclapply(1:p, function(k) {
+      vimp <- unlist(papply(1:p, function(k) {
         DbetaT.k <- D %*% t(beta.vimp[[k]])
         mu.k <- lapply(1:n, function(i) {
           DbetaT.k[, i][match(tm[[i]], tm.unq, tm[[i]])]
@@ -391,14 +397,14 @@ generic.predict.boostmtree <- function(object,
       names(vimp) <- xvar.names
     }
     if (df.D > 1) {
-      vimp.cov <- unlist(mclapply(1:p, function(k) {
+      vimp.cov <- unlist(papply(1:p, function(k) {
         DbetaT.k <- D %*% t(beta.cov.vimp[[k]])
         mu.k <- lapply(1:n, function(i) {
           DbetaT.k[, i][match(tm[[i]], tm.unq, tm[[i]])]
         })
         l2Dist(Y, mu.k) - err.rate[Mopt, "l2"]
       }))
-      vimp.cov.time <- unlist(mclapply(1:p, function(k) {
+      vimp.cov.time <- unlist(papply(1:p, function(k) {
         DbetaT.k <- D %*% t(beta.time.vimp[[k]])
         mu.k <- lapply(1:n, function(i) {
           DbetaT.k[, i][match(tm[[i]], tm.unq, tm[[i]])]

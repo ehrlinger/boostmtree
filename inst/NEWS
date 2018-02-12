@@ -1,10 +1,14 @@
 Package: boostmtree
-Version: 1.2.0
-BUILD: bld20170903
+Version: 1.2.1
+BUILD: bld20180212
 
 ---------------------------------------------------------------------------------
-CHANGES TO RELEASE 1.2.0
+CHANGES TO RELEASE 1.2.1
 ---------------------------------------------------------------------------------
+RELEASE 1.2.1
+---------------------------------------------------------------------------------
+Fix to avoid mclapply on Debian, and to default to lapply instead.
+
 RELEASE 1.2.0
 ---------------------------------------------------------------------------------
 Synchronization with package dependency in randomForestSRC (1.5.0) due to

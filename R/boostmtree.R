@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.2.0 (_PROJECT_BUILD_ID_)
+####  Version 1.2.1 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -87,6 +87,12 @@ boostmtree <- function(x,
                        mod.grad = TRUE,
                        ...)
 {
+  if (grepl("Debian", Sys.info()["version"])) {
+    papply <- lapply
+  }
+  else {
+    papply <- mclapply
+  }
   univariate <- FALSE
   if (missing(tm)) {
     id <- 1:nrow(x)
@@ -345,7 +351,7 @@ boostmtree <- function(x,
     }
     if (ntree == 1) {
       if (lambda.est.flag) {
-        transf.data <- mclapply(1:n, function(i) {
+        transf.data <- papply(1:n, function(i) {
           if (ni[i] > 1) {
             ci <- rho.inv.sqrt(ni[i], rho)
             R.inv.sqrt <- (diag(1, ni[i]) - matrix(ci, ni[i], ni[i])) / sqrt(1 - rho)
@@ -393,7 +399,7 @@ boostmtree <- function(x,
         lambda <- lambda.hat 
         sigma <- sigma.robust(lambda, rho) 
       }
-      Xnew <- mclapply(1:n, function(i) {
+      Xnew <- papply(1:n, function(i) {
         rmi <- rho.inv(ni[i], rho)
         Wi <- diag(1, ni[i]) - matrix(rmi, ni[i], ni[i])
         t(D[[i]]) %*% Wi %*% D[[i]]
@@ -477,12 +483,12 @@ boostmtree <- function(x,
     }
     else{
       forest.wt <- rfsrc.obj$forest.wt
-      Xnew <- mclapply(1:n, function(i) {
+      Xnew <- papply(1:n, function(i) {
         rmi <- rho.inv(ni[i], rho)
         Wi <- diag(1, ni[i]) - matrix(rmi, ni[i], ni[i])
         t(D[[i]]) %*% Wi %*% D[[i]]
       })
-      bhat <- do.call("cbind", mclapply(1:n, function(i) {
+      bhat <- do.call("cbind", papply(1:n, function(i) {
         fwt.i <- forest.wt[i, ]
         fwt.i[fwt.i <= forest.tol] <- 0
         pt.i <- (fwt.i != 0)
