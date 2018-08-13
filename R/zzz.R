@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.2.1 (_PROJECT_BUILD_ID_)
+####  Version 1.3.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -49,10 +49,6 @@
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
 ####    Udaya B. Kogalur, Ph.D.
-####    Consultant Staff
-####    Deptartment of Quantitative Health Sciences
-####    Cleveland Clinic Foundation
-####
 ####    Kogalur & Company, Inc.
 ####    5425 Nestleway Drive, Suite L1
 ####    Clemmons, NC 27012

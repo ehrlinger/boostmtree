@@ -63,16 +63,15 @@
       solution.  Experimental and for experts only.}
     \item{verbose}{Should verbose output be printed?}
     \item{cv.flag}{Should in-sample cross-validation (CV) be used to determine
-      optimal stopping?}
+      optimal stopping using out of bag data?}
      \item{eps}{Tolerance value used for determining the optimal
        \code{M}. Applies only if \command{cv.flag} = TRUE.  For experts only.}
-    \item{importance}{Should variable importance (VIMP) be determined?  Not currently
-      implemented.}
+    \item{importance}{Should variable importance (VIMP) be determined using out of bag data?}
     \item{mod.grad}{Use a modified gradient? See details below.}
     \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
-  
+
   Each individual has observed y-values, over possibly different time
   points, with possibly differing number of time points.  Given y, the
   time points, and x, the conditional mean time profile of y is
@@ -107,9 +106,8 @@
   stochastic gradient descent boosting (Friedman, 2002).  Stochastic
   descent often improves performance and has the added advantage that
   out-of-sample data (out-of-bag, OOB) can be used to calculate
-  variable importance (VIMP).  This feature will be implemented in
-  future releases.
-  
+  variable importance (VIMP).
+
    The package implements R-side parallel processing by replacing
   the R function \command{lapply} with \command{mclapply} found in the
   \pkg{parallel} package.  You can set the number of cores accessed by
@@ -121,23 +119,27 @@
 
   As an example, issuing the following options command uses all
   available cores for R-side parallel processing:
-  
+
   \command{options(mc.cores=detectCores())}
-  
+
   However, be cautious when setting \command{mc.cores}.  This can create
   not only high CPU usage but also high RAM usage, especially when using
   functions \command{partialPlot} and \command{predict}.
 
-  Finally note that \code{cv.flag} can be used for an in-sample
+  The method can impute the missing observations in x (covariates) using
+  on the fly imputation. Details regarding can be found in the
+  \pkg{randomForestSRC} package. If missing values are present in the
+  \code{tm}, \code{id} or \code{y}, the user should either impute or
+  delete these values before executing the function.
+
+  Finally note \code{cv.flag} can be used for an in-sample
   cross-validated estimate of prediction error.  This is used to
   determine the optimized number of boosting iterations \emph{Mopt}.
   The final mu predictor is evaluated at this value and is
   cross-validated.  The prediction error returned via \command{err.rate}
-  is standardized by the overall standard deviation of y.  
-}
-\value{
-     An object of class \code{(boostmtree, grow)} with the following
-     components:
+  is standardized by the overall standard deviation of y.  } \value{ An
+  object of class \code{(boostmtree, grow)} with the following
+  components:
 
      \item{x}{The x-values, but with only one row per individual
        (i.e. duplicated rows are removed). Values sorted on \code{id}.}
@@ -173,8 +175,8 @@
      \item{ntree}{Number of trees.}
      \item{err.rate}{In-sample standardized estimate of l1-error and RMSE.}
      \item{rmse}{In-sample standardized RMSE at optimized \code{M}.}
-     \item{Mopt}{The optimized \code{M}.}	  
-     \item{vimp}{Variable importance.  Not currently implemented.}
+     \item{Mopt}{The optimized \code{M}.}
+     \item{vimp}{Variable importance at optimized M.}
      \item{forest.tol}{Forest tolerance value (needed for prediction).}
 }
 \author{
@@ -183,23 +185,25 @@
 \references{
   Friedman J.H. (2001). Greedy function approximation: a gradient
   boosting machine, \emph{Ann. of Statist.}, 5:1189-1232.
-  
+
   Friedman J.H. (2002). Stochastic gradient boosting.
   \emph{Comp. Statist. Data Anal.}, 38(4):367--378.
 
   Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
   Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
-  longitudinal data, \emph{Machine Learning}, 106(2): 277--305. 
+  longitudinal data, \emph{Machine Learning}, 106(2): 277--305.
 
   Pande A. (2017).  \emph{Boosting for longitudinal data}.  Ph.D. Dissertation,
   Miller School of Medicine, University of Miami.
 }
 \seealso{
+  \command{\link{marginalPlot}}
   \command{\link{partialPlot}},
   \command{\link{plot.boostmtree}},
   \command{\link{predict.boostmtree}},
   \command{\link{print.boostmtree}},
-  \command{\link{simLong}}
+  \command{\link{simLong}},
+  \command{\link{vimpPlot}}
 }
 \examples{
 ##------------------------------------------------------------
@@ -221,14 +225,16 @@ plot(boost.grow)
 \dontrun{
 ##------------------------------------------------------------
 ## same synthetic example as above but with in-sample cross-validation
-## estimate for RMSE
+## estimate for RMSE and vimp
 ##-------------------------------------------------------------
-dta <- simLong(n = 100, N = 5, rho =.80, model = 2)$dtaL
-boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-                        M = 150, nu = 0.1, cv.flag = TRUE)
+dta <- simLong(n = 50, N = 5, rho =.80, model = 2)$dtaL
+boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, M = 300,
+                 cv.flag = TRUE, importance = TRUE)
 plot(boost.cv.grow)
 print(boost.cv.grow)
-
+vimpPlot(object = boost.cv.grow, ymaxlim = 20, ymaxtimelim = 20,
+         xaxishead = c(3,3), yaxishead = c(65,65),
+         cex.xlab = 1, subhead.cexval = 1.2)
 ##----------------------------------------------------------------------------
 ## spirometry data
 ##----------------------------------------------------------------------------
@@ -257,6 +263,12 @@ if (library("mlbench", logical.return = TRUE)) {
   o.p <- predict(o, x = x[-trn, ], y = y[-trn])
   print(o)
   plot(o.p)
+
+  ## run boosting in univariate mode to obtain RMSE and vimp
+  o.cv <- boostmtree(x = x, y = y, M = 100, cv.flag = TRUE, importance = TRUE)
+  print(o.cv)
+  plot(o.cv)
+  vimpPlot(o.cv,ymaxlim = 10,cex.xlab = 1)
 }
 
 }}

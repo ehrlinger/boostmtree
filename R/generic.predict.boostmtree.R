@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.2.1 (_PROJECT_BUILD_ID_)
+####  Version 1.3.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -49,10 +49,6 @@
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
 ####    Udaya B. Kogalur, Ph.D.
-####    Consultant Staff
-####    Deptartment of Quantitative Health Sciences
-####    Cleveland Clinic Foundation
-####
 ####    Kogalur & Company, Inc.
 ####    5425 Nestleway Drive, Suite L1
 ####    Clemmons, NC 27012
@@ -80,12 +76,6 @@ generic.predict.boostmtree <- function(object,
   }
   if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2) {
     stop("this function only works for objects of class `(boostmtree, grow)'")
-  }
-  if (grepl("Debian", Sys.info()["version"])) {
-    papply <- lapply
-  }
-  else {
-    papply <- mclapply
   }
   user.option <- match.call(expand.dots = TRUE)
   partial <- is.hidden.partial(user.option)
@@ -194,7 +184,7 @@ generic.predict.boostmtree <- function(object,
                       newdata = X,
                       membership = TRUE,
                       ptn.count = K,
-                      importance = "none")$ptn.membership)
+                      importance = "none",na.action = "na.impute")$ptn.membership)
     })
     nullObj <- lapply(1:M, function(m) {
       orgMembership <- gamma[[m]][, 1]
@@ -213,12 +203,12 @@ generic.predict.boostmtree <- function(object,
       NULL
     })
     rm(nullObj)
-    mu.list <- lapply(mu.list, function(mlist){  
+    mu.list <- lapply(mu.list, function(mlist){
       lapply(1:n,function(i) {mlist[[i]] * Ysd + Ymean})
     })
     if (testFlag) {
       err.rate <- matrix(unlist(lapply(mu.list, function(mlist) {
-        c(l1Dist(Y, mlist), l2Dist(Y, mlist)) 
+        c(l1Dist(Y, mlist), l2Dist(Y, mlist))
       })), ncol = 2, byrow = TRUE)
       colnames(err.rate) <- c("l1", "l2")
     }
@@ -250,7 +240,7 @@ generic.predict.boostmtree <- function(object,
                         newdata = Xnoise,
                         membership = TRUE,
                         ptn.count = K,
-                        importance = "none")$ptn.membership)
+                        importance = "none",na.action = "na.impute")$ptn.membership)
       })
       if (!is.null(rf.cores.old)) options(rf.cores = rf.cores.old)
       if (!is.null(mc.cores.old)) options(mc.cores = mc.cores.old)
@@ -342,7 +332,7 @@ generic.predict.boostmtree <- function(object,
         beta <<- beta.m
       }
       else {
-        beta <<- beta + beta.m 
+        beta <<- beta + beta.m
       }
       Dbeta.m <- D %*% (beta.m.org * nu.vec)
       if (m == 1) {
@@ -357,13 +347,13 @@ generic.predict.boostmtree <- function(object,
       }
       NULL
     })
-    mu.list <- lapply(mu.list, function(mlist){  
+    mu.list <- lapply(mu.list, function(mlist){
       lapply(1:n,function(i) {mlist[[i]] * Ysd + Ymean})
     })
     if (testFlag) {
       err.rate <- matrix(unlist(lapply(mu.list, function(mlist) {
         c(l1Dist(Y, mlist), l2Dist(Y, mlist))
-      })), ncol = 2, byrow = TRUE) 
+      })), ncol = 2, byrow = TRUE)
       colnames(err.rate) <- c("l1", "l2")
     }
     else {

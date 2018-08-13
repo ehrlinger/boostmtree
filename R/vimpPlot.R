@@ -61,80 +61,77 @@
 ####**********************************************************************
 
 
-simLong <- function(n = 100,
-                     ntest = 0,
-                     N = 5,
-                     rho = 0.8,
-                     type = c("corCompSym", "corAR1", "corSymm", "iid"),
-                     model = c(0, 1, 2, 3),
-                     phi = 1,
-                     q = 0,
-                     ...)
+vimpPlot <- function(object,
+                     xvar.names = NULL,
+                     cex.xlab = NULL,
+                     ymaxlim = 0,
+                     ymaxtimelim = 0,
+                     subhead.cexval = 1,
+                     yaxishead = NULL,
+                     xaxishead = NULL,
+                     main = "Variable Importance (%)",
+                     col = grey(.80),
+                     cex.lab = 1.5,
+                     subhead.labels = c("Time-Interactions Effects","Main Effects"),
+                     ylbl = FALSE,
+                     seplim = NULL
+)
 {
-  type <- match.arg(type, c("corCompSym", "corAR1", "corSymm", "iid"))
-  model <- as.numeric(match.arg(as.character(model), as.character(0:3)))
-  dta <- data.frame(do.call("rbind", lapply(1:(n+ntest), function(i) {
-    Ni <- round(runif(1, 1, 3 * N))
-    type <- match.arg(type, c("corCompSym", "corAR1", "corSymm", "iid"))
-    if (type == "corCompSym") {
-      corr.mat <- matrix(rho, nrow=Ni, ncol=Ni)
-      diag(corr.mat) <- 1
-    }
-    if (type == "corAR1") {
-      corr.mat <- diag(rep(1, Ni))
-      if (Ni > 1) {
-       for (ii in 1:(Ni - 1)) {
-          corr.mat[ii, (ii + 1):Ni] <- rho^(1:(Ni - ii))
-        }
-        ind <- lower.tri(corr.mat) 
-        corr.mat[ind] <- t(corr.mat)[ind]
-      }
-    }
-    if (type == "iid") {
-      corr.mat <- diag(rep(1, Ni))
-    }
-    eps <- sqrt(phi) * t(chol(corr.mat)) %*% rnorm(Ni)
-    x1 <- rnorm(1)
-    x2 <- runif(1, 1, 2)
-    x3 <- runif(1, 1, 3)
-    x4 <- rnorm(1)
-    x <- c(x1, x2, x3, x4)
-    p <- length(x)
-    if (q > 0) {
-      xnoise <- rnorm(q)
-      x <- c(x, xnoise)
-    }
-    tm <- sample((1:(3 * N))/N, size = Ni, replace = TRUE)
-    if (model == 0) {
-      y <- 1.5 + 2.5 * x1 - 1.2 * x3 - .6 * x4 + eps
-    }
-    if (model == 1) {
-      y <- 1.5 + 2.5 * x1 - 1.2 * x3 - .2 * x4 - .65 * tm  * x2   + eps
-    }
-    if (model == 2) {
-      y <- 1.5 + 2.5 * x1 - 1.2 * x3 - .2 * x4 - .65 * (tm ^ 2) * (x2 ^ 2)   + eps
-    }
-    if (model == 3) {
-      y <- 1.5 + 2.5 * x1 - 1.2 * x3 - .2 * exp(x4) - .65 * (tm ^ 2) * (x2 ^2) * x3  + eps
-    }
-    cbind(matrix(x, nrow = Ni, ncol = length(x), byrow = TRUE),
-          tm, rep(i, Ni), y)
-  })))
-  d <- q + 4
-  colnames(dta) <- c(paste("x", 1:d, sep = ""), "time", "id", "y")
-  dtaL <- list(features = dta[, 1:d], time = dta$time, id = dta$id, y = dta$y) 
-  if (model == 0) {
-    f.true <- "y ~ x1 + x3 + x4"
+  if(is.null(object$vimp) ){
+    stop("vimp is not present in the object")
   }
-  if (model == 1) {
-    f.true <- "y ~ x1 + x3 + x4 + I(time * x2)"
+  vimp <- object$vimp
+  if(is.null(xvar.names)){
+    xvar.names <- colnames(object$x)
   }
-  if (model == 2) {
-    f.true <- "y ~ x1 + x3 + x4 + I(time^2 * x2^2)"
+  p <- ncol(object$x)
+  n.vimp <- length(vimp)
+  if(n.vimp == p ){
+    univariate <- TRUE
+  }else
+  {
+    univariate <- FALSE
   }
-  if (model == 3) {
-    f.true <- "y ~ x1 + x3 + exp(x4) + I(time^2 * x2^2 * x3)"
+  if(univariate){
+    vimp <- vimp*100
+  }else
+  {
+    vimp <- (vimp[-n.vimp])*100
+    n.vimp <- length(vimp)
   }
-  trn <- c(1:sum(dta$id <= n))
-  return(invisible(list(dtaL = dtaL, dta = dta, trn = trn, f.true = f.true)))
+  if(univariate){
+    ylim <- range(vimp) + c(0,ymaxlim)
+    yaxs <- pretty(ylim)
+    yat <- abs(yaxs)
+    bp <- barplot(as.matrix(vimp),beside=T,col=col,ylim=ylim,yaxt="n",main = main,cex.lab=cex.lab)
+    text(c(bp), pmax(as.matrix(vimp),0), rep(xvar.names, 3),srt=90,adj=-0.5,cex= if(!is.null(cex.xlab)) cex.xlab else 1 )
+    axis(2,yaxs,yat)
+  }else
+  {
+    vimp.x <- vimp[1:p]
+    vimp.time <- vimp[-c(1:p)]
+    ylim <- max(c(vimp.x,vimp.time)) * c(-1, 1) + c(-ymaxtimelim,ymaxlim)
+    if(ylbl){
+      ylbl <- paste("Time-Interactions", "Main Effects", sep = if(!is.null(seplim)) seplim else "                   " )
+    }else
+    {
+      ylbl <- NULL
+    }
+    yaxs <- pretty(ylim)
+    yat <- abs(yaxs)
+    if(is.null(yaxishead)){
+      yaxishead <- c(-ylim[1],ylim[2])
+    }
+    if(is.null(xaxishead)){
+      xaxishead <- c(floor(n.vimp/4),floor(n.vimp/4))
+    }
+    bp1 <- barplot(pmax(as.matrix(vimp.x),0),beside=T,col=col,ylim=ylim,yaxt="n",ylab = ylbl,cex.lab=cex.lab,
+                   main = main)
+    text(c(bp1), pmax(as.matrix(vimp.x),0), rep(xvar.names, 3),srt=90,adj=-0.5,cex=if(!is.null(cex.xlab)) cex.xlab else 1)
+    text(xaxishead[2],yaxishead[2],labels = subhead.labels[2],cex = subhead.cexval)
+    bp2 <- barplot(-pmax(as.matrix(vimp.time),0),beside=T,col=col,add=TRUE,yaxt="n")
+    text(c(bp2), -pmax(as.matrix(vimp.time),0), rep(xvar.names, 3),srt=90,adj=1.5,yaxt="n",cex=if(!is.null(cex.xlab)) cex.xlab else 1)
+    text(xaxishead[1],-yaxishead[1],labels = subhead.labels[1],cex = subhead.cexval)
+    axis(2,yaxs,yat)
+  }
 }

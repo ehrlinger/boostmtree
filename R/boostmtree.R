@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.2.1 (_PROJECT_BUILD_ID_)
+####  Version 1.3.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -49,10 +49,6 @@
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
 ####    Udaya B. Kogalur, Ph.D.
-####    Consultant Staff
-####    Deptartment of Quantitative Health Sciences
-####    Cleveland Clinic Foundation
-####
 ####    Kogalur & Company, Inc.
 ####    5425 Nestleway Drive, Suite L1
 ####    Clemmons, NC 27012
@@ -87,12 +83,15 @@ boostmtree <- function(x,
                        mod.grad = TRUE,
                        ...)
 {
-  if (grepl("Debian", Sys.info()["version"])) {
-    papply <- lapply
-  }
-  else {
-    papply <- mclapply
-  }
+    if (grepl("Debian", Sys.info()["sysname"])) {
+        papply <- lapply
+    }
+    else if (grepl("Windows", Sys.info()["sysname"])) {
+        papply <- lapply
+    }
+    else {
+        papply <- mclapply
+    }
   univariate <- FALSE
   if (missing(tm)) {
     id <- 1:nrow(x)
@@ -110,15 +109,28 @@ boostmtree <- function(x,
     lambda.vec <- phi.vec <- rho.vec <- NULL
   }
   user.option <- list(...)
-  if (any(is.na(id)) || any(is.na(y)) || any(is.na(x)) || any(is.na(tm))) {
+  if (any(is.na(id)) || any(is.na(y)) || any(is.na(tm))) {
     stop("missing values encountered: remove observations with missing values")
   }
   x <- as.data.frame(x)
-  p <- ncol(x)
-  xvar.names <- colnames(x)
   X <- do.call(rbind, lapply(1:n, function(i) {
     x[id == id.unq[i],, drop = FALSE][1,, drop = FALSE]}))
   x <- do.call(rbind, lapply(1:n, function(i) {x[id == id.unq[i],, drop = FALSE]}))
+  if(any(is.na(X))){
+    RemoveMiss.Obj <- RemoveMiss.Fun(X)
+    X <- RemoveMiss.Obj$X
+    if(!is.null(RemoveMiss.Obj$id.remove)){
+      id.remove <- id.unq[RemoveMiss.Obj$id.remove]
+      id.unq <- setdiff(id.unq,id.remove)
+      n <- length(id.unq)
+      tm <- unlist(lapply(1:n,function(i){ tm[id == id.unq[i] ]    }))
+      y <- unlist(lapply(1:n,function(i){ y[id == id.unq[i] ]    }))
+      x <- do.call(rbind, lapply(1:n, function(i) {x[id == id.unq[i],, drop = FALSE]}))
+      id <- unlist(lapply(1:n,function(i){ id[id == id.unq[i] ]    }))
+    }
+  }
+  p <- ncol(X)
+  xvar.names <- colnames(X)
   Ymean <- mean(y, na.rm = TRUE)
   Ysd <- sd(y, na.rm = TRUE)
   if (Ysd < 1e-6) {
@@ -149,7 +161,7 @@ boostmtree <- function(x,
       X.tm <- cbind(1, cbind(tm.unq))
     }
   }
-  else {    
+  else {
     X.tm <- cbind(rep(1, n.tm))
     lambda <- 0
   }
@@ -164,6 +176,21 @@ boostmtree <- function(x,
   nu.vec <- c(nu[1], rep(nu[2], df.D - 1))
   ntree <- is.hidden.ntree(user.option)
   bootstrap <- is.hidden.bootstrap(user.option)
+  bst.frac <- is.hidden.bst.frac(user.option)
+  if(bootstrap == "by.user"){
+    if(missing(bst.frac)){
+      bst.frac <- 0.632
+    }
+    samp.mat <- matrix(NA,nrow = n,ncol = M)
+    for(i in 1:M){
+      samp.value <- (sample(1:n,floor(bst.frac*n),replace = FALSE))
+      samp.value <- sort(c(samp.value,sample(samp.value, n - length(samp.value),replace = TRUE)))
+      samp.value <- unlist(lapply(1:n,function(i){
+        sum(samp.value == i)
+      }))
+      samp.mat[,i] <- samp.value
+    }
+  }
   if (ntree == 1) {
     nodesize <- max(1, round(n/(2 * K)))
     mtry <- df.D + p
@@ -243,17 +270,19 @@ boostmtree <- function(x,
   cv.lambda.flag <- cv.flag && is.hidden.CVlambda(user.option) && lambda.est.flag
   cv.rho.flag <- cv.flag && is.hidden.CVrho(user.option) && rho.fit.flag
   vimp.flag <- importance && cv.flag
-  vimp.flag <- FALSE
   if (cv.flag) {
     mu.cv.list <- vector("list", M)
     mu.cv <- lapply(1:n, function(i) {rep(0, ni[i])})
     mu.i <- lapply(1:n, function(i) {
       lapply(1:n, function(j) {rep(0, ni[j])})
     })
+    gamma.i.list <- lapply(1:M,function(m){
+      vector("list", length = n)
+    })
     err.rate <- matrix(NA, M, 2)
     colnames(err.rate) <- c("l1", "l2")
     Ymean.i <- sapply(1:n, function(i) {
-      mean(unlist(Yorg[-i]), na.rm = TRUE) 
+      mean(unlist(Yorg[-i]), na.rm = TRUE)
     })
     Ysd.i <- sapply(1:n, function(i) {
       sd.i <- sd(unlist(Yorg[-i]), na.rm = TRUE)
@@ -264,16 +293,12 @@ boostmtree <- function(x,
         sd.i
       }
     })
-    if (vimp.flag) {
-      vimp <- matrix(0, M, p)
-      colnames(vimp) <- xvar.names
-    }
-    else {
-      vimp <- NULL
-    }
   }
   else {
     err.rate <- rmse <- Mopt <- vimp <- NULL
+  }
+  if(vimp.flag){
+    membershipNoise.list <- oob.list <- vector("list", length = M)
   }
   if (verbose) pb <- txtProgressBar(min = 0, max = M, style = 3)
   for (m in 1:M) {
@@ -286,17 +311,18 @@ boostmtree <- function(x,
         t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
       })), nrow = df.D))
     }
-    else {
-      gm.mod <- t(matrix(unlist(lapply(1:n, function(i) {
-        rmi <- rho.inv(ni[i], rho.tree.grad)
-        cmi <- rmi * sum(Y[[i]] - mu[[i]], na.rm = TRUE)
-        t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
-      })), nrow = df.D))
-      gm <- t(matrix(unlist(lapply(1:n, function(i) {
-        rmi <- rho.inv(ni[i], rho)
-        cmi <- rmi * sum(Y[[i]] - mu[[i]], na.rm = TRUE)
-        t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
-      })), nrow = df.D))
+    else
+        {
+          gm.mod <- t(matrix(unlist(lapply(1:n, function(i) {
+            rmi <- rho.inv(ni[i], rho.tree.grad)
+            cmi <- rmi * sum(Y[[i]] - mu[[i]], na.rm = TRUE)
+            t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
+          })), nrow = df.D))
+          gm <- t(matrix(unlist(lapply(1:n, function(i) {
+            rmi <- rho.inv(ni[i], rho)
+            cmi <- rmi * sum(Y[[i]] - mu[[i]], na.rm = TRUE)
+            t(D[[i]]) %*% (Y[[i]] - mu[[i]] - cbind(rep(cmi, ni[i])))
+          })), nrow = df.D))
     }
     incoming.data <- cbind(gm.mod, X)
     names(incoming.data) = c(Y.names, names(X))
@@ -309,7 +335,7 @@ boostmtree <- function(x,
                          importance = "none",
                          bootstrap = bootstrap,
                          ntree = ntree,
-                         forest.wt = TRUE, 
+                         forest.wt = TRUE,
                          memebership = TRUE)
       Kmax <- max(rfsrc.obj$leaf.count, na.rm = TRUE)
       baselearner[[m]] <- list(forest = rfsrc.obj)
@@ -322,7 +348,10 @@ boostmtree <- function(x,
                          nodesize = nodesize,
                          importance = "none",
                          bootstrap = bootstrap,
-                         membership = TRUE)
+                         samp = if(bootstrap == "by.user") samp.mat[,m,drop = FALSE] else NULL,
+                         membership = TRUE,
+                         na.action = "na.impute",
+                         nimpute = 2)
       baselearner[[m]] <- rfsrc.obj
       result.pred <- predict.rfsrc(rfsrc.obj,
                                    membership = TRUE,
@@ -336,8 +365,9 @@ boostmtree <- function(x,
       if (vimp.flag) {
         oob <- which(rfsrc.obj$inbag == 0)
         n.oob <- length(oob)
+        oob.list[[m]] <- oob
         Xnoise <- do.call(rbind, lapply(1:p, function(k) {
-          X.k <- X[oob,, drop = FALSE]
+          X.k <- rfsrc.obj$xvar[oob,, drop = FALSE]
           X.k[, k] <- sample(X.k[, k])
           X.k
         }))
@@ -346,7 +376,7 @@ boostmtree <- function(x,
                         membership = TRUE,
                         ptn.count = K,
                         importance = "none")$ptn.membership)
-        membershipNoise <- as.numeric(factor(membershipNoise, levels = levels(factor(membership.org))))
+        membershipNoise.list[[m]] <- matrix(membershipNoise,nrow = n.oob,byrow = FALSE)
       }
     }
     if (ntree == 1) {
@@ -396,8 +426,8 @@ boostmtree <- function(x,
           }
           lambda.hat <- min(lambda.hat, lambda.max)
         }
-        lambda <- lambda.hat 
-        sigma <- sigma.robust(lambda, rho) 
+        lambda <- lambda.hat
+        sigma <- sigma.robust(lambda, rho)
       }
       Xnew <- papply(1:n, function(i) {
         rmi <- rho.inv(ni[i], rho)
@@ -405,7 +435,7 @@ boostmtree <- function(x,
         t(D[[i]]) %*% Wi %*% D[[i]]
       })
       gamma <- lapply(1:Kmax, function(k) {
-        pt.k <- (membership == k)
+          pt.k <- (membership == k)
         if (sum(pt.k) > 0) {
           YnewSum <- colSums(gm[pt.k,, drop = FALSE])
           XnewSum <- Reduce("+", lapply(which(pt.k), function(j) {Xnew[[j]]}))
@@ -430,8 +460,10 @@ boostmtree <- function(x,
         gamma[[membership[i]]]})), nrow = df.D) * nu.vec)
       mu <- lapply(1:n, function(i) {mu[[i]] + D[[i]] %*% bhat[i, ]})
       if (cv.flag) {
+        oob <- which(rfsrc.obj$inbag == 0)
         mu.i <- lapply(1:n,function(i) {
-          mem.i <- membership[i]  
+          if( any(i == oob)){
+          mem.i <- membership[i]
           mu.ij <- mu.i[[i]]
           grad.i <- t(matrix(unlist(lapply(1:n, function(i) {
             rmi <- rho.inv(ni[i], rho)
@@ -466,19 +498,22 @@ boostmtree <- function(x,
             }
           })
           gamma.matx.i <- matrix(0, Kmax, df.D + 1)
-          gamma.matx.i[, 1] <- 1:Kmax
+          gamma.matx.i[, 1] <- sort(unique(membership.org))
           gamma.matx.i[, 2:(df.D+1)] <- matrix(unlist(gamma.i), ncol = df.D, byrow = TRUE)
+          gamma.i.list[[m]][[i]] <<- gamma.matx.i
           lapply(1:n,function(j) {
-            which.j <- which(gamma.matx.i[, 1] == membership[j])
+            which.j <- which(gamma.matx.i[, 1] == membership.org[j])
             mu.i[[i]][[j]] + c(D[[j]] %*% (gamma.matx.i[which.j, -1] * nu.vec))
           })
+          }else
+            {
+          mu.i[[i]]
+        }
         })
         mu.cv <- lapply(1:n,function(i){mu.i[[i]][[i]]})
         mu.cv.list[[m]] <- mu.cv
         mu.cv.org <- lapply(1:n,function(i){mu.cv[[i]] * Ysd.i[i] + Ymean.i[i]})
         err.rate[m, ] <- c(l1Dist(Yorg, mu.cv.org), l2Dist(Yorg, mu.cv.org))
-        if (vimp.flag) {
-        }
       }
     }
     else{
@@ -564,7 +599,85 @@ boostmtree <- function(x,
         Mopt <- M
       }
     rmse <- err.rate[Mopt, "l2"]
-    mu <- lapply(1:n,function(i){mu.cv.list[[Mopt]][[i]] * Ysd.i[i] + Ymean.i[i]})
+    mu <- lapply(1:n,function(i){mu.cv.list[[Mopt]][[i]] * Ysd.i[i] + Ymean.i[i] })
+  }
+  if(vimp.flag){
+    if(df.D > 1){
+      vimp.main <- vimp.int <-rep(NA,p)
+      for(k in 1:p){
+        mu.vimp <- lapply(1:n,function(i){
+          mu.main.i <- mu.int.i <- rep(0,ni[i])
+          if(k == p){ mu.time <- rep(0,ni[i])  }
+          NullObj <- lapply(1:Mopt,function(m){
+            if( any(i == oob.list[[m]] )){
+              membershipNoise.i <- membershipNoise.list[[m]][ which(oob.list[[m]] == i)   , k ,drop = TRUE]
+              membershipOrg.i.vec <- gamma.i.list[[m]][[i]][,1,drop = TRUE]
+              gamma.noise.i <- t(gamma.i.list[[m]][[i]][which(membershipOrg.i.vec == membershipNoise.i),-1,drop = FALSE])
+              membershipOrg.i <- membership.list[[m]][ i ]
+              gamma.org.i <- t(gamma.i.list[[m]][[i]][which(membershipOrg.i.vec == membershipOrg.i),-1,drop = FALSE])
+              gamma.main <- cbind(c(gamma.noise.i[1,1],gamma.org.i[-1,1]))
+              out.main <- c(D[[i]] %*% (gamma.main * nu.vec))
+              gamma.int <- cbind(c(gamma.org.i[1,1],gamma.noise.i[-1,1]))
+              out.int <- c(D[[i]] %*% (gamma.int * nu.vec))
+              if(k == p){
+                n.D <- nrow(D[[i]])
+                out.time <- c(D[[i]][sample(1:n.D,n.D,replace = TRUE),,drop = FALSE] %*% (gamma.org.i * nu.vec))
+              }
+            }
+            else{
+              out.main <- out.int <- rep(0,ni[i])
+              if(k == p){ out.time <- rep(0,ni[i])  }
+            }
+            mu.main.i <<- mu.main.i + out.main
+            mu.int.i <<- mu.int.i + out.int
+            if(k == p){ mu.time <<- mu.time + out.time }
+            NULL
+          })
+          list(mu.main = mu.main.i,mu.int = mu.int.i,mu.time = if (k == p) mu.time else NULL  )
+        })
+        mu.main <- lapply(1:n,function(i){ mu.vimp[[i]]$mu.main * Ysd.i[i] + Ymean.i[i]  })
+        mu.int  <- lapply(1:n,function(i){ mu.vimp[[i]]$mu.int  * Ysd.i[i] + Ymean.i[i]  })
+        err.rate.main <- l2Dist(Yorg, mu.main)
+        vimp.main[k] <-  err.rate.main - err.rate[Mopt,2]
+        err.rate.int <- l2Dist(Yorg, mu.int)
+        vimp.int[k] <-  err.rate.int - err.rate[Mopt,2]
+        if(k == p){
+          mu.time <- lapply(1:n,function(i){ mu.vimp[[i]]$mu.time * Ysd.i[i] + Ymean.i[i] })
+          err.rate.time <- l2Dist(Yorg, mu.time)
+          vimp.time <-  err.rate.time - err.rate[Mopt,2]
+        }
+      }
+      names(vimp.main) <- xvar.names
+      names(vimp.int) <- paste(xvar.names, "time", sep=":")
+      names(vimp.time) <- "time"
+      vimp <- c(vimp.main,vimp.int,vimp.time)
+    }
+    else{
+      vimp <- rep(NA,p)
+      for(k in 1:p){
+        mu.k <- lapply(1:n,function(i){
+          mu.i <- rep(0,ni[i])
+          NullObj <- lapply(1:Mopt,function(m){
+            if( any(i == oob.list[[m]] )){
+              membershipNoise.i <- membershipNoise.list[[m]][ which(oob.list[[m]] == i)   , k ,drop = TRUE]
+              membershipOrg.i.vec <- gamma.i.list[[m]][[i]][,1,drop = TRUE]
+              gamma.noise.i <- t(gamma.i.list[[m]][[i]][which(membershipOrg.i.vec == membershipNoise.i),-1,drop = FALSE])
+              out <- c(D[[i]] %*% (gamma.noise.i * nu.vec))
+            }
+            else
+            {
+              out <- rep(0,ni[i])
+            }
+            mu.i <<- mu.i + out
+            NULL
+          })
+          mu.i * Ysd.i[i] + Ymean.i[i]
+        })
+        err.rate.k <- l2Dist(Yorg, mu.k)
+        vimp[k] <- err.rate.k - err.rate[Mopt,2]
+      }
+      names(vimp) <- xvar.names
+    }
   }
   obj <- list(x = X,
               xvar.names = xvar.names,
@@ -590,7 +703,7 @@ boostmtree <- function(x,
               err.rate = if (!is.null(err.rate)) err.rate / Ysd else NULL,
               rmse = if (!is.null(rmse)) rmse / Ysd else NULL,
               Mopt = Mopt,
-              vimp = if (!is.null(vimp)) colSums(vimp, na.rm = TRUE) else NULL,
+              vimp = if (!is.null(vimp)) vimp / err.rate[Mopt, "l2"] else NULL,
               forest.tol = forest.tol)
   class(obj) <- c("boostmtree", "grow", learnerUsed)
   invisible(obj)

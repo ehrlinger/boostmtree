@@ -9,6 +9,8 @@
  tm,
  npts = 25,
  subset,
+ conditional.xvars = NULL,
+ conditional.values = NULL,
  plot.it = TRUE,
  ...)}
 \arguments{
@@ -21,6 +23,11 @@
     plots are slow.}
   \item{subset}{Vector indicating which rows of the x-data to be used for the
     analysis.  The default is to use the entire data.}
+  \item{conditional.xvars}{Vector of character values indicating names of the x-variables
+    to be used for further conditioning (adjusting) the predicted y values. Variable names
+    should be different from \code{xvar.names}.}
+  \item{conditional.values}{Vector of values taken by the variables from \code{conditional.xvars}.
+    The length of the vector should be same as the length of the vector for \code{conditional.xvars},     which means only one value per conditional variable.}
   \item{plot.it}{Should plots be displayed?}
   \item{...}{Further arguments passed to or from other methods.}
 }
@@ -28,7 +35,8 @@
   Partial dependence plot (Friedman, 2001) of x values specified by
   \code{xvar.names} against the adjusted predicted y-values over a set
   of time points specified by \code{tm}.  Analysis can be restricted to
-  a subset of the data using \code{subset}.
+  a subset of the data using \code{subset}. Further conditioning can be
+  imposed using \code{conditional.xvars}.
 }
 \author{
   Hemant Ishwaran, Pande A. and Udaya B. Kogalur
@@ -55,12 +63,16 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, M = 300)
 partialPlot(boost.grow, "x1")
 partialPlot(boost.grow, "x2")
 
+#partial plot using "x2" as the conditional variable
+partialPlot(boost.grow, "x1", conditional.xvar = "x2", conditional.values = 1)
+partialPlot(boost.grow, "x1", conditional.xvar = "x2", conditional.values = 2)
+
 ##----------------------------------------------------------------------------
 ## spirometry data
 ##----------------------------------------------------------------------------
 data(spirometry, package = "boostmtree")
 
-#boosting call: cubic B-splines with 15 knots 
+#boosting call: cubic B-splines with 15 knots
 spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spirometry$y,
             M = 300, nu = .025, nknots = 15)
 
