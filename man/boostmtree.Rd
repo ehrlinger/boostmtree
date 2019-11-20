@@ -1,35 +1,36 @@
 \name{boostmtree}
 \alias{boostmtree}
-\alias{boostmtree}
 \title{Boosted multivariate trees for longitudinal data}
 \description{
   Multivariate extension of Friedman's gradient descent boosting method
-  to longitudinal data using multivariate tree base learners (Pande et
+  for modeling continuous or binary longitudinal response using 
+  multivariate tree base learners (Pande et
   al., 2017).  Covariate-time interactions are modeled using penalized
   B-splines (P-splines) with estimated adaptive smoothing parameter.
 }
 \usage{
  boostmtree(x,
-   tm,
-   id,
-   y,
-   M = 200,
-   nu = 0.05,
-   K = 5,
-   nknots = 10,
-   d = 3,
-   pen.ord = 3,
-   lambda,
-   lambda.max = 1e6,
-   lambda.iter = 2,
-   svd.tol = 1e-6,
-   forest.tol = 1e-3,
-   verbose = TRUE,
-   cv.flag = FALSE,
-   eps = 1e-5,
-   importance = FALSE,
-   mod.grad = TRUE,
-   ...)
+            tm,
+            id,
+            y,
+            family = c("Continuous","Binary"),
+            M = 200,
+            nu = 0.05,
+            K = 5,
+            nknots = 10,
+            d = 3,
+            pen.ord = 3,
+            lambda,
+            lambda.max = 1e6,
+            lambda.iter = 2,
+            svd.tol = 1e-6,
+            forest.tol = 1e-3,
+            verbose = TRUE,
+            cv.flag = FALSE,
+            eps = 1e-5,
+            mod.grad = TRUE,
+            NR.iter = 3,
+            ...)
 }
 \arguments{
     \item{x}{Data frame (or matrix) containing the x-values.   Rows
@@ -39,6 +40,7 @@
     \item{tm}{Vector of time values, one entry for each row in \code{x}.}
     \item{id}{Unique subject identifier, one entry for each row in \code{x}.}
     \item{y}{Observed y-value, one entry for each row in \code{x}.}
+    \item{family}{Family of the response variable \code{y}. Use any one from \{"Continuous", "Binary"\} based on the scale of \code{y}.}
     \item{M}{Number of boosting iterations}
     \item{nu}{Boosting regularization parameter.  A value in (0,1].}
     \item{K}{Number of terminal nodes used for the multivariate tree learner.}
@@ -66,8 +68,8 @@
       optimal stopping using out of bag data?}
      \item{eps}{Tolerance value used for determining the optimal
        \code{M}. Applies only if \command{cv.flag} = TRUE.  For experts only.}
-    \item{importance}{Should variable importance (VIMP) be determined using out of bag data?}
     \item{mod.grad}{Use a modified gradient? See details below.}
+    \item{NR.iter}{Number of Newton-Raphson iteration. Applied for \command{family} = "Binary".}
     \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
@@ -149,8 +151,14 @@
      \item{id}{Sorted subject identifier.}
      \item{y}{List with each component containing the observed
        y-values for a given individual. Values sorted on \code{id}.}
-     \item{ymean}{Overall mean of y-values for all individuals.}
-     \item{ysd}{Overall standard deviation of y-values for all individuals.}
+     \item{family}{Family of \code{y}.}   
+     \item{ymean}{Overall mean of y-values for all individuals. If \code{family} = 
+     "Binary", \code{ymean} = 0.}
+     \item{ysd}{Overall standard deviation of y-values for all individuals. If \code{family} = 
+     "Binary", \code{ysd} = 1.}
+     \item{n}{Total number of subjects.}
+     \item{ni}{Number of repeated measures for each subject.}
+     \item{tm.unq}{Unique time points.}
      \item{gamma}{List of length \emph{M}, with each component
        containing the boosted tree fitted values.}
      \item{mu}{List with each component containing the estimated mean
@@ -166,21 +174,23 @@
      \item{membership}{List of length \emph{M}, with each component
        containing the terminal node membership for a given boosting
        iteration.}
-     \item{D}{Design matrix for time.}
+     \item{X.tm}{Design matrix for all the unique time points.}
+     \item{D}{Design matrix for each subject.}
      \item{d}{Degree of the piecewise B-spline polynomial.}
      \item{pen.ord}{Penalization difference order.}
      \item{K}{Number of terminal nodes.}
      \item{M}{Number of boosting iterations.}
      \item{nu}{Boosting regularization parameter.}
      \item{ntree}{Number of trees.}
+     \item{cv.flag}{Whether in-sample CV is used or not?}
      \item{err.rate}{In-sample standardized estimate of l1-error and RMSE.}
      \item{rmse}{In-sample standardized RMSE at optimized \code{M}.}
      \item{Mopt}{The optimized \code{M}.}
-     \item{vimp}{Variable importance at optimized M.}
+     \item{gamma.i.list}{Estimate of gamma obtained from in-sample CV if \code{cv.flag} = TRUE,       else NULL}
      \item{forest.tol}{Forest tolerance value (needed for prediction).}
 }
 \author{
-  Hemant Ishwaran, Pande A. and Udaya B. Kogalur
+  Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 }
 \references{
   Friedman J.H. (2001). Greedy function approximation: a gradient
@@ -207,14 +217,30 @@
 }
 \examples{
 ##------------------------------------------------------------
-## synthetic example
+## synthetic example (Response y is continuous)
 ## 0.8 correlation, quadratic time with quadratic interaction
 ##-------------------------------------------------------------
 #simulate the data (use a small sample size for illustration)
-dta <- simLong(n = 50, N = 5, rho =.80, model = 2)$dtaL
+dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call (M set to a small value for illustration)
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, M = 20)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 20)
+
+#print results
+print(boost.grow)
+
+#plot.results
+plot(boost.grow)
+
+##------------------------------------------------------------
+## synthetic example (Response y is binary)
+## 0.8 correlation, quadratic time with quadratic interaction
+##-------------------------------------------------------------
+#simulate the data (use a small sample size for illustration)
+dta <- simLong(n = 50, N = 5, rho =.80, model = 2, family = "Binary")$dtaL
+
+#basic boosting call (M set to a small value for illustration)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary", M = 20)
 
 #print results
 print(boost.grow)
@@ -224,26 +250,35 @@ plot(boost.grow)
 
 \dontrun{
 ##------------------------------------------------------------
-## same synthetic example as above but with in-sample cross-validation
-## estimate for RMSE and vimp
+## Same synthetic example as above with continuous response
+## but with in-sample cross-validation estimate for RMSE
 ##-------------------------------------------------------------
-dta <- simLong(n = 50, N = 5, rho =.80, model = 2)$dtaL
-boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, M = 300,
-                 cv.flag = TRUE, importance = TRUE)
+dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
+boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
+                 family = "Continuous", M = 300, cv.flag = TRUE)
 plot(boost.cv.grow)
 print(boost.cv.grow)
-vimpPlot(object = boost.cv.grow, ymaxlim = 20, ymaxtimelim = 20,
-         xaxishead = c(3,3), yaxishead = c(65,65),
-         cex.xlab = 1, subhead.cexval = 1.2)
+
 ##----------------------------------------------------------------------------
-## spirometry data
+## spirometry data (Response is continuous)
 ##----------------------------------------------------------------------------
 data(spirometry, package = "boostmtree")
 
 #boosting call: cubic B-splines with 15 knots
 spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spirometry$y,
-                        M = 100, nu = .025, nknots = 15)
+                        family = "Continuous",M = 100, nu = .025, nknots = 15)
 plot(spr.obj)
+
+
+##----------------------------------------------------------------------------
+## Atrial Fibrillation data (Response is binary)
+##----------------------------------------------------------------------------
+data(AF, package = "boostmtree")
+
+#boosting call: cubic B-splines with 15 knots
+AF.obj <- boostmtree(AF$feature, AF$time, AF$id, AF$y,
+                        family = "Binary",M = 100, nu = .025, nknots = 15)
+plot(AF.obj)
 
 
 ##----------------------------------------------------------------------------
@@ -259,16 +294,15 @@ if (library("mlbench", logical.return = TRUE)) {
   trn <- sample(1:nrow(x), size = nrow(x) * (2 / 3), replace = FALSE)
 
   ## run boosting in univariate mode
-  o <- boostmtree(x = x[trn,], y = y[trn])
+  o <- boostmtree(x = x[trn,], y = y[trn],family = "Continuous")
   o.p <- predict(o, x = x[-trn, ], y = y[-trn])
   print(o)
   plot(o.p)
 
   ## run boosting in univariate mode to obtain RMSE and vimp
-  o.cv <- boostmtree(x = x, y = y, M = 100, cv.flag = TRUE, importance = TRUE)
+  o.cv <- boostmtree(x = x, y = y, M = 100,family = "Continuous",cv.flag = TRUE)
   print(o.cv)
   plot(o.cv)
-  vimpPlot(o.cv,ymaxlim = 10,cex.xlab = 1)
 }
 
 }}

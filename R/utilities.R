@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.3.0 (_PROJECT_BUILD_ID_)
+####  Version 1.4.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -41,10 +41,13 @@
 ####    email:  hemant.ishwaran@gmail.com
 ####    URL:    http://web.ccs.miami.edu/~hishwaran
 ####    --------------------------------------------------------------
-####    Amol Pande
-####    Division of Biostatistics
-####    1120 NW 14th Street
-####    University of Miami, Miami FL 33136
+####    Amol Pande, Ph.D.
+####    Assistant Staff,
+####    Thoracic and Cardiovascular Surgery
+####    Heart and Vascular Institute
+####    JJ4, Room 508B,
+####    9500 Euclid Ave,
+####    Cleveland Clinic, Cleveland, Ohio, 44195
 ####
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
@@ -61,6 +64,134 @@
 ####**********************************************************************
 
 
+# Function is use to create a diagonal matrix from a vector
+DiagMat <- function(X){
+  n <- length(X)
+  if(n == 1){
+    XMat <- as.matrix(X)
+  }else
+  {
+    XMat <- diag(X)
+  }
+  return(XMat)
+}
+# Converting linear predictor to mu using family
+GetMu <- function(Linear_Predictor,Family){
+  if(is.list(Linear_Predictor)){
+    n <- length(Linear_Predictor)
+    if(Family == "Continuous"){
+      mu <- lapply(1:n,function(i){
+        Linear_Predictor[[i]]
+      })
+    }
+    if(Family == "Binary"){
+      mu <- lapply(1:n,function(i){
+        exp(Linear_Predictor[[i]])/(1 + exp(Linear_Predictor[[i]]) )
+      })
+    }
+  }
+  else{
+    if(Family == "Continuous"){
+      mu <- Linear_Predictor
+    }
+    if(Family == "Binary"){
+      mu <- exp(Linear_Predictor)/(1 + exp(Linear_Predictor) )
+    }
+  }
+  return(mu)
+}
+# Converting linear predictor to mu using family
+GetMu_Lambda <- function(Linear_Predictor,Family){
+  if(is.list(Linear_Predictor)){
+    n <- length(Linear_Predictor)
+    if(Family == "Continuous"){
+      mu <- lapply(1:n,function(i){
+        rep(1,length(Linear_Predictor[[i]]))
+      })
+    }
+    if(Family == "Binary"){
+      mu <- lapply(1:n,function(i){
+        exp(Linear_Predictor[[i]])/(1 + exp(Linear_Predictor[[i]]) )
+      })
+    }
+  }
+  else{
+    if(Family == "Continuous"){
+      mu <- rep(1,length(Linear_Predictor))
+    }
+    if(Family == "Binary"){
+      mu <- exp(Linear_Predictor)/(1 + exp(Linear_Predictor) )
+    }
+  }
+  return(mu)
+}
+# Apply a transform H function
+Transform_H <- function(Mu, Family){
+  if(is.list(Mu)){
+    n <- length(Mu)
+    if(Family == "Continuous"){
+      H_Mu <- lapply(1:n,function(i){
+        DiagMat(rep(1,length(Mu[[i]])))
+      })
+    }
+    if(Family == "Binary"){
+      H_Mu <- lapply(1:n,function(i){
+        DiagMat(Mu[[i]]*(1 - Mu[[i]]))
+      })
+    }
+  }
+  else{
+    if(Family == "Continuous"){
+      H_Mu <- DiagMat(rep(1,length(Mu)))
+    }
+    if(Family == "Binary"){
+      H_Mu <- DiagMat(Mu*(1 - Mu))
+    }
+  }
+  return(H_Mu)
+}
+# Function for obtaining index based on approx. matching 
+AppoxMatch <- function(x,y){
+  n <- length(x)
+  out <- unlist(lapply(1:n,function(i){
+    which.min(abs(x[i] - y))
+  }))
+  return(out)
+}
+# Function to remove covariates with all elements of a column or a row missing
+RemoveMiss.Fun <- function(X){
+  n <- nrow(X)
+  WhichRow <- unlist(lapply(1:n,function(i){
+    temp.var <- X[i,]
+    if(all(is.na(temp.var))){
+      out <- "remove"
+    }
+    else{
+      out <- "keep"
+    }
+    out
+  }))
+  WhichRow.remove <- which(WhichRow == "remove")
+  if(length(WhichRow.remove) > 0){
+    X <- X[-WhichRow.remove,]  
+  }
+  p <- ncol(X)
+  WhichCol <- unlist(lapply(1:p,function(i){
+    temp.var <- X[,i]
+    if(all(is.na(temp.var))){
+      out <- "remove"
+    }
+    else{
+      out <- "keep"
+    }
+    out
+  }))
+  WhichCol.remove <- which(WhichCol == "remove")
+  if(length(WhichCol.remove) > 0){
+    X <- X[,-WhichCol.remove]  
+  }
+  return(list(X = X,id.remove = if (length(WhichRow.remove) > 0) WhichRow.remove else NULL))
+}
 blup.solve <- function(transf.data, membership, sigma, Kmax) {
   lapply(1:Kmax, function(k) {
     pt.k <- (membership == k)
@@ -236,7 +367,7 @@ parse.depth <- function(obj) {
       if (!is.null(obj[[k]])) {
         max(obj[[k]][, "dpthID"], na.rm = TRUE)
       }
-    })), na.rm = TRUE)
+    })), na.rm = TRUE) 
   depth[is.na(depth)] <- treeDepth + 1
   }
   depth
@@ -293,7 +424,7 @@ plot.profile.prx <- function(obj, col = NULL, rnd.case = NULL, cut = .95, restri
                   %*% rnd.prx / sum(rnd.prx))
   prx.which.time <- is.element(time.unq, unlist(lapply(rnd.match, function(i){time[[i]]})))
   prx.time <- time.unq[prx.which.time]
-  prx.mu <- prx.mu[prx.which.time]
+  prx.mu <- prx.mu[prx.which.time] 
   if (is.null(col)) col <- rep(1, length(rnd.prx))
   plot(supsmu(rnd.time, rnd.mean),
        xlim = if (restrictX) range(rnd.time) else range(c(rnd.time, prx.time)),
@@ -330,7 +461,7 @@ rho.inv <- function(ni, rho, tol = 1e-2) {
   }
   else if (rho < 0 && abs(rho + 1 / m) <= tol) {
     (-1 / m + tol) / (m * tol)
-  }
+  } 
   else {
     rho / (1 + m * rho)
   }
@@ -350,39 +481,6 @@ rho.inv.sqrt <- function(ni, rho, tol = 1e-2) {
 }
 sigma.robust <- function(lambda, rho) {
   lambda
-}
-RemoveMiss.Fun <- function(X){
-  n <- nrow(X)
-  WhichRow <- unlist(lapply(1:n,function(i){
-    temp.var <- X[i,]
-    if(all(is.na(temp.var))){
-      out <- "remove"
-    }
-    else{
-      out <- "keep"
-    }
-    out
-  }))
-  WhichRow.remove <- which(WhichRow == "remove")
-  if(length(WhichRow.remove) > 0){
-    X <- X[-WhichRow.remove,]
-  }
-  p <- ncol(X)
-  WhichCol <- unlist(lapply(1:p,function(i){
-    temp.var <- X[,i]
-    if(all(is.na(temp.var))){
-      out <- "remove"
-    }
-    else{
-      out <- "keep"
-    }
-    out
-  }))
-  WhichCol.remove <- which(WhichCol == "remove")
-  if(length(WhichCol.remove) > 0){
-    X <- X[,-WhichCol.remove]
-  }
-  return(list(X = X,id.remove = if (length(WhichRow.remove) > 0) WhichRow.remove else NULL))
 }
 papply <- function(X,FUN,...,mc.preschedule = TRUE, mc.set.seed = TRUE,
                    mc.silent = FALSE, mc.cores = getOption("mc.cores", 2L),
@@ -406,5 +504,5 @@ papply <- function(X,FUN,...,mc.preschedule = TRUE, mc.set.seed = TRUE,
       result.mclapply[[i]]
     }
   })
-return(result)
+  return(result)
 }

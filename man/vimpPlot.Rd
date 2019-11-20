@@ -7,7 +7,8 @@ Variable Importance (VIMP) plot
 Barplot displaying VIMP.
 }
 \usage{
-vimpPlot(object,
+vimpPlot(vimp,
+         Time_Interaction = TRUE,
          xvar.names = NULL,
          cex.xlab = NULL,
          ymaxlim = 0,
@@ -20,14 +21,21 @@ vimpPlot(object,
          cex.lab = 1.5,
          subhead.labels = c("Time-Interactions Effects", "Main Effects"),
          ylbl = FALSE,
-         seplim = NULL)
+         seplim = NULL,
+         eps = 0.1,
+         Width_Bar = 1)
 }
 \arguments{
-  \item{object}{
-Either a grow boostmtree object or a predict boostmtree object that includes VIMP is allowed.
+  \item{vimp}{
+VIMP values.
+}
+  \item{Time_Interaction}{
+Whether VIMP is estimated from a longitudinal data, in which case VIMP
+is available for covariate and covariate-time interaction. Default is TRUE.
+If FALSE, VIMP is assumed to be estimated from a cross-sectional data.
 }
   \item{xvar.names}{
-Names of the covariates. If NULL, names can be taken from the object.
+Names of the covariates. If NULL, names are assigned as x1, x2,...,xp.
 }
   \item{cex.xlab}{
 Magnification of the names of the covariates above (and below) the barplot.
@@ -66,6 +74,12 @@ Should labels for the sub-headings be shown on left side of the y-axis.
   \item{seplim}{
 if \code{ylbl} is \code{TRUE}, the distance between the lables of the sub-headings.
 }
+  \item{eps}{
+Amount of gap between the top of the barplot and variable names.
+}
+  \item{Width_Bar}{
+Width of the barplot.
+}
 }
 \details{
 Barplot displaying VIMP. If the analysis is for the univariate case,
@@ -76,7 +90,7 @@ effects) are shown below the x-axis. In either case, negative vimp value
 is set to zero.
 }
 \author{
-  Hemant Ishwaran, Pande A. and Udaya B. Kogalur
+  Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 }
 \examples{
 \dontrun{
@@ -85,14 +99,15 @@ is set to zero.
 ## high correlation, quadratic time with quadratic interaction
 ##-------------------------------------------------------------
 #simulate the data
-dta <- simLong(n = 50, N = 5, rho =.80, model = 2)$dtaL
+dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, M = 300,
-              cv.flag = TRUE, importance = TRUE)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, 
+              family = "Continuous",M = 300, cv.flag = TRUE)
+vimp.grow <- vimp.boostmtree(object = boost.grow)              
 
 # VIMP plot
-vimpPlot(object = boost.grow, ymaxlim = 20, ymaxtimelim = 20,
+vimpPlot(vimp = vimp.grow, ymaxlim = 20, ymaxtimelim = 20,
          xaxishead = c(3,3), yaxishead = c(65,65),
          cex.xlab = 1, subhead.cexval = 1.2)
 }

@@ -2,18 +2,20 @@
 \alias{simLong}
 \title{Simulate longitudinal data}
 \description{
-  Simulates longitudinal data from models with increasing complexity of
+  Simulates longitudinal data with continuous or binary response 
+  from models with increasing complexity of
   covariate-time interactions.
 }
 \usage{simLong(n,
- ntest = 0,
- N = 5,
- rho = 0.8,
- type = c("corCompSym", "corAR1", "corSymm", "iid"),
- model = c(0, 1, 2, 3),
- phi = 1,
- q = 0,
- ...)}
+        ntest = 0,
+        N = 5,
+        rho = 0.8,
+        type = c("corCompSym", "corAR1", "corSymm", "iid"),
+        model = c(0, 1, 2, 3),
+        family = c("Continuous","Binary"),
+        phi = 1,
+        q = 0,
+        ...)}
 \arguments{
   \item{n}{Requested training sample size.}
   \item{ntest}{Requested test sample size.}
@@ -21,6 +23,7 @@
   \item{rho}{Correlation parameter.}
   \item{type}{Type of correlation matrix.}
   \item{model}{Requested simulation model.}
+  \item{family}{Family of response \code{y}. Use any one from \{"Continuous", "Binary"\} based on the scale of \code{y}.} 
   \item{phi}{Variance of measurement error.}
   \item{q}{Number of zero-signal variables (i.e., variables unrelated to y).}
   \item{...}{Further arguments passed to or from other methods.}
@@ -47,7 +50,7 @@
   \item{f.true}{Formula of the simulation model.}
 }
 \author{
-  Hemant Ishwaran, Pande A. and Udaya B. Kogalur
+  Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 }
 \references{
   Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
@@ -57,37 +60,38 @@
 \examples{
 \dontrun{
 ##------------------------------------------------------------
-##
-##  test how well we can select variables
+##  Response is continuous
 ##----------------------------------------------------------------------------
-
 
 ## set the number of boosting iterations
 M <- 500
 
 ## simulation 0: only main effects (x1, x3, x4)
-dta <- simLong(n = 100, ntest = 100, model = 0, q = 5)
+dta <- simLong(n = 100, ntest = 100, model = 0, family = "Continuous", q = 5)
 trn <- dta$trn
 dtaL <- dta$dtaL
 dta <- dta$dta
-obj.0 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn], M = M)
+obj.0 <-  boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn], 
+          family = "Continuous", M = M)
 pred.0 <- predict(obj.0, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
-vimp.0 <- pred.0$vimp
 
-## simulation 3: main effects (x1, x3, x4), time-interactions (x2, x3)
-dta <- simLong(n = 100, ntest = 100, model = 3, q = 5)
+
+
+##------------------------------------------------------------
+##  Response is binary
+##----------------------------------------------------------------------------
+
+## set the number of boosting iterations
+M <- 500
+
+## simulation 0: only main effects (x1, x3, x4)
+dta <- simLong(n = 100, ntest = 100, model = 0, family = "Binary", q = 5)
 trn <- dta$trn
 dtaL <- dta$dtaL
 dta <- dta$dta
-obj.3 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn], M = M)
-pred.3 <- predict(obj.3, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
-vimp.3 <- pred.3$vimp
-
-## plot vimp side by side
-barplot(rbind(vimp.0,vimp.3),beside=T,las=2,
-    ylab="standardized vimp", args.legend = list(x = "topleft"),
-    col = c(2, 4), legend.text = c("model 0", "model 3"))
-
+obj.0 <-  boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn], 
+          family = "Binary", M = M)
+pred.0 <- predict(obj.0, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 }
 }
 \keyword{simulation}

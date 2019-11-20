@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.3.0 (_PROJECT_BUILD_ID_)
+####  Version 1.4.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -41,10 +41,13 @@
 ####    email:  hemant.ishwaran@gmail.com
 ####    URL:    http://web.ccs.miami.edu/~hishwaran
 ####    --------------------------------------------------------------
-####    Amol Pande
-####    Division of Biostatistics
-####    1120 NW 14th Street
-####    University of Miami, Miami FL 33136
+####    Amol Pande, Ph.D.
+####    Assistant Staff,
+####    Thoracic and Cardiovascular Surgery
+####    Heart and Vascular Institute
+####    JJ4, Room 508B,
+####    9500 Euclid Ave,
+####    Cleveland Clinic, Cleveland, Ohio, 44195
 ####
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
@@ -67,7 +70,6 @@ generic.predict.boostmtree <- function(object,
                                        id,
                                        y,
                                        M,
-                                       importance = TRUE,
                                        eps = 1e-5,
                                        ...)
 {
@@ -83,9 +85,11 @@ generic.predict.boostmtree <- function(object,
     if (missing(x)) {
       X <- object$x
       n <- nrow(X)
-      D <- object$D
+      X.tm <- object$X.tm
       tm <- object$time
       tm.unq <- sort(unique(unlist(object$time)))
+      id <- object$id
+      id.unq <- sort(unique(id))
       testFlag <- FALSE
     }
     else {
@@ -134,19 +138,9 @@ generic.predict.boostmtree <- function(object,
       n <- nrow(X)
       tm.unq <- tm
       tm <- lapply(1:n, function(i){tm.unq})
+      id.unq <- 1:n
+      id <- rep(id.unq,each = length(tm.unq))
       testFlag <- FALSE
-  }
-  if (object$d > 0) {
-    if (length(tm.unq) > 1) {
-      D <- cbind(1, bs(tm.unq, knots = attr(object$D, "knots"),
-                       Boundary.knots = attr(object$D, "Boundary.knots"), degree = object$d))
-    }
-    else {
-      stop("only one unique time point")
-    }
-  }
-  else {
-    D <- cbind(rep(1, length(tm.unq)))
   }
   if (missing(M)) {
     M <- object$M
@@ -160,21 +154,34 @@ generic.predict.boostmtree <- function(object,
   nu <- object$nu
   ntree <- object$ntree
   p <- ncol(X)
-  df.D <- ncol(D)
+  X.tm <- object$X.tm
+  df.D <- ncol(X.tm)
   xvar.names <- colnames(X)
   nu.vec <- c(nu[1], rep(nu[2], df.D - 1))
   Ymean <- object$ymean
   Ysd <- object$ysd
   gamma <- object$gamma
   baselearner <- object$baselearner
+  family <- object$family
+  id.index <- lapply(1:n,function(i){
+    which(id == id.unq[i] )
+  })
+  ni <- unlist(lapply(1:n,function(i){
+    length(id.index[[i]])
+  }))
+  tm.unq_train <- object$tm.unq
+  tm.index <- lapply(1:n,function(i){
+    AppoxMatch(unlist(tm)[id.index[[i]]],tm.unq_train)
+  })
+  D <- lapply(1:n,function(i){
+    X.tm[tm.index[[i]] ,,drop = FALSE]
+  })
   beta <- matrix(0, n, df.D)
   if (ntree == 1) {
     beta.vimp <- beta.cov.vimp <- beta.time.vimp <- vector("list", p)
   }
-  mu.list <- vector("list", M)
+  l_pred.list <- vector("list", M)
   forest.tol <- object$forest.tol
-  vimpFlag <- testFlag && importance && ntree == 1
-  vimp <- NULL
   if (ntree == 1) {
     rf.cores.old <- getOption("rf.cores")
     mc.cores.old <- getOption("mc.cores")
@@ -184,31 +191,33 @@ generic.predict.boostmtree <- function(object,
                       newdata = X,
                       membership = TRUE,
                       ptn.count = K,
-                      importance = "none",na.action = "na.impute")$ptn.membership)
+                      na.action = "na.impute",
+                      importance = "none")$ptn.membership)
     })
     nullObj <- lapply(1:M, function(m) {
       orgMembership <- gamma[[m]][, 1]
-      beta.m <- t(gamma[[m]][match(membership[[m]], orgMembership), -1, drop = FALSE]) * nu.vec
-      Dbeta.m <- D %*% beta.m
       if (m == 1) {
-        mu.list[[m]] <<- lapply(1:n, function(i) {
-          Dbeta.m[, i][match(tm[[i]], tm.unq, tm[[i]])]
+        l_pred.list[[m]] <<- lapply(1:n, function(i) {
+          D[[i]]%*%t(gamma[[m]][match(membership[[m]][i], orgMembership), -1, drop = FALSE]*nu.vec) 
         })
       }
       else {
-        mu.list[[m]] <<- lapply(1:n, function(i) {
-          unlist(mu.list[[m-1]][i]) + Dbeta.m[, i][match(tm[[i]], tm.unq, tm[[i]])]
+        l_pred.list[[m]] <<- lapply(1:n, function(i) {
+          unlist(l_pred.list[[m-1]][i]) + D[[i]]%*%t(gamma[[m]][match(membership[[m]][i], orgMembership), -1, drop = FALSE]*nu.vec)
         })
       }
       NULL
     })
     rm(nullObj)
-    mu.list <- lapply(mu.list, function(mlist){
+    l_pred.list <- lapply(l_pred.list, function(mlist){  
       lapply(1:n,function(i) {mlist[[i]] * Ysd + Ymean})
+    })
+    mu.list <- lapply(1:M,function(m){
+      GetMu(Linear_Predictor = l_pred.list[[m]],Family = family)
     })
     if (testFlag) {
       err.rate <- matrix(unlist(lapply(mu.list, function(mlist) {
-        c(l1Dist(Y, mlist), l2Dist(Y, mlist))
+        c(l1Dist(Y, mlist), l2Dist(Y, mlist)) 
       })), ncol = 2, byrow = TRUE)
       colnames(err.rate) <- c("l1", "l2")
     }
@@ -228,73 +237,6 @@ generic.predict.boostmtree <- function(object,
     else {
       Mopt <- M
     }
-    if (vimpFlag) {
-      membershipNoise <- papply(1:Mopt, function(m) {
-        Xnoise <- do.call(rbind, lapply(1:p, function(k) {
-          X.k <- X
-          X.k[, k] <- sample(X.k[, k])
-          X.k
-        }))
-        options(rf.cores = 1, mc.cores = 1)
-        c(predict.rfsrc(baselearner[[m]],
-                        newdata = Xnoise,
-                        membership = TRUE,
-                        ptn.count = K,
-                        importance = "none",na.action = "na.impute")$ptn.membership)
-      })
-      if (!is.null(rf.cores.old)) options(rf.cores = rf.cores.old)
-      if (!is.null(mc.cores.old)) options(mc.cores = mc.cores.old)
-      nullObj <- lapply(1:Mopt, function(m) {
-        orgMembership <- gamma[[m]][, 1]
-        beta.m <- t(t(gamma[[m]][match(membership[[m]], orgMembership), -1, drop = FALSE]) * nu.vec) * Ysd
-        if (m == 1) {
-          beta.m[, 1] <- beta.m[, 1] + Ymean
-          beta <<- beta.m
-        }
-        else {
-          beta <<- beta + beta.m
-        }
-        beta.vimp <<- lapply(1:p, function(k) {
-          membership.k <- membershipNoise[[m]][((k-1) * n + 1):(k * n)]
-          beta.m.k <- t(t(gamma[[m]][match(membership.k, orgMembership), -1, drop = FALSE]) * nu.vec) * Ysd
-          if (m == 1) {
-            beta.m.k[, 1] <- beta.m.k[, 1] + Ymean
-            beta.m.k
-          }
-          else {
-            beta.vimp[[k]] + beta.m.k
-          }
-        })
-        if (df.D > 1) {
-          beta.cov.vimp <<- lapply(1:p, function(k) {
-            b.c.v <- beta.vimp[[k]]
-            b.c.v[, -1] <- beta[, -1]
-            b.c.v
-          })
-          beta.time.vimp <<- lapply(1:p, function(k) {
-            b.t.v <- beta.vimp[[k]]
-            b.t.v[, 1] <- beta[, 1]
-            b.t.v
-          })
-        }
-        NULL
-      })
-      rm(nullObj)
-    }
-    else {
-      nullObj <- lapply(1:Mopt, function(m) {
-        orgMembership <- gamma[[m]][, 1]
-        beta.m <- t(t(gamma[[m]][match(membership[[m]], orgMembership), -1, drop = FALSE]) * nu.vec) * Ysd
-        if (m == 1) {
-          beta.m[, 1] <- beta.m[, 1] + Ymean
-          beta <<- beta.m
-        }
-        else {
-          beta <<- beta + beta.m
-        }
-        NULL
-      })
-    }
   }
   else{
     nullObj <- lapply(1:M, function(m) {
@@ -305,7 +247,7 @@ generic.predict.boostmtree <- function(object,
                                  newdata = X,
                                  importance = "none",
                                  forest.wt = TRUE)$forest.wt
-      beta.m.org <- do.call("cbind", papply(1:n, function(i) {
+      beta.m.org <- do.call("cbind", mclapply(1:n, function(i) {
         fwt.i <- forest.wt[i, ]
         fwt.i[fwt.i <= forest.tol] <- 0
         pt.i <- (fwt.i != 0)
@@ -332,7 +274,7 @@ generic.predict.boostmtree <- function(object,
         beta <<- beta.m
       }
       else {
-        beta <<- beta + beta.m
+        beta <<- beta + beta.m 
       }
       Dbeta.m <- D %*% (beta.m.org * nu.vec)
       if (m == 1) {
@@ -347,13 +289,13 @@ generic.predict.boostmtree <- function(object,
       }
       NULL
     })
-    mu.list <- lapply(mu.list, function(mlist){
+    mu.list <- lapply(mu.list, function(mlist){  
       lapply(1:n,function(i) {mlist[[i]] * Ysd + Ymean})
     })
     if (testFlag) {
       err.rate <- matrix(unlist(lapply(mu.list, function(mlist) {
         c(l1Dist(Y, mlist), l2Dist(Y, mlist))
-      })), ncol = 2, byrow = TRUE)
+      })), ncol = 2, byrow = TRUE) 
       colnames(err.rate) <- c("l1", "l2")
     }
     else {
@@ -373,56 +315,42 @@ generic.predict.boostmtree <- function(object,
       Mopt <- M
     }
   }
-  DbetaT <- D %*% t(beta)
-  muhat <- lapply(1:n, function(i) {DbetaT[, i]})
-  if (vimpFlag) {
-    if (df.D <= 1) {
-      vimp <- unlist(papply(1:p, function(k) {
-        DbetaT.k <- D %*% t(beta.vimp[[k]])
-        mu.k <- lapply(1:n, function(i) {
-          DbetaT.k[, i][match(tm[[i]], tm.unq, tm[[i]])]
-        })
-        l2Dist(Y, mu.k) - err.rate[Mopt, "l2"]
-      }))
-      names(vimp) <- xvar.names
-    }
-    if (df.D > 1) {
-      vimp.cov <- unlist(papply(1:p, function(k) {
-        DbetaT.k <- D %*% t(beta.cov.vimp[[k]])
-        mu.k <- lapply(1:n, function(i) {
-          DbetaT.k[, i][match(tm[[i]], tm.unq, tm[[i]])]
-        })
-        l2Dist(Y, mu.k) - err.rate[Mopt, "l2"]
-      }))
-      vimp.cov.time <- unlist(papply(1:p, function(k) {
-        DbetaT.k <- D %*% t(beta.time.vimp[[k]])
-        mu.k <- lapply(1:n, function(i) {
-          DbetaT.k[, i][match(tm[[i]], tm.unq, tm[[i]])]
-        })
-        l2Dist(Y, mu.k) - err.rate[Mopt, "l2"]
-      }))
-      mu.time <- lapply(1:n, function(i) {
-        DbetaT[, i][sample(match(tm[[i]], tm.unq, tm[[i]]))]
-      })
-      vimp.time <- l2Dist(Y, mu.time) - err.rate[Mopt, "l2"]
-      vimp <- c(vimp.cov, vimp.cov.time, vimp.time)
-      names(vimp) <- c(xvar.names, paste(xvar.names, "time", sep=":"), "time")
-    }
-  }
+  l_pred_hat <- lapply(1:n,function(i){
+    l_pred.i <- rep(0,nrow(X.tm))
+    NullObj <- lapply(1:Mopt,function(m){
+        orgMembership <- gamma[[m]][, 1]
+        l_pred.i <<- l_pred.i + X.tm%*%t(gamma[[m]][match(membership[[m]][i], orgMembership), -1, drop = FALSE]*nu.vec)
+        NULL
+    })
+    l_pred.i * Ysd + Ymean
+  })
+  muhat <- GetMu(Linear_Predictor = l_pred_hat,Family = family)
   object$baselearner <- object$membership <- object$gamma <- NULL
-  pobj <- list(
-               boost.obj = object,
+  pobj <- list(boost.obj = object,
                x = X,
                time = tm,
-               time.unq = tm.unq,
+               id = id,
                y = if (testFlag) Y else NULL,
+               family = family,
+               ymean = Ymean,
+               ysd = Ysd,
+               xvar.names = xvar.names,
+               K = K,
+               n = n,
+               ni = ni,
+               nu.vec = nu.vec,
+               D = D,
+               df.D = df.D,
+               time.unq = tm.unq,
+               baselearner = baselearner,
+               gamma = gamma,
+               membership = membership,
                mu = mu.list[[Mopt]],
                muhat = muhat,
                phi = object$phi[Mopt],
                rho = object$rho[Mopt],
                err.rate = if (!is.null(err.rate)) err.rate / Ysd else NULL,
                rmse = if (!is.null(err.rate)) err.rate[Mopt, "l2"] / Ysd else NULL,
-               vimp = if (!is.null(vimp)) vimp / err.rate[Mopt, "l2"] else NULL,
                Mopt = if (testFlag) Mopt else NULL)
   class(pobj) <- c("boostmtree", "predict", class(object)[3])
   invisible(pobj)

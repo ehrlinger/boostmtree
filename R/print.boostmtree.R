@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.3.0 (_PROJECT_BUILD_ID_)
+####  Version 1.4.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -41,10 +41,13 @@
 ####    email:  hemant.ishwaran@gmail.com
 ####    URL:    http://web.ccs.miami.edu/~hishwaran
 ####    --------------------------------------------------------------
-####    Amol Pande
-####    Division of Biostatistics
-####    1120 NW 14th Street
-####    University of Miami, Miami FL 33136
+####    Amol Pande, Ph.D.
+####    Assistant Staff,
+####    Thoracic and Cardiovascular Surgery
+####    Heart and Vascular Institute
+####    JJ4, Room 508B,
+####    9500 Euclid Ave,
+####    Cleveland Clinic, Cleveland, Ohio, 44195
 ####
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
@@ -71,6 +74,7 @@ print.boostmtree <- function (x, ...)
     univariate <- length(x$id) == length(unique(x$id))
     cat("model                       :", class(x)[3], "\n")
     cat("fitting mode                :", class(x)[2], "\n")
+    cat("Family                      :", x$family, "\n")
     if (x$ntree > 1) {
       cat("ntree                       :", x$ntree, "\n")
     }
@@ -81,7 +85,7 @@ print.boostmtree <- function (x, ...)
     if (!univariate) {
       cat("number of unique time points:", length(sort(unique(unlist(x$time)))), "\n")
       cat("avg. number of time points  :", round(mean(sapply(x$time, length), na.rm = TRUE), 2), "\n")
-      cat("B-spline dimension          :", ncol(x$D), "\n")
+      cat("B-spline dimension          :", ncol(x$X.tm), "\n")
       cat("penalization order          :", x$pen.ord, "\n")
     }
     else {
@@ -101,6 +105,7 @@ print.boostmtree <- function (x, ...)
     univariate <- length(x$boost.obj$id) == length(unique(x$boost.obj$id))
     cat("model                       :", class(x)[3], "\n")
     cat("fitting mode                :", class(x)[2], "\n")
+    cat("Family                      :", x$family, "\n")
     cat("sample size                 :", nrow(x$x), "\n")
     cat("number of variables         :", ncol(x$x), "\n")
     if (!univariate) {

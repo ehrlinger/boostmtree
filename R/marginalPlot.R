@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.3.0 (_PROJECT_BUILD_ID_)
+####  Version 1.4.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -41,10 +41,13 @@
 ####    email:  hemant.ishwaran@gmail.com
 ####    URL:    http://web.ccs.miami.edu/~hishwaran
 ####    --------------------------------------------------------------
-####    Amol Pande
-####    Division of Biostatistics
-####    1120 NW 14th Street
-####    University of Miami, Miami FL 33136
+####    Amol Pande, Ph.D.
+####    Assistant Staff,
+####    Thoracic and Cardiovascular Surgery
+####    Heart and Vascular Institute
+####    JJ4, Room 508B,
+####    9500 Euclid Ave,
+####    Cleveland Clinic, Cleveland, Ohio, 44195
 ####
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
@@ -61,71 +64,79 @@
 ####**********************************************************************
 
 
-marginalPlot <- function (obj,
+marginalPlot <- function (object,
                          xvar.names,
-                         tm,
+                         tm.unq,
                          subset,
-                         plot.it = TRUE,
+                         plot.it = FALSE,
                          ...)
 {
-  if (sum(inherits(obj, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2) {
+  if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2) {
     stop("this function only works for objects of class `(boostmtree, grow)'")
   }
   if (missing(xvar.names)) {
-    xvar.names <- colnames(obj$x)
+    xvar.names <- colnames(object$x)
   }
-  xvar.names <- intersect(xvar.names, colnames(obj$x))
+  xvar.names <- intersect(xvar.names, colnames(object$x))
   if (length(xvar.names) == 0) {
     stop("x-variable names provided do not match original variable names")
   }
   n.xvar <- length(xvar.names)
-  tmOrg <- sort(unique(unlist(obj$time)))
-  if (missing(tm)) {
-    tm.q <- unique(quantile(tmOrg, (1:9)/10, na.rm = TRUE))
-    tm.pt <- sapply(tm.q, function(tt) {#assign original time values
+  tmOrg <- sort(unique(unlist(object$time)))
+  if (missing(tm.unq)) {
+    tm.unq <- unique(quantile(tmOrg, (1:9)/10, na.rm = TRUE))
+    tm.pt <- sapply(tm.unq, function(tt) {#assign original time values
       max(which.min(abs(tmOrg - tt)))
     })
   }
   else {
-    tm.q <- tm
-    tm.pt <- sapply(tm, function(tt) {#assign original time values
+    tm.pt <- sapply(tm.unq, function(tt) {#assign original time values
       max(which.min(abs(tmOrg - tt)))
     })
   }
   n.tm <- length(tm.pt)
   if (!missing(subset)) {
-    obj$x <- obj$x[subset,, drop = FALSE]
+    object$x <- object$x[subset,, drop = FALSE]
   }
-  n <- nrow(obj$x)
+  n <- nrow(object$x)
   if(n.tm == 1){
-      muhat <- cbind(matrix(unlist(predict.boostmtree(object = obj,importance = FALSE)$muhat),nrow = n,byrow = TRUE)[,tm.pt])
-    }else
-      {
-      muhat <- matrix(unlist(predict.boostmtree(object = obj,importance = FALSE)$muhat),nrow = n,byrow = TRUE)[,tm.pt]
+      muhat <- cbind(matrix(unlist(predict.boostmtree(object = object)$muhat),nrow = n,byrow = TRUE)[,tm.pt])
     }
-  lo.obj <- lapply(1:n.xvar, function(nm){
-    x <- obj$x[, xvar.names[nm]]
+  else {
+      muhat <- matrix(unlist(predict.boostmtree(object = object)$muhat),nrow = n,byrow = TRUE)[,tm.pt]
+  }
+  p.obj <- lapply(1:n.xvar, function(nm){
+    x <- object$x[, xvar.names[nm]]
+    RawDt <- lapply(1:n.tm,function(nt){
+      cbind(x,muhat[,nt])
+    })
+    names(RawDt) <- paste("time = ",tm.unq,sep="")
+    RawDt
+  })
+  names(p.obj) <- xvar.names  
+  if(plot.it){
+  l.obj <- lapply(1:n.xvar, function(nm){
+    x <- object$x[, xvar.names[nm]]
     lo.fit <- lapply(1:n.tm,function(nt){
       fit <- lowess(x,muhat[,nt])
       cbind(fit$x,fit$y)
     })
-    names(lo.fit) <- paste("time = ",tm.q,sep="")
+    names(lo.fit) <- paste("time = ",tm.unq,sep="")
     lo.fit
   })
-  names(lo.obj) <- xvar.names
-  if(plot.it){
+  names(l.obj) <- xvar.names
     if(n.xvar > 1){
       pdf(file = "MarginalPlot.pdf",width = 10,height = 10)
     }
     for(pp in 1:n.xvar){
-      xmin <- min(unlist(lapply(1:n.tm,function(nn){  lo.obj[[pp]][[nn]][,1]   })))
-      xmax <- max(unlist(lapply(1:n.tm,function(nn){  lo.obj[[pp]][[nn]][,1]   })))
-      ymin <- min(unlist(lapply(1:n.tm,function(nn){  lo.obj[[pp]][[nn]][,2]   })))
-      ymax <- max(unlist(lapply(1:n.tm,function(nn){  lo.obj[[pp]][[nn]][,2]   })))
-      plot(lo.obj[[pp]][[1]][,1],lo.obj[[pp]][[1]][,2],type = "n",xlim=c(xmin,xmax),ylim=c(ymin,ymax) ,
+      xmin <- min(unlist(lapply(1:n.tm,function(nn){  l.obj[[pp]][[nn]][,1]   })))
+      xmax <- max(unlist(lapply(1:n.tm,function(nn){  l.obj[[pp]][[nn]][,1]   })))
+      ymin <- min(unlist(lapply(1:n.tm,function(nn){  l.obj[[pp]][[nn]][,2]   })))
+      ymax <- max(unlist(lapply(1:n.tm,function(nn){  l.obj[[pp]][[nn]][,2]   })))
+      plot(l.obj[[pp]][[1]][,1],l.obj[[pp]][[1]][,2],type = "n",xlim=c(xmin,xmax),ylim=c(ymin,ymax) ,
            xlab = xvar.names[pp],ylab = "Predicted response")
       for(nn in 1:n.tm){
-      lines(lo.obj[[pp]][[nn]][,1],lo.obj[[pp]][[nn]][,2],type = "l",col = nn)
+      lines(l.obj[[pp]][[nn]][,1],l.obj[[pp]][[nn]][,2],type = "l",col = nn)
       }
     }
     if(n.xvar > 1){
@@ -133,5 +144,5 @@ marginalPlot <- function (obj,
     print(paste("Plot is stored in the directory:",getwd(),sep=" "))
     }
   }
-  return(invisible(lo.obj))
+  return(invisible(list(p.obj = p.obj, l.obj = if(plot.it) l.obj else NULL, time = tmOrg[tm.pt])))
 }

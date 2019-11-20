@@ -6,7 +6,8 @@
 }
 \description{
   Multivariate extension of Friedman's (2001) gradient descent boosting
-  method to longitudinal data using multivariate tree base learners.
+  method for modeling continuous or binary longitudinal data
+  using multivariate tree base learners.
   Covariate-time interactions are modeled using penalized B-splines
   (P-splines) with estimated adaptive smoothing parameter.
 }
@@ -33,7 +34,7 @@
   }
 }
 \author{
-  Hemant Ishwaran, Pande A. and Udaya B. Kogalur
+  Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 }
 \references{
   Friedman J.H. (2001). Greedy function approximation: a gradient

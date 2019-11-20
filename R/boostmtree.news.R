@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.3.0 (_PROJECT_BUILD_ID_)
+####  Version 1.4.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -41,10 +41,13 @@
 ####    email:  hemant.ishwaran@gmail.com
 ####    URL:    http://web.ccs.miami.edu/~hishwaran
 ####    --------------------------------------------------------------
-####    Amol Pande
-####    Division of Biostatistics
-####    1120 NW 14th Street
-####    University of Miami, Miami FL 33136
+####    Amol Pande, Ph.D.
+####    Assistant Staff,
+####    Thoracic and Cardiovascular Surgery
+####    Heart and Vascular Institute
+####    JJ4, Room 508B,
+####    9500 Euclid Ave,
+####    Cleveland Clinic, Cleveland, Ohio, 44195
 ####
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------

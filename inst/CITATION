@@ -15,5 +15,5 @@ citEntry(entry="Manual",
          url          = "https://cran.r-project.org/package=boostmtree",
          pdf          = "https://cran.r-project.org/web/packages/boostmtree/boostmtree.pdf",
          textVersion =
-         paste("Ishwaran H. and Kogalur U.B. (",year ,"). ",
+         paste("Ishwaran H., Pande A. and Kogalur U.B. (",year ,"). ",
                titl, ", ", vers, ".", sep=""))

@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.3.0 (_PROJECT_BUILD_ID_)
+####  Version 1.4.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -41,10 +41,13 @@
 ####    email:  hemant.ishwaran@gmail.com
 ####    URL:    http://web.ccs.miami.edu/~hishwaran
 ####    --------------------------------------------------------------
-####    Amol Pande
-####    Division of Biostatistics
-####    1120 NW 14th Street
-####    University of Miami, Miami FL 33136
+####    Amol Pande, Ph.D.
+####    Assistant Staff,
+####    Thoracic and Cardiovascular Surgery
+####    Heart and Vascular Institute
+####    JJ4, Room 508B,
+####    9500 Euclid Ave,
+####    Cleveland Clinic, Cleveland, Ohio, 44195
 ####
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
@@ -61,7 +64,8 @@
 ####**********************************************************************
 
 
-vimpPlot <- function(object,
+vimpPlot <- function(vimp,
+                     Time_Interaction = TRUE,
                      xvar.names = NULL,
                      cex.xlab = NULL,
                      ymaxlim = 0,
@@ -74,37 +78,30 @@ vimpPlot <- function(object,
                      cex.lab = 1.5,
                      subhead.labels = c("Time-Interactions Effects","Main Effects"),
                      ylbl = FALSE,
-                     seplim = NULL
+                     seplim = NULL,
+                     eps = 0.1,
+                     Width_Bar = 1
 )
 {
-  if(is.null(object$vimp) ){
+  if(is.null(vimp) ){
     stop("vimp is not present in the object")
   }
-  vimp <- object$vimp
+  if(Time_Interaction){
+    p <- floor(length(vimp)/2)
+  }else
+  {
+    p <- length(vimp)  
+  }
   if(is.null(xvar.names)){
-    xvar.names <- colnames(object$x)
+    xvar.names <- paste("x",1:p,sep="")
   }
-  p <- ncol(object$x)
-  n.vimp <- length(vimp)
-  if(n.vimp == p ){
-    univariate <- TRUE
-  }else
-  {
-    univariate <- FALSE
-  }
-  if(univariate){
-    vimp <- vimp*100
-  }else
-  {
-    vimp <- (vimp[-n.vimp])*100
-    n.vimp <- length(vimp)
-  }
-  if(univariate){
-    ylim <- range(vimp) + c(0,ymaxlim)
+  vimp <- vimp*100
+  if(!Time_Interaction){
+    ylim <- range(vimp) + c(-0,ymaxlim)
     yaxs <- pretty(ylim)
     yat <- abs(yaxs)
-    bp <- barplot(as.matrix(vimp),beside=T,col=col,ylim=ylim,yaxt="n",main = main,cex.lab=cex.lab)
-    text(c(bp), pmax(as.matrix(vimp),0), rep(xvar.names, 3),srt=90,adj=-0.5,cex= if(!is.null(cex.xlab)) cex.xlab else 1 )
+    bp <- barplot(pmax(as.matrix(vimp),0),beside=T,width = Width_Bar,col=col,ylim=ylim,yaxt="n",main = main,cex.lab=cex.lab)
+    text(c(bp), pmax(as.matrix(vimp),0) + eps, rep(xvar.names, 3),srt=90,adj= 0.0,cex=if(!is.null(cex.xlab)) cex.xlab else 1)
     axis(2,yaxs,yat)
   }else
   {
@@ -123,14 +120,14 @@ vimpPlot <- function(object,
       yaxishead <- c(-ylim[1],ylim[2])
     }
     if(is.null(xaxishead)){
-      xaxishead <- c(floor(n.vimp/4),floor(n.vimp/4))
+      xaxishead <- c(floor(p/4),floor(p/4))
     }
-    bp1 <- barplot(pmax(as.matrix(vimp.x),0),beside=T,col=col,ylim=ylim,yaxt="n",ylab = ylbl,cex.lab=cex.lab,
-                   main = main)
-    text(c(bp1), pmax(as.matrix(vimp.x),0), rep(xvar.names, 3),srt=90,adj=-0.5,cex=if(!is.null(cex.xlab)) cex.xlab else 1)
+    bp1 <- barplot(pmax(as.matrix(vimp.x),0),width = Width_Bar,horiz = FALSE,beside=T,col=col,ylim=ylim,yaxt="n",ylab = ylbl,cex.lab=cex.lab,
+                   main = main,line = 2)
+    text(c(bp1), pmax(as.matrix(vimp.x),0) + eps, rep(xvar.names, 3),srt=90,adj= 0.0,cex=if(!is.null(cex.xlab)) cex.xlab else 1)
     text(xaxishead[2],yaxishead[2],labels = subhead.labels[2],cex = subhead.cexval)
-    bp2 <- barplot(-pmax(as.matrix(vimp.time),0),beside=T,col=col,add=TRUE,yaxt="n")
-    text(c(bp2), -pmax(as.matrix(vimp.time),0), rep(xvar.names, 3),srt=90,adj=1.5,yaxt="n",cex=if(!is.null(cex.xlab)) cex.xlab else 1)
+    bp2 <- barplot(-pmax(as.matrix(vimp.time),0) - eps,width = Width_Bar,horiz = FALSE,beside=T,col=col,add=TRUE,yaxt="n")
+    #text(c(bp2), -4, rep(xvar.names, 3),srt=270,adj= 0,yaxt="n",cex=if(!is.null(cex.xlab)) cex.xlab else 1)
     text(xaxishead[1],-yaxishead[1],labels = subhead.labels[1],cex = subhead.cexval)
     axis(2,yaxs,yat)
   }

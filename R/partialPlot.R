@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.3.0 (_PROJECT_BUILD_ID_)
+####  Version 1.4.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -41,10 +41,13 @@
 ####    email:  hemant.ishwaran@gmail.com
 ####    URL:    http://web.ccs.miami.edu/~hishwaran
 ####    --------------------------------------------------------------
-####    Amol Pande
-####    Division of Biostatistics
-####    1120 NW 14th Street
-####    University of Miami, Miami FL 33136
+####    Amol Pande, Ph.D.
+####    Assistant Staff,
+####    Thoracic and Cardiovascular Surgery
+####    Heart and Vascular Institute
+####    JJ4, Room 508B,
+####    9500 Euclid Ave,
+####    Cleveland Clinic, Cleveland, Ohio, 44195
 ####
 ####    email:  amoljpande@gmail.com
 ####    --------------------------------------------------------------
@@ -61,23 +64,25 @@
 ####**********************************************************************
 
 
-partialPlot <- function (obj,
+partialPlot <- function (object,
                          xvar.names,
-                         tm,
+                         tm.unq,
+                         xvar.unq = NULL,
                          npts = 25,
                          subset,
                          conditional.xvars = NULL,
                          conditional.values = NULL,
-                         plot.it = TRUE,
+                         plot.it = FALSE,
+                         Variable_Factor = FALSE,
                          ...)
 {
-  if (sum(inherits(obj, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2) {
+  if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2) {
     stop("this function only works for objects of class `(boostmtree, grow)'")
   }
   if (missing(xvar.names)) {
-    xvar.names <- colnames(obj$x)
+    xvar.names <- colnames(object$x)
   }
-  xvar.names <- intersect(xvar.names, colnames(obj$x))
+  xvar.names <- intersect(xvar.names, colnames(object$x))
   if (length(xvar.names) == 0) {
     stop("x-variable names provided do not match original variable names")
   }
@@ -87,49 +92,66 @@ partialPlot <- function (obj,
       stop("conditional x-variable and conditional value vectors are not of same length")
     }
     for (i in 1:length(conditional.xvars)) {
-      if( is.factor(obj$x[,conditional.xvars[i] ])){
-      xuniq <- unique(obj$x[,conditional.xvars[i] ])
-      if ( !any(xuniq == conditional.values[i] )  ) {
-        stop("conditional value for the conditional variable:", conditional.xvars[i], " is not from the original data.")
+      if( is.factor(object$x[,conditional.xvars[i] ])){
+        xuniq <- unique(object$x[,conditional.xvars[i] ])
+        if ( !any(xuniq == conditional.values[i] )  ) {
+          stop("conditional value for the conditional variable:", conditional.xvars[i], " is not from the original data.")
+        }
       }
-     }
     }
   }
-  tmOrg <- sort(unique(unlist(obj$time)))
-  if (missing(tm)) {
+  tmOrg <- sort(unique(unlist(object$time)))
+  if (missing(tm.unq)) {
     tm.q <- unique(quantile(tmOrg, (1:9)/10, na.rm = TRUE))
     tm.pt <- sapply(tm.q, function(tt) {#assign original time values
       max(which.min(abs(tmOrg - tt)))
     })
   }
   else {
-    tm.pt <- sapply(tm, function(tt) {#assign original time values
+    tm.pt <- sapply(tm.unq, function(tt) {#assign original time values
       max(which.min(abs(tmOrg - tt)))
     })
   }
   n.tm <- length(tm.pt)
   if (!missing(subset)) {
-    obj$x <- obj$x[subset,, drop = FALSE]
+    object$x <- object$x[subset,, drop = FALSE]
   }
   if( !is.null(conditional.xvars) && !is.null(conditional.values) ){
     n.cond.xvar <- length(conditional.xvars)
     for(i in 1:n.cond.xvar){
-      if(is.factor(obj$x[, conditional.xvars[i]  ])){
-      obj$x[, conditional.xvars[i]  ] <- as.factor(conditional.values[i])
+      if(is.factor(object$x[, conditional.xvars[i]  ])){
+        object$x[, conditional.xvars[i]  ] <- as.factor(conditional.values[i])
       }else
-        {
-          obj$x[, conditional.xvars[i]  ] <- conditional.values[i]
+      {
+        object$x[, conditional.xvars[i]  ] <- conditional.values[i]
       }
     }
   }
   p.obj <- lapply(xvar.names, function(nm) {
-    x <- obj$x[, nm]
+    x <- object$x[, nm]
     n.x <- length(unique(x))
-    x.unq <- sort(unique(x))[unique(as.integer(seq(1, n.x, length = min(npts, n.x))))]
-    newx <- obj$x
+    if(is.null(xvar.unq)){
+      x.unq <- sort(unique(x))[unique(as.integer(seq(1, n.x, length = min(npts, n.x))))]  
+    }else
+    {
+      if(!is.list(xvar.unq)){
+        stop("xvar.unq must be a list of length same as xvar.names")
+      }
+      if( length(xvar.unq) != length(xvar.names) ){
+        stop("Length of xvar.unq and xvar.names is different")
+      }
+      if(!identical(xvar.names,names(xvar.unq))){
+        stop("Names of xvar.unq must match with xvar.names")
+      }
+     x.unq <- xvar.unq[[which(names(xvar.unq) == nm)]] 
+    }
+    newx <- object$x
     rObj <- t(sapply(x.unq, function(xu) {
       newx[, nm] <- rep(xu, nrow(newx))
-      mu <- predict(obj, x = newx, tm = tmOrg, partial = TRUE, ...)$mu
+      if(Variable_Factor){
+        newx[, nm] <- as.factor(newx[, nm])
+      }
+      mu <- predict(object, x = newx, tm = tmOrg, partial = TRUE, ...)$mu
       mn.x <- colMeans(do.call(rbind, lapply(mu, function(mm) {mm[tm.pt]})))
       c(xu, mn.x)
     }))
@@ -137,6 +159,7 @@ partialPlot <- function (obj,
     rObj
   })
   names(p.obj) <- xvar.names
+  if (plot.it) {
   l.obj <- lapply(p.obj, function(pp) {
     x <- pp[, 1]
     y <- apply(pp[, -1, drop = FALSE], 2, function(yy) {
@@ -146,7 +169,6 @@ partialPlot <- function (obj,
     rObj
   })
   names(l.obj) <- xvar.names
-  if (plot.it) {
     def.par <- par(no.readonly = TRUE)
     for (k in 1:n.xvar) {
       plot(range(l.obj[[k]][, 1]), range(l.obj[[k]][, -1]), type = "n",
@@ -157,5 +179,5 @@ partialPlot <- function (obj,
     }
     par(def.par)
   }
-  return(invisible(list(p.obj = p.obj, l.obj = l.obj, time = tmOrg[tm.pt])))
+  return(invisible(list(p.obj = p.obj, l.obj = if(plot.it) l.obj else NULL, time = tmOrg[tm.pt])))
 }
