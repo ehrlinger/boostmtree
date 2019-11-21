@@ -23,7 +23,7 @@ are available with average of 35 measurements per patient.
 \format{
   A list containing four elements:
   \enumerate{
-    \item  The 84 patient variables (features).
+    \item  The 34 patient variables (features).
     \item  Time points (time).
     \item  Unique patient identifier (id).
     \item  Presence or absence of AF (y).

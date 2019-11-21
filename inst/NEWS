@@ -1,9 +1,9 @@
 Package: boostmtree
-Version: 1.4.0
-BUILD: bld20191120
+Version: 1.4.1
+BUILD: bld20191121
 
 ---------------------------------------------------------------------------------
-CHANGES TO RELEASE 1.4.0
+CHANGES TO RELEASE 1.4.1
 ---------------------------------------------------------------------------------
 Added the ability to model a binary response.  Added a separate
 function, vimp.boostmtree(), for calculating VIMP using out of bag or

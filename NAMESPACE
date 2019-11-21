@@ -1,7 +1,7 @@
 import(randomForestSRC)
 importFrom("splines", "bs")
 importFrom("nlme", "gls", "corSymm", "corCompSymm", "corAR1")
-importFrom("parallel", mclapply)
+importFrom("parallel", "mclapply")
 importFrom("graphics", "abline", "barplot", "layout", "legend",
            "lines", "par", "plot", "points", "axis", "text")
 importFrom("grDevices", "dev.off", "grey", "pdf")
