@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.4.1 (_PROJECT_BUILD_ID_)
+####  Version 1.5.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -71,6 +71,7 @@ generic.predict.boostmtree <- function(object,
                                        y,
                                        M,
                                        eps = 1e-5,
+                                       useCVflag = FALSE,
                                        ...)
 {
   if (missing(object)) {
@@ -124,7 +125,6 @@ generic.predict.boostmtree <- function(object,
         tm.unq <- sort(unique(tm))
         if (!missing(y)) {
           tm <- lapply(1:n, function(i) {tm[id == id.unq[i]]})
-          Y <- lapply(1:n, function(i) {y[id == id.unq[i]]})
           testFlag <- TRUE
         }
         else {
@@ -160,9 +160,60 @@ generic.predict.boostmtree <- function(object,
   nu.vec <- c(nu[1], rep(nu[2], df.D - 1))
   Ymean <- object$ymean
   Ysd <- object$ysd
-  gamma <- object$gamma
   baselearner <- object$baselearner
   family <- object$family
+  n.Q <- object$n.Q
+  Q_set <- object$Q_set
+  y.unq <- object$y.unq
+  na.action <- object$na.action
+  #----------------------------------------------------------------------------------
+  # Date: 09/04/2020
+  # Following comment added as a part of estimating partial predicted mu based on
+  # oob sample
+  # Earlier, we use gamma estimate which is derived from all the samples, and use
+  # all the training sample for prediction. Here, we focus on estimating response
+  # based on the oob sample. 
+  # This should be ideally be used for the partial plot, however, in case you need
+  # to use gamma estimate based on oob sample, you could do that. In either case,
+  # this is done using useCVflag = TRUE
+  #----------------------------------------------------------------------------------
+  if(useCVflag){
+    if(!object$cv.flag){
+      useCVflag <- FALSE
+    }
+  }
+  if(!useCVflag){
+    gamma <- object$gamma
+  }else
+  {
+    gamma <- object$gamma.i.list
+    oob.list <- lapply(1:n.Q,function(q){  vector("list",M[q]) })
+  }
+    if(any(is.na(X))){
+    RemoveMiss.Obj <- RemoveMiss.Fun(X)
+    X <- RemoveMiss.Obj$X
+    id_all_na <- RemoveMiss.Obj$id.remove
+    id_any_na <- which(unlist(lapply(1:nrow(X),function(i){ any(is.na(X[i,])) } )))
+    if(na.action == "na.omit"){
+      id_na <- id_any_na
+    } else
+    {
+      id_na <- id_all_na
+    }
+    if( length(id_na) > 0 ){
+      id.remove <- id.unq[id_na]
+      id.unq.revise <- setdiff(id.unq,id.remove)
+      index.id_revise <- match(id.unq.revise,id.unq)
+      id.unq <- id.unq.revise
+      n <- length(id.unq)
+      tm <- lapply(index.id_revise,function(i){ tm[[i]]  })
+      X <- X[index.id_revise,drop = FALSE]
+      id <- unlist(lapply(1:n,function(i){ id[id == id.unq[i] ]    }))
+      if(testFlag){
+         y <- unlist(lapply(1:n,function(i){ y[id == id.unq[i] ]    }))
+      }
+    }
+  }
   id.index <- lapply(1:n,function(i){
     which(id == id.unq[i] )
   })
@@ -177,65 +228,227 @@ generic.predict.boostmtree <- function(object,
     X.tm[tm.index[[i]] ,,drop = FALSE]
   })
   beta <- matrix(0, n, df.D)
-  if (ntree == 1) {
-    beta.vimp <- beta.cov.vimp <- beta.time.vimp <- vector("list", p)
-  }
-  l_pred.list <- vector("list", M)
+  l_pred_db.list <- lapply(1:n.Q,function(q){
+    lapply(1:M,function(m){
+      lapply(1:n,function(i){
+        rep(0,ni[i])
+      })
+    })
+  })
+  l_pred_ref <- vector("list", M)
+  Mopt <- rep(NA,n.Q)
+  rmse <- rep(NA,n.Q)
   forest.tol <- object$forest.tol
+  membership <- lapply(1:n.Q,function(q){
+    lapply(1:M,function(m){
+      NULL
+    })
+  })
+  if(testFlag){
+    if(family != "Continuous"){
+      if(!is.numeric(y)){
+      y <- as.numeric(factor(y))
+     }
+      y.unq_test <- sort(unique(y))
+      if(any(is.na(match(y.unq_test,y.unq)))){
+        stop("Unique values of response from training and test data do not match")
+      }
+    }
+    Yq <- lapply(1:n.Q,function(q){
+      if(family == "Continuous"){
+        out <- y
+      }
+      if(family == "Nominal" || family == "Binary"){
+        out <- ifelse(y == Q_set[q],1,0)
+      }
+      if(family == "Ordinal"){
+        out <- ifelse(y <= Q_set[q],1,0)
+      }
+      out
+    })
+    Y <- lapply(1:n.Q,function(q){
+      lapply(1:n, function(i) { Yq[[q]][id == id.unq[i]] })
+    })
+  }
   if (ntree == 1) {
     rf.cores.old <- getOption("rf.cores")
     mc.cores.old <- getOption("mc.cores")
-    membership <- papply(1:M, function(m) {
-      options(rf.cores = 1, mc.cores = 1)
-      c(predict.rfsrc(baselearner[[m]],
-                      newdata = X,
-                      membership = TRUE,
-                      ptn.count = K,
-                      na.action = "na.impute",
-                      importance = "none")$ptn.membership)
-    })
-    nullObj <- lapply(1:M, function(m) {
-      orgMembership <- gamma[[m]][, 1]
-      if (m == 1) {
-        l_pred.list[[m]] <<- lapply(1:n, function(i) {
-          D[[i]]%*%t(gamma[[m]][match(membership[[m]][i], orgMembership), -1, drop = FALSE]*nu.vec) 
-        })
-      }
-      else {
-        l_pred.list[[m]] <<- lapply(1:n, function(i) {
-          unlist(l_pred.list[[m-1]][i]) + D[[i]]%*%t(gamma[[m]][match(membership[[m]][i], orgMembership), -1, drop = FALSE]*nu.vec)
-        })
-      }
+    for(q in 1:n.Q){
+      nullObj <- papply(1:M, function(m) {
+        options(rf.cores = 1, mc.cores = 1)
+        if(!useCVflag){
+        membership[[q]][[m]] <<- c(predict.rfsrc(baselearner[[q]][[m]],
+                                                 newdata = X,
+                                                 membership = TRUE,
+                                                 ptn.count = K,
+                                                 na.action = na.action,
+                                                 importance = "none")$ptn.membership)
+        } else
+        {
+          oob <- which(baselearner[[q]][[m]]$inbag == 0)
+          oob.list[[q]][[m]] <<- oob
+          membership[[q]][[m]] <<- c(predict.rfsrc(baselearner[[q]][[m]],
+                                                   newdata = X[oob,, drop = FALSE],
+                                                   membership = TRUE,
+                                                   ptn.count = K,
+                                                   na.action = na.action,
+                                                   importance = "none")$ptn.membership)
+        }
+        NULL
+      })
+      rm(nullObj)
+    }
+    for(q in 1:n.Q){
+      nullObj <- lapply(1:M, function(m) {
+        if(!useCVflag){
+        orgMembership <- gamma[[q]][[m]][, 1]
+        if (m == 1) {
+          l_pred_db.list[[q]][[m]] <<- lapply(1:n, function(i) {
+            l_pred_db_Temp <- D[[i]]%*%t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE]*nu.vec) 
+            if(family == "Ordinal" && q > 1){
+              l_pred_db_Temp <- ifelse(l_pred_db_Temp < l_pred_db.list[[q-1]][[m]][[i]],l_pred_db.list[[q-1]][[m]][[i]],l_pred_db_Temp)
+            }
+            l_pred_db_Temp
+            })
+        }
+        else {
+          l_pred_db.list[[q]][[m]] <<- lapply(1:n, function(i) {
+            l_pred_db_Temp <- unlist(l_pred_db.list[[q]][[m-1]][i]) + D[[i]]%*%t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE]*nu.vec)
+            if(family == "Ordinal" && q > 1){
+              l_pred_db_Temp <- ifelse(l_pred_db_Temp < l_pred_db.list[[q-1]][[m]][[i]],l_pred_db.list[[q-1]][[m]][[i]],l_pred_db_Temp)
+            }
+            l_pred_db_Temp
+          })
+        }
+       } else
+       {
+         if(m == 1){
+           l_pred_db.list[[q]][[m]] <<- lapply(1:n,function(i){
+             if( any(i == oob.list[[q]][[m]] )){
+               orgMembership <- gamma[[q]][[m]][[i]][,1,drop = TRUE]
+               l_pred_db_Temp <- D[[i]]%*%t(gamma[[q]][[m]][[i]][match(membership[[q]][[m]][ which(oob.list[[q]][[m]] == i) ], orgMembership), -1, drop = FALSE]*nu.vec) 
+               if(family == "Ordinal" && q > 1){
+                 l_pred_db_Temp <- ifelse(l_pred_db_Temp < l_pred_db.list[[q-1]][[m]][[i]],l_pred_db.list[[q-1]][[m]][[i]],l_pred_db_Temp)
+               }   
+             } else
+             {
+               l_pred_db_Temp <- l_pred_db.list[[q]][[m]][[i]]
+             }
+             l_pred_db_Temp
+           })
+         }else
+         {
+           l_pred_db.list[[q]][[m]] <<- lapply(1:n,function(i){
+             if( any(i == oob.list[[q]][[m]] )){
+               orgMembership <- gamma[[q]][[m]][[i]][,1,drop = TRUE]
+               l_pred_db_Temp <- l_pred_db.list[[q]][[m-1]][[i]] + D[[i]]%*%t(gamma[[q]][[m]][[i]][match(membership[[q]][[m]][ which(oob.list[[q]][[m]] == i) ], orgMembership), -1, drop = FALSE]*nu.vec) 
+               if(family == "Ordinal" && q > 1){
+                 l_pred_db_Temp <- ifelse(l_pred_db_Temp < l_pred_db.list[[q-1]][[m]][[i]],l_pred_db.list[[q-1]][[m]][[i]],l_pred_db_Temp)
+               }   
+             } else
+             {
+               l_pred_db_Temp <- l_pred_db.list[[q]][[m-1]][[i]]
+             }
+             l_pred_db_Temp
+           })
+         }
+       }
+        NULL
+      })
+      rm(nullObj)
+    }
+    if(family == "Nominal"){
+    nullObj <- lapply(1:M,function(m){
+      l_pred_ref[[m]] <<- lapply(1:n,function(i){
+        log((1 + (Reduce("+",lapply(1:n.Q,function(q){
+          exp(l_pred_db.list[[q]][[m]][[i]])  
+        }))))^{-1})
+      })
       NULL
     })
     rm(nullObj)
-    l_pred.list <- lapply(l_pred.list, function(mlist){  
-      lapply(1:n,function(i) {mlist[[i]] * Ysd + Ymean})
+    } else
+    {
+      nullObj <- lapply(1:M,function(m){
+        l_pred_ref[[m]] <<- lapply(1:n,function(i){
+                        rep(0,ni[i])
+        })
+        NULL
+      })
+      rm(nullObj)
+    }
+    l_pred.list <- lapply(1:n.Q,function(q){
+      lapply(1:M,function(m){
+        lapply(1:n,function(i){
+          l_pred_db.list[[q]][[m]][[i]] + l_pred_ref[[m]][[i]]
+        })
+      })
     })
-    mu.list <- lapply(1:M,function(m){
-      GetMu(Linear_Predictor = l_pred.list[[m]],Family = family)
+    l_pred.list <- lapply(1:n.Q,function(q){
+      lapply(1:M,function(m){
+        lapply(1:n,function(i){
+          l_pred.list[[q]][[m]][[i]] * Ysd + Ymean
+        })
+      })
+    })
+    mu.list <- lapply(1:n.Q,function(q){
+      lapply(1:M,function(m){
+        lapply(1:n,function(i){
+          GetMu(Linear_Predictor = l_pred.list[[q]][[m]][[i]],Family = family)
+        })
+      })
     })
     if (testFlag) {
-      err.rate <- matrix(unlist(lapply(mu.list, function(mlist) {
-        c(l1Dist(Y, mlist), l2Dist(Y, mlist)) 
-      })), ncol = 2, byrow = TRUE)
-      colnames(err.rate) <- c("l1", "l2")
+      err.rate <- lapply(1:n.Q,function(q){
+        err.rate_temp <- matrix(unlist(lapply(1:M, function(m) {
+          c(l1Dist(Y[[q]], mu.list[[q]][[m]]), l2Dist(Y[[q]], mu.list[[q]][[m]])) 
+        })), ncol = 2, byrow = TRUE)
+        colnames(err.rate_temp) <- c("l1", "l2")
+        err.rate_temp
+      })
     }
     else {
       err.rate <- NULL
     }
-    if (!Mflag && testFlag) {
-      diff.err <- abs(err.rate[, "l2"] - min(err.rate[, "l2"], na.rm = TRUE))
-      diff.err[is.na(diff.err)] <- 1
-      if (sum(diff.err < Ysd * eps) > 0) {
-        Mopt <- min(which(diff.err < eps))
+    for(q in 1:n.Q){
+      if (!Mflag && testFlag) {
+        diff.err <- abs(err.rate[[q]][, "l2"] - min(err.rate[[q]][, "l2"], na.rm = TRUE))
+        diff.err[is.na(diff.err)] <- 1
+        if (sum(diff.err < Ysd * eps) > 0) {
+          Mopt[q] <- min(which(diff.err < eps))
+        }
+        else {
+          Mopt[q] <- M
+        }
+       rmse[q] <- err.rate[[q]][Mopt[q], "l2"]
       }
       else {
-        Mopt <- M
+        Mopt[q] <- M
       }
     }
-    else {
-      Mopt <- M
+    mu <- lapply(1:n.Q,function(q){ mu.list[[q]][[ Mopt[q] ]]  })
+    if(family == "Ordinal"){
+      Prob_class <- lapply(1:(n.Q+1),function(q){
+        if(q == 1){
+          out <- lapply(1:n,function(i){
+            mu[[q]][[i]]
+          })
+        }
+        if(q == (n.Q+1)){
+          out <- lapply(1:n,function(i){
+            1 - mu[[q-1]][[i]]
+          })
+        }
+        if(q > 1 && q < (n.Q+1) ){
+          out <- lapply(1:n,function(i){
+            mu[[q]][[i]] - mu[[q-1]][[i]]
+          })
+        }
+        out
+      })
+    } else
+    {
+      Prob_class <- NULL
     }
   }
   else{
@@ -315,22 +528,114 @@ generic.predict.boostmtree <- function(object,
       Mopt <- M
     }
   }
-  l_pred_hat <- lapply(1:n,function(i){
-    l_pred.i <- rep(0,nrow(X.tm))
-    NullObj <- lapply(1:Mopt,function(m){
-        orgMembership <- gamma[[m]][, 1]
-        l_pred.i <<- l_pred.i + X.tm%*%t(gamma[[m]][match(membership[[m]][i], orgMembership), -1, drop = FALSE]*nu.vec)
-        NULL
+  #----------------------------------------------------------------------------------
+  # Date: 09/08/2020
+  # Following comment added as a part of estimating partial predicted mu based on
+  # oob sample.
+  # Earlier I have provided an estimate of mu based on gamma obtained using oob sample.
+  # This is in addition to the mu based on gamma obtained using all the sample.
+  # In the procedure below, I am going to estimate muhat and Prob_hat_class only
+  # based on gamma obtained using all the sample. Thus, when useCVflag == TRUE,
+  # we use muhat and Prob_hat_class as NULL.
+  # This is due to time constraints.
+  # Later, I will come back to the code below, and provide two separate estimates,
+  # one based on gamma from all the sample, and other based on gamma from oob sample.
+  #----------------------------------------------------------------------------------
+  if(!useCVflag){
+  l_pred_db_hat_Temp <- lapply(1:n.Q,function(q){
+    lapply(1:n,function(i){
+      lapply(1:Mopt[q],function(m){
+        orgMembership <- gamma[[q]][[m]][, 1]
+        as.vector(X.tm%*%t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE]*nu.vec))
+      })
     })
-    l_pred.i * Ysd + Ymean
   })
-  muhat <- GetMu(Linear_Predictor = l_pred_hat,Family = family)
+  l_pred_db_hat <- lapply(1:n.Q,function(q){
+    lapply(1:n,function(i){
+       sum_l_pred_db_Temp <- Reduce("+",lapply(1:Mopt[q],function(m){
+        l_pred_db_Temp <- l_pred_db_hat_Temp[[q]][[i]][[m]]
+        if(family == "Ordinal" && q > 1){
+          l_pred_db_Temp <- ifelse(l_pred_db_Temp < l_pred_db_hat_Temp[[q-1]][[i]][[m]],l_pred_db_hat_Temp[[q-1]][[i]][[m]],l_pred_db_Temp)
+          l_pred_db_hat_Temp[[q]][[i]][[m]] <<- l_pred_db_Temp
+          l_pred_db_Temp
+        }
+        l_pred_db_Temp
+      }))
+       sum_l_pred_db_Temp
+    })
+  })
+  #if(FALSE){
+  # This should be deleted once I know that above code works
+  #l_pred_db_hat <- lapply(1:n.Q,function(q){
+  #  l_pred_db_i_list <- lapply(1:n,function(i){
+  #    l_pred_db.i <- rep(0,nrow(X.tm))
+  #    nullObj <- lapply(1:Mopt[q],function(m){
+  #      orgMembership <- gamma[[q]][[m]][, 1]
+  #      l_pred_db.i <<- l_pred_db.i + X.tm%*%t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE]*nu.vec)
+  #      NULL
+  #    })
+  #    l_pred_db.i
+  #  })
+  #  l_pred_db_i_list
+  #})
+  #}
+  if(family == "Nominal"){
+  l_pred_ref_hat <- lapply(1:n,function(i){
+      log((1 + (Reduce("+",lapply(1:n.Q,function(q){
+        exp(l_pred_db_hat[[q]][[i]])  
+      }))))^{-1})
+  })
+  } else 
+  {
+    l_pred_ref_hat <- lapply(1:n,function(i){
+      rep(0,nrow(X.tm))
+    })
+  }
+  l_pred_hat <- lapply(1:n.Q,function(q){
+    lapply(1:n,function(i){
+      (l_pred_db_hat[[q]][[i]] + l_pred_ref_hat[[i]])* Ysd + Ymean
+    })
+  })
+  muhat <- lapply(1:n.Q,function(q){
+    lapply(1:n,function(i){
+      GetMu(Linear_Predictor = l_pred_hat[[q]][[i]],Family = family)
+    })
+  })
+  if(family == "Ordinal"){
+    Prob_hat_class <- lapply(1:(n.Q+1),function(q){
+      if(q == 1){
+        out <- lapply(1:n,function(i){
+          muhat[[q]][[i]]
+        })
+      }
+      if(q == (n.Q+1)){
+        out <- lapply(1:n,function(i){
+          1 - muhat[[q-1]][[i]]
+        })
+      }
+      if(q > 1 && q < (n.Q+1) ){
+        out <- lapply(1:n,function(i){
+          muhat[[q]][[i]] - muhat[[q-1]][[i]]
+        })
+      }
+      out
+    })
+  } else
+  {
+    Prob_hat_class <- NULL
+  }
+ }else
+ {
+   muhat <- NULL
+   Prob_hat_class <- NULL
+ }
   object$baselearner <- object$membership <- object$gamma <- NULL
   pobj <- list(boost.obj = object,
                x = X,
                time = tm,
                id = id,
-               y = if (testFlag) Y else NULL,
+               y = if (testFlag) y else NULL,
+               Y = if(testFlag) {if(family == "Nominal" || family == "Ordinal") Y else unlist(Y,recursive=FALSE)} else NULL,
                family = family,
                ymean = Ymean,
                ysd = Ysd,
@@ -338,6 +643,9 @@ generic.predict.boostmtree <- function(object,
                K = K,
                n = n,
                ni = ni,
+               n.Q = n.Q,
+               Q_set = Q_set,
+               y.unq = y.unq,
                nu.vec = nu.vec,
                D = D,
                df.D = df.D,
@@ -345,12 +653,12 @@ generic.predict.boostmtree <- function(object,
                baselearner = baselearner,
                gamma = gamma,
                membership = membership,
-               mu = mu.list[[Mopt]],
-               muhat = muhat,
-               phi = object$phi[Mopt],
-               rho = object$rho[Mopt],
-               err.rate = if (!is.null(err.rate)) err.rate / Ysd else NULL,
-               rmse = if (!is.null(err.rate)) err.rate[Mopt, "l2"] / Ysd else NULL,
+               mu = if(family == "Nominal" || family == "Ordinal") mu else unlist(mu,recursive=FALSE),
+               Prob_class = Prob_class,
+               muhat = if(!useCVflag)  if(family == "Nominal" || family == "Ordinal") muhat else unlist(muhat,recursive=FALSE) else NULL,
+               Prob_hat_class = Prob_hat_class,
+               err.rate = if (!is.null(err.rate)) { if(family == "Nominal" || family == "Ordinal") lapply(1:n.Q,function(q){ err.rate[[q]] / Ysd   }) else err.rate[[1]]/Ysd }  else NULL,
+               rmse = if (testFlag) unlist(lapply(1:n.Q,function(q) { rmse[q] / Ysd })) else NULL,
                Mopt = if (testFlag) Mopt else NULL)
   class(pobj) <- c("boostmtree", "predict", class(object)[3])
   invisible(pobj)

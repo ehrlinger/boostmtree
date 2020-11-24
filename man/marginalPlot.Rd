@@ -2,36 +2,39 @@
 \alias{marginalPlot}
 \title{Marginal plot analysis}
 \description{
-  Marginal plot of x against the unadjusted predicted y. This is mainly
-  used to obtain marginal relationships between x and the unadjusted
-  predicted y. Marginal plots have a faster execution compared to
-  partial plots (Friedman, 2001).
+  Marginal plot of x against the unadjusted predicted y. This is mainly used to obtain
+  marginal relationships between x and the unadjusted predicted
+  y. Marginal plots have a faster
+  execution compared to partial plots (Friedman, 2001).
 }
 \usage{marginalPlot(object,
              xvar.names,
              tm.unq,
              subset,
              plot.it = FALSE,
+             path_saveplot = NULL,
+             Verbose = TRUE,
              ...)}
 \arguments{
   \item{object}{A boosting object of class \code{(boostmtree, grow)}.}
   \item{xvar.names}{Names of the x-variables to be used.  By default,
     all variables are plotted.}
-  \item{tm.unq}{Unique time points used for the plots of x against y.
-    By default, the deciles of the observed time values are used.}
-  \item{subset}{Vector indicating which rows of the x-data to be used
-    for the analysis.  The default is to use the entire data.}
-  \item{plot.it}{Should plots be displayed? If \code{xvar.names} is a
-  vector with more than one variable name, then instead of displaying,
-  plot is stored as "MarginalPlot.pdf" in the current working
-  directory.}
+  \item{tm.unq}{Unique time points used for the plots of x against y.  By default,
+    the deciles of the observed time values are used.}
+  \item{subset}{Vector indicating which rows of the x-data to be used for the
+    analysis.  The default is to use the entire data.}
+  \item{plot.it}{Should plots be displayed? If \code{xvar.names} is a vector with more than
+  one variable name, then instead of displaying, plot is stored as "MarginalPlot.pdf" in the location specified
+  by \code{path_saveplot}.}
+  \item{path_saveplot}{Provide the location where plot should be saved. By default the plot will be saved at temporary folder.}
+  \item{Verbose}{Display the path where the plot is saved?}
   \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
-  Marginal plot of x values specified by \code{xvar.names} against the
-  unadjusted predicted y-values over a set of time points specified by
-  \code{tm.unq}.  Analysis can be restricted to a subset of the data
-  using \code{subset}.
+  Marginal plot of x values specified by
+  \code{xvar.names} against the unadjusted predicted y-values over a set
+  of time points specified by \code{tm.unq}.  Analysis can be restricted to
+  a subset of the data using \code{subset}.
 }
 \author{
   Hemant Ishwaran, Amol Pande and Udaya B. Kogalur

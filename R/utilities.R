@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.4.1 (_PROJECT_BUILD_ID_)
+####  Version 1.5.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -84,9 +84,14 @@ GetMu <- function(Linear_Predictor,Family){
         Linear_Predictor[[i]]
       })
     }
-    if(Family == "Binary"){
+    if(Family == "Binary" || Family == "Ordinal"){
       mu <- lapply(1:n,function(i){
         exp(Linear_Predictor[[i]])/(1 + exp(Linear_Predictor[[i]]) )
+      })
+    }
+    if(Family == "Nominal"){
+      mu <- lapply(1:n,function(i){
+        exp(Linear_Predictor[[i]])
       })
     }
   }
@@ -94,8 +99,11 @@ GetMu <- function(Linear_Predictor,Family){
     if(Family == "Continuous"){
       mu <- Linear_Predictor
     }
-    if(Family == "Binary"){
+    if(Family == "Binary" || Family == "Ordinal"){
       mu <- exp(Linear_Predictor)/(1 + exp(Linear_Predictor) )
+    }
+    if(Family == "Nominal"){
+      mu <- exp(Linear_Predictor)
     }
   }
   return(mu)
@@ -109,9 +117,14 @@ GetMu_Lambda <- function(Linear_Predictor,Family){
         rep(1,length(Linear_Predictor[[i]]))
       })
     }
-    if(Family == "Binary"){
+    if(Family == "Binary" || Family == "Ordinal"){
       mu <- lapply(1:n,function(i){
         exp(Linear_Predictor[[i]])/(1 + exp(Linear_Predictor[[i]]) )
+      })
+    }
+    if(Family == "Nominal"){
+      mu <- lapply(1:n,function(i){
+        exp(Linear_Predictor[[i]])
       })
     }
   }
@@ -119,8 +132,11 @@ GetMu_Lambda <- function(Linear_Predictor,Family){
     if(Family == "Continuous"){
       mu <- rep(1,length(Linear_Predictor))
     }
-    if(Family == "Binary"){
+    if(Family == "Binary" || Family == "Ordinal"){
       mu <- exp(Linear_Predictor)/(1 + exp(Linear_Predictor) )
+    }
+    if(Family == "Nominal"){
+      mu <- exp(Linear_Predictor)
     }
   }
   return(mu)
@@ -134,9 +150,14 @@ Transform_H <- function(Mu, Family){
         DiagMat(rep(1,length(Mu[[i]])))
       })
     }
-    if(Family == "Binary"){
+    if(Family == "Binary" || Family == "Ordinal"){
       H_Mu <- lapply(1:n,function(i){
         DiagMat(Mu[[i]]*(1 - Mu[[i]]))
+      })
+    }
+    if(Family == "Nominal"){
+      H_Mu <- lapply(1:n,function(i){
+        DiagMat(Mu[[i]])
       })
     }
   }
@@ -144,8 +165,11 @@ Transform_H <- function(Mu, Family){
     if(Family == "Continuous"){
       H_Mu <- DiagMat(rep(1,length(Mu)))
     }
-    if(Family == "Binary"){
+    if(Family == "Binary" || Family == "Ordinal"){
       H_Mu <- DiagMat(Mu*(1 - Mu))
+    }
+    if(Family == "Nominal"){
+      H_Mu <- DiagMat(Mu)
     }
   }
   return(H_Mu)
@@ -278,6 +302,54 @@ is.hidden.bst.frac <-  function (user.option) {
   }
   else {
     user.option$bst.frac
+  }
+}
+is.hidden.samp.mat <-  function (user.option) {
+  if (is.null(user.option$samp.mat)) {
+    NULL
+  }
+  else {
+    user.option$samp.mat
+  }
+}
+is.hidden.nsplit <-  function (user.option) {
+  if (is.null(user.option$nsplit)) {
+    NULL
+  }
+  else {
+    user.option$nsplit
+  }
+}
+is.hidden.samptype <-  function (user.option) {
+  if (is.null(user.option$samptype)) {
+    "swor"
+  }
+  else {
+    as.character(user.option$samptype)
+  }
+}
+is.hidden.xvar.wt <-  function (user.option) {
+  if (is.null(user.option$xvar.wt)) {
+    NULL
+  }
+  else {
+    user.option$xvar.wt
+  }
+}
+is.hidden.case.wt <-  function (user.option) {
+  if (is.null(user.option$case.wt)) {
+    NULL
+  }
+  else {
+    user.option$case.wt
+  }
+}
+is.hidden.seed.value <-  function (user.option) {
+  if (is.null(user.option$seed.value)) {
+    NULL
+  }
+  else {
+     user.option$seed.value
   }
 }
 is.hidden.CVlambda <-  function (user.option) {

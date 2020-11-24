@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.4.1 (_PROJECT_BUILD_ID_)
+####  Version 1.5.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -65,15 +65,20 @@
 
 
 partialPlot <- function (object,
+                         M = NULL,
                          xvar.names,
                          tm.unq,
                          xvar.unq = NULL,
                          npts = 25,
                          subset,
+                         prob.class = FALSE,
                          conditional.xvars = NULL,
                          conditional.values = NULL,
                          plot.it = FALSE,
                          Variable_Factor = FALSE,
+                         path_saveplot = NULL,
+                         Verbose = TRUE,
+                         useCVflag = FALSE,
                          ...)
 {
   if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2) {
@@ -113,6 +118,20 @@ partialPlot <- function (object,
     })
   }
   n.tm <- length(tm.pt)
+  if(is.null(M)){
+    if(is.null(object$Mopt)){
+      M <- object$M
+    }else
+    {
+      M <- object$Mopt
+    }
+  }
+  #----------------------------------------------------------------------------------
+  # Date: 09/08/2020
+  # Following comment added as a part of estimating partial predicted mu based on
+  # oob sample
+  # How the subset should be handled in the case of useCVflag == TRUE?
+  #----------------------------------------------------------------------------------
   if (!missing(subset)) {
     object$x <- object$x[subset,, drop = FALSE]
   }
@@ -127,11 +146,36 @@ partialPlot <- function (object,
       }
     }
   }
-  p.obj <- lapply(xvar.names, function(nm) {
+  family <- object$family
+  if(family == "Ordinal" && prob.class == TRUE){
+    n.Q <- (object$n.Q + 1)
+    Q_set <- c(object$Q_set,max(object$Q_set) + 1)
+    p.obj <- vector("list",n.Q)
+  } else
+  {
+    n.Q <- object$n.Q
+    Q_set <- object$Q_set
+    p.obj <- vector("list",n.Q)
+  }
+  if(n.Q > 1){
+    names(p.obj) <- unlist(lapply(1:n.Q,function(q){
+      paste("y = ",Q_set[q],sep="")
+    }))
+  }
+  if(plot.it){
+    l.obj <- vector("list",n.Q)
+    if(n.Q > 1){
+      names(l.obj) <- unlist(lapply(1:n.Q,function(q){
+        paste("y = ",Q_set[q],sep="")
+      }))
+    }
+  }
+  for(q in 1:n.Q){
+  p.obj[[q]] <- lapply(xvar.names, function(nm) {
     x <- object$x[, nm]
-    n.x <- length(unique(x))
+    n.x <-length( unique(na.omit(x) ))
     if(is.null(xvar.unq)){
-      x.unq <- sort(unique(x))[unique(as.integer(seq(1, n.x, length = min(npts, n.x))))]  
+      x.unq <- sort(unique( na.omit(x) ))[unique(as.integer(seq(1, n.x, length = min(npts, n.x))))] 
     }else
     {
       if(!is.list(xvar.unq)){
@@ -151,16 +195,31 @@ partialPlot <- function (object,
       if(Variable_Factor){
         newx[, nm] <- as.factor(newx[, nm])
       }
-      mu <- predict(object, x = newx, tm = tmOrg, partial = TRUE, ...)$mu
-      mn.x <- colMeans(do.call(rbind, lapply(mu, function(mm) {mm[tm.pt]})))
+      if(family == "Ordinal" && prob.class == TRUE){
+        mu <- predict.boostmtree(object, x = newx, tm = tmOrg, partial = TRUE,M = M,useCVflag = useCVflag, ...)$Prob_class[[q]]
+      } else
+      {
+        if(family == "Continuous" || family == "Binary"){
+            mu <- predict.boostmtree(object, x = newx, tm = tmOrg, partial = TRUE,M = M,useCVflag = useCVflag, ...)$mu
+        }else
+        {
+          mu <- predict.boostmtree(object, x = newx, tm = tmOrg, partial = TRUE,M = M,useCVflag = useCVflag, ...)$mu[[q]]
+        }        
+      }
+      mn.x <- colMeans(do.call(rbind, lapply(mu, function(mm) {mm[tm.pt]})),na.rm = TRUE)
       c(xu, mn.x)
     }))
     colnames(rObj) <- c("x", paste("y.", 1:length(tm.pt), sep = ""))
     rObj
   })
-  names(p.obj) <- xvar.names
+  names(p.obj[[q]]) <- xvar.names
   if (plot.it) {
-  l.obj <- lapply(p.obj, function(pp) {
+   if(is.null(path_saveplot)){
+      path_saveplot <- tempdir()
+   }
+    Plot_Name <- if(n.Q == 1) "PartialPlot.pdf" else paste("PartialPlot_Prob(y = ",Q_set[q],")",".pdf",sep="")
+    pdf(file = paste(path_saveplot,"/",Plot_Name,sep=""),width = 10,height = 10)
+  l.obj[[q]] <- lapply(p.obj[[q]], function(pp) {
     x <- pp[, 1]
     y <- apply(pp[, -1, drop = FALSE], 2, function(yy) {
       lowess(x, yy)$y})
@@ -168,16 +227,23 @@ partialPlot <- function (object,
     colnames(rObj) <- c("x", paste("y.", 1:length(tm.pt), sep = ""))
     rObj
   })
-  names(l.obj) <- xvar.names
-    def.par <- par(no.readonly = TRUE)
+  names(l.obj[[q]]) <- xvar.names
+  def.par <- par(no.readonly = TRUE)
     for (k in 1:n.xvar) {
-      plot(range(l.obj[[k]][, 1]), range(l.obj[[k]][, -1]), type = "n",
+      plot(range(l.obj[[q]][[k]][, 1],na.rm = TRUE), range(l.obj[[q]][[k]][, -1],na.rm = TRUE), type = "n",
            xlab = xvar.names[k], ylab = "predicted y (adjusted)")
       for (l in 1:n.tm) {
-        lines(l.obj[[k]][, 1], l.obj[[k]][, -1, drop = FALSE][, l], type = "l", col = 1)
+        lines(l.obj[[q]][[k]][, 1], l.obj[[q]][[k]][, -1, drop = FALSE][, l], type = "l", ,col = l)
       }
     }
-    par(def.par)
+  par(def.par)
+  dev.off()
+      if(Verbose){
+       cat("Plot will be saved at:",path_saveplot,sep = "","\n")
+    }
   }
-  return(invisible(list(p.obj = p.obj, l.obj = if(plot.it) l.obj else NULL, time = tmOrg[tm.pt])))
+}
+  return(invisible(list(p.obj = if(family == "Nominal" || family == "Ordinal") p.obj else unlist(p.obj,recursive = FALSE),
+                        l.obj = if(plot.it) {if(family == "Nominal" || family == "Ordinal") l.obj else unlist(l.obj,recursive = FALSE)} else NULL,
+                        time = tmOrg[tm.pt])))
 }

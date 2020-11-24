@@ -1,5 +1,6 @@
 \name{boostmtree}
 \alias{boostmtree}
+\alias{boostmtree}
 \title{Boosted multivariate trees for longitudinal data}
 \description{
   Multivariate extension of Friedman's gradient descent boosting method
@@ -13,14 +14,18 @@
             tm,
             id,
             y,
-            family = c("Continuous","Binary"),
+            family = c("Continuous","Binary","Nominal","Ordinal"),
+            y_reference = NULL,
             M = 200,
             nu = 0.05,
+            na.action = c("na.omit","na.impute")[2],
             K = 5,
+            mtry = NULL,
             nknots = 10,
             d = 3,
             pen.ord = 3,
             lambda,
+            rho,
             lambda.max = 1e6,
             lambda.iter = 2,
             svd.tol = 1e-6,
@@ -40,10 +45,15 @@
     \item{tm}{Vector of time values, one entry for each row in \code{x}.}
     \item{id}{Unique subject identifier, one entry for each row in \code{x}.}
     \item{y}{Observed y-value, one entry for each row in \code{x}.}
-    \item{family}{Family of the response variable \code{y}. Use any one from \{"Continuous", "Binary"\} based on the scale of \code{y}.}
+    \item{family}{Family of the response variable \code{y}. Use any one 
+    from \{"Continuous", "Binary","Nominal","Ordinal"\} based on the scale of \code{y}.}
+    \item{y_reference}{Set this value, among the unique \code{y} values 
+    when \code{family} == "Nominal". If NULL, lowest value, among unique \code{y} values, is used.}
     \item{M}{Number of boosting iterations}
     \item{nu}{Boosting regularization parameter.  A value in (0,1].}
+    \item{na.action}{Remove missing values (casewise) or impute it. Default is to impute the missign values.}
     \item{K}{Number of terminal nodes used for the multivariate tree learner.}
+    \item{mtry}{Number of \code{x} variables selected randomly for tree fitting. Default is use all \code{x} variables.}
     \item{nknots}{Number of knots used for the B-spline for modeling the
     time interaction effect.}
     \item{d}{Degree of the piecewise B-spline polynomial (no time
@@ -54,6 +64,7 @@
       increasing values associated with increasing
       smoothness/penalization. If missing, or non-positive, the value is
       estimated adaptively using a mixed models approach.}
+    \item{rho}{If missing, rho is estimated, else, use the \code{rho} value specified in this argument.}
     \item{lambda.max}{Tolerance used for adaptively estimated lambda
       (caps it).  For experts only.}
     \item{lambda.iter}{Number of iterations used to estimate lambda
@@ -69,7 +80,8 @@
      \item{eps}{Tolerance value used for determining the optimal
        \code{M}. Applies only if \command{cv.flag} = TRUE.  For experts only.}
     \item{mod.grad}{Use a modified gradient? See details below.}
-    \item{NR.iter}{Number of Newton-Raphson iteration. Applied for \command{family} = "Binary".}
+    \item{NR.iter}{Number of Newton-Raphson iteration. Applied 
+    for \command{family} = \{Binary","Nominal","Ordinal"\}.}
     \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
@@ -151,13 +163,20 @@
      \item{id}{Sorted subject identifier.}
      \item{y}{List with each component containing the observed
        y-values for a given individual. Values sorted on \code{id}.}
+     \item{Yorg}{For family == "Nominal" or family == "Ordinal", this provides the 
+     response in list-format where each element coverted the response into the binary response.}  
      \item{family}{Family of \code{y}.}   
      \item{ymean}{Overall mean of y-values for all individuals. If \code{family} = 
      "Binary", \code{ymean} = 0.}
      \item{ysd}{Overall standard deviation of y-values for all individuals. If \code{family} = 
      "Binary", \code{ysd} = 1.}
+     \item{na.action}{Remove missing values or impute?}
      \item{n}{Total number of subjects.}
      \item{ni}{Number of repeated measures for each subject.}
+     \item{n.Q}{Number of class labels for non-continuous response.}
+     \item{Q_set}{Class labels for the non-continuous response.}
+     \item{y.unq}{Unique y values for the non-continous response.}
+     \item{y_reference}{Reference value for family == "Nominal".}  
      \item{tm.unq}{Unique time points.}
      \item{gamma}{List of length \emph{M}, with each component
        containing the boosted tree fitted values.}
@@ -166,10 +185,17 @@
        estimated time-profile for an individual.  When in-sample
        cross-validation is requested using \command{cv.flag}=TRUE, the
        estimated mean is cross-validated and evaluated at the optimal
-       number of iterations \code{Mopt}.}
-     \item{lambda}{Smoothing parameter.}
-     \item{phi}{Variance parameter.}
-     \item{rho}{Correlation parameter.}
+       number of iterations \code{Mopt}.
+       If the family == "Nominal" or family == "Ordinal", \code{mu} will have a higher level
+       of list to accommodate binary responses generated from nominal or ordinal response.} 
+     \item{Prob_class}{For family == "Ordinal", this provides individual probabilty rather than
+     cumulative probabilty.}
+     \item{lambda}{Smoothing parameter. Results provided in vector or matrix form, depending
+     on whether family == c("Continuous","Binary") or family == c("Nominal", "Ordinal").}
+     \item{phi}{Variance parameter.Results provided in vector or matrix form, depending
+     on whether family == c("Continuous","Binary") or family == c("Nominal", "Ordinal").}
+     \item{rho}{Correlation parameter.Results provided in vector or matrix form, depending
+     on whether family == c("Continuous","Binary") or family == c("Nominal", "Ordinal").}
      \item{baselearner}{List of length \emph{M} containing the base learners.}
      \item{membership}{List of length \emph{M}, with each component
        containing the terminal node membership for a given boosting

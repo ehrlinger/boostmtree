@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.4.1 (_PROJECT_BUILD_ID_)
+####  Version 1.5.0 (_PROJECT_BUILD_ID_)
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -68,14 +68,18 @@ boostmtree <- function(x,
                        tm,
                        id,
                        y,
-                       family = c("Continuous","Binary"),
+                       family = c("Continuous","Binary","Nominal","Ordinal"),
+                       y_reference = NULL,
                        M = 200,
                        nu = 0.05,
+                       na.action = c("na.omit","na.impute")[2],
                        K = 5,
+                       mtry = NULL,
                        nknots = 10,
                        d = 3,
                        pen.ord = 3,
                        lambda,
+                       rho, 
                        lambda.max = 1e6,
                        lambda.iter = 2,
                        svd.tol = 1e-6,
@@ -89,13 +93,13 @@ boostmtree <- function(x,
 {
   if(Sys.info()["sysname"] == "Windows")
   {
-    options(rf.cores=1, mc.cores= 1)
-  } 
-  if(length(family) != 1){
-    stop("Specify any one of the family")
+    options(rf.cores = 1, mc.cores = 1)
   }
-  if(any(is.na( match(family,c("Continuous","Binary"))))){
-    stop("family must be Continuous or Binary")
+  if(length(family) != 1){
+    stop("Specify any one of the four families")
+  }
+  if(any(is.na( match(family,c("Continuous","Binary","Nominal","Ordinal"))))){
+    stop("family must be any one from Continuous, Binary, Nominal or Ordinal")
   }
   univariate <- FALSE
   if (missing(tm)) {
@@ -108,10 +112,46 @@ boostmtree <- function(x,
     tm <- rep(0, n)
     d <- -1
   }
+  if(family == "Continuous"){
+    Q_set <- NA
+    n.Q <- 1
+  } else
+  {
+  #---------------------------------------------------------------------------------- 
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Added the following if statement because binary/nominal/ordinal response
+  # could be a factor or a character.
+  #----------------------------------------------------------------------------------
+    if(!is.numeric(y)){
+      y <- as.numeric(factor(y))
+    }
+    y.unq <- sort(unique(y))
+    Q   <- length(y.unq)
+    if(family == "Nominal"){
+      if(is.null(y_reference)){
+        y_reference <- min(y.unq)
+      } else
+      {
+        if(length(y_reference) != 1 || is.na(match(y_reference,y.unq))){
+          stop(paste("y_reference must take any one of the following:",y.unq,sep=" "))
+        }
+      }
+      Q_set <- setdiff(y.unq,y_reference)
+    }
+    if(family == "Ordinal")
+    {
+      Q_set <- setdiff(y.unq,max(y.unq))
+    }
+    if(family == "Binary"){
+      Q_set <- setdiff(y.unq,min(y.unq))
+    }
+    n.Q  <- length(Q_set)
+  }
   if (univariate) {
     mod.grad <- FALSE
-    rho <- 0
-    lambda.vec <- phi.vec <- rho.vec <- NULL
+    rho <- rep(0,n.Q)
+    lambda.mat <- phi.mat <- rho.mat <- NULL
   }
   user.option <- list(...)
   if (any(is.na(id)) || any(is.na(y)) || any(is.na(tm))) {
@@ -121,11 +161,28 @@ boostmtree <- function(x,
   X <- do.call(rbind, lapply(1:n, function(i) {
     x[id == id.unq[i],, drop = FALSE][1,, drop = FALSE]}))
   x <- do.call(rbind, lapply(1:n, function(i) {x[id == id.unq[i],, drop = FALSE]}))
+  #---------------------------------------------------------------------------------- 
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Added the below three lines so that id, tm and y are consistent with x (as
+  # described on the line above)
+  #----------------------------------------------------------------------------------
+  id <- unlist(lapply(1:n,function(i){ id[id == id.unq[i] ]    }))
+  tm <- unlist(lapply(1:n,function(i){ tm[id == id.unq[i] ]    }))
+  y <- unlist(lapply(1:n,function(i){ y[id == id.unq[i] ]    }))    
   if(any(is.na(X))){
     RemoveMiss.Obj <- RemoveMiss.Fun(X)
     X <- RemoveMiss.Obj$X
-    if(!is.null(RemoveMiss.Obj$id.remove)){
-      id.remove <- id.unq[RemoveMiss.Obj$id.remove]
+    id_all_na <- RemoveMiss.Obj$id.remove
+    id_any_na <- which(unlist(lapply(1:nrow(X),function(i){ any(is.na(X[i,])) } )))
+    if(na.action == "na.omit"){
+      id_na <- id_any_na
+    } else
+    {
+      id_na <- id_all_na
+    }
+    if( length(id_na) > 0 ){
+      id.remove <- id.unq[id_na]
       id.unq <- setdiff(id.unq,id.remove)
       n <- length(id.unq)
       tm <- unlist(lapply(1:n,function(i){ tm[id == id.unq[i] ]    }))
@@ -147,10 +204,14 @@ boostmtree <- function(x,
     Ymean <- 0
     Ysd <- 1
   }
-  Yorg <- lapply(1:n, function(i) {y[id == id.unq[i]]})
-  Y <- lapply(1:n, function(i) {(y[id == id.unq[i]] - Ymean) / Ysd})
   ni <- unlist(lapply(1:n, function(i) {sum(id == id.unq[i])}))
-  id <- sort(id)
+  #----------------------------------------------------------------------------------
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # We already sorted the id by arranging id already sorted by id.unq.
+  # Therefore, we don't need to sort id here. Commenting out the line below
+  #----------------------------------------------------------------------------------
+  # id <- sort(id)
   tm.unq <- sort(unique(tm))
   n.tm <- length(tm.unq)
   tm.id <- lapply(1:n, function(i) {
@@ -175,7 +236,7 @@ boostmtree <- function(x,
   }
   else {    
     X.tm <- cbind(rep(1, n.tm))
-    lambda <- 0
+    lambda <- rep(0,n.Q)
   }
   df.D <- ncol(X.tm)
   D <- lapply(1:n, function(i) {
@@ -187,12 +248,34 @@ boostmtree <- function(x,
   }
   nu.vec <- c(nu[1], rep(nu[2], df.D - 1))
   ntree <- is.hidden.ntree(user.option)
+  #----------------------------------------------------------------------------------
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # **** PROBLEM **** 
+  # I tried to use bootstrap <- "none" and it didn't work
+  # because the error occurs in the generic.predict.rfsrc function.
+  # This is likely a bug due to specification of ptn.count in the predict.rfsrc function.
+  # As a temporary solution, when bootstrap = "none", convert bootstrap = "by.user"
+  # and set bst.frac = 1.
+  #----------------------------------------------------------------------------------
   bootstrap <- is.hidden.bootstrap(user.option)
   bst.frac <- is.hidden.bst.frac(user.option)
+  samp.mat <- is.hidden.samp.mat(user.option)
+  if(bootstrap == "none"){
+    bootstrap <- "by.user"
+    bst.frac <- 1
+  }
+  #----------------------------------------------------------------------------------
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Added an option where users can specify his/her own inbag sample
+  # for each boosting iteration using argument samp.mat
+  #----------------------------------------------------------------------------------
   if(bootstrap == "by.user"){
     if(missing(bst.frac)){
       bst.frac <- 0.632
     }
+    if(is.null(samp.mat)){
     samp.mat <- matrix(NA,nrow = n,ncol = M)
     for(i in 1:M){
       samp.value <- (sample(1:n,floor(bst.frac*n),replace = FALSE))
@@ -202,19 +285,58 @@ boostmtree <- function(x,
       }))
       samp.mat[,i] <- samp.value
     }
+    }
   }
+  #----------------------------------------------------------------------------------
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Added an option where users can specify nsplit. The default is to use all
+  # the possible splitting points.
+  #----------------------------------------------------------------------------------
+  nsplit <- is.hidden.nsplit(user.option)
+  #----------------------------------------------------------------------------------
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Added an option where users can specify bootstrap sample with/our replacement.
+  # Default is sampling without replacement.
+  #----------------------------------------------------------------------------------
+  samptype <- is.hidden.samptype(user.option)
+  #----------------------------------------------------------------------------------
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Add mtry = NULL in the function argument, and corresponding change it to
+  # mtry = p if NULL. In the earlier version mtry was mtry = df.D + p
+  #----------------------------------------------------------------------------------
   if (ntree == 1) {
     nodesize <- max(1, round(n/(2 * K)))
-    mtry <- df.D + p
+    if(is.null(mtry)){
+        mtry <- p
+    }
   }
   else {
     nodedepth <- max(0, log(max(0, K), base = 2))
     nodesize <- 1
     mtry <- NULL
     if (missing(lambda) || lambda < 0) {
-      lambda <- 0
+      lambda <- rep(0,n.Q)
     }
   }
+  #----------------------------------------------------------------------------------
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Added an option xvar.wt and case.wt where users can specify weights for the
+  # covariates and observations. 
+  #----------------------------------------------------------------------------------
+  xvar.wt <- is.hidden.xvar.wt(user.option)
+  case.wt <- is.hidden.case.wt(user.option)
+  #----------------------------------------------------------------------------------
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Added an option seed.value to specify value of the seed. This helps to get the
+  # same randomization, which helps to compare two boosting model.
+  # Default is NULL, meaning the seed value is set randomly.
+  #----------------------------------------------------------------------------------
+  seed.value <- is.hidden.seed.value(user.option)
   if (ntree > 1) {
     if (univariate) {
       learnerUsed <- "forest learner"
@@ -232,6 +354,11 @@ boostmtree <- function(x,
     }
   }
   lambda.est.flag <- FALSE
+  if(!missing(lambda)){
+    if(length(lambda) == 1){
+      lambda <- rep(lambda,n.Q)  
+    }
+  }
   pen.lsq.matx <- penBSderiv(df.D - 1, pen.ord)
   if (!univariate && ntree == 1 && (missing(lambda) || lambda < 0)) {
     if (df.D >= (pen.ord + 2)) {
@@ -244,23 +371,52 @@ boostmtree <- function(x,
       d.inv.sqrt <- 1 / sqrt(svd.pen$d)
       d.inv.sqrt[d.zap] <- 0
       pen.inv.sqrt.matx <- svd.pen$v %*% (t(svd.pen$v) * d.inv.sqrt)
+      lambda <- rep(0,n.Q)
     }
     else {
       warning("not enough degrees of freedom to estimate lambda: setting lambda to zero\n")
-      lambda <- 0
+      lambda <- rep(0,n.Q)
     }
   }
-  l_pred <- lapply(1:n, function(i) {rep(0, ni[i])})
-  mu <- GetMu(Linear_Predictor = l_pred,Family = family)
+  Yq <- lapply(1:n.Q,function(q){
+    if(family == "Continuous"){
+      out <- y
+    }
+  #---------------------------------------------------------------------------------- 
+  # Date: 06/04/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Following line was modified such that condition for nominal and binary
+  # became same. This is in conjunction to changes in the other non-continuous
+  # responses so that user can specify factor/character response, and it will be
+  # converted to numeric response. 
+  #----------------------------------------------------------------------------------
+    if(family == "Nominal" || family == "Binary"){
+      out <- ifelse(y == Q_set[q],1,0)
+    }
+    if(family == "Ordinal"){
+      out <- ifelse(y <= Q_set[q],1,0)
+    }
+    out
+  })
+  Yorg <- lapply(1:n.Q,function(q){
+    lapply(1:n, function(i) { Yq[[q]][id == id.unq[i]] })
+  })
+  Y <- lapply(1:n.Q,function(q){
+    lapply(1:n, function(i) {(Yq[[q]][id == id.unq[i]] - Ymean) / Ysd})
+  })
   if (ntree == 1) {
-    baselearner <- membership.list <- gamma.list <- vector("list", length = M)
+    baselearner <- membership.list <- gamma.list <- lapply(1:n.Q,function(q){
+      lapply(1:M,function(m){
+        NULL
+      })
+    })
   }
   else {
    membership.list <- gamma.list <- NULL
    baselearner <- vector("list", length = M)
   }
   if (!univariate) {
-    lambda.vec <- phi.vec <- rho.vec <- rep(0, M)
+    lambda.mat <- phi.mat <- rho.mat <- matrix(NA,nrow = M,ncol = n.Q)
   }
   lambda.initial <- Ysd^2
   rho.fit.flag <- TRUE
@@ -268,49 +424,98 @@ boostmtree <- function(x,
   rho.hide <- is.hidden.rho(user.option)
   if (!is.null(rho.hide) && (rho.hide >= 0 && rho.hide < 1)) {
     rho.fit.flag <- FALSE
-    rho <- rho.hide
+    rho <- rep(rho.hide,n.Q)
   }
   else {
-    rho <- 0
+    rho <- rep(0,n.Q)
   }
-  sigma <- phi <- 1
+  sigma <- phi <- rep(1,n.Q)
   if (!lambda.est.flag) {
-    sigma <- sigma.robust(lambda, rho)
+    sigma <- unlist(lapply(1:n.Q,function(q){
+      sigma.robust(lambda[q], rho[q])
+    }))
   }
   Y.names <- paste("Y", 1:df.D, sep = "")
   rfsrc.f <- as.formula(paste("Multivar(", paste(Y.names, collapse = ","), paste(") ~ ."), sep = ""))
   cv.flag <- cv.flag && (ntree == 1)
   cv.lambda.flag <- cv.flag && is.hidden.CVlambda(user.option) && lambda.est.flag
   cv.rho.flag <- cv.flag && is.hidden.CVrho(user.option) && rho.fit.flag
+  #---------------------------------------------------------------------------------- 
+  # Date: 06/05/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # This needs more thoughts because, it probably okay to start l_pred_bd = 0
+  # for binary and continuous case. However, is it a good starting point for
+  # nominal and ordinal case?
+  # Same logic should apply when l_pred_db.i under cv.flag = TRUE 
+  #----------------------------------------------------------------------------------
+  l_pred_db <- lapply(1:n.Q,function(q){
+    lapply(1:n,function(i){
+      rep(0,ni[i])
+    })
+  })
   if (cv.flag) {
-    mu.cv.list <- vector("list", M)
-    l_pred.cv <- lapply(1:n, function(i) {rep(0, ni[i])})
-    mu.cv <- GetMu(Linear_Predictor = l_pred.cv,Family = family)
-    l_pred.i <- lapply(1:n, function(i) {
-      lapply(1:n, function(j) {rep(0, ni[j])})
+    mu.cv.list <- lapply(1:n.Q,function(q){
+      vector("list", M)
     })
-    gamma.i.list <- lapply(1:M,function(m){
-      vector("list", length = n)
-    })
-    err.rate <- matrix(NA, M, 2)
-    colnames(err.rate) <- c("l1", "l2")
-    if(family == "Continuous"){
-      Ymean.i <- sapply(1:n, function(i) {
-        mean(unlist(Yorg[-i]), na.rm = TRUE)
+    if(family == "Nominal"){
+      l_pred_ref.cv <- lapply(1:n,function(i){
+        rep(log(1/Q),ni[i])
       })
-      Ysd.i <- sapply(1:n, function(i) {
-        sd.i <- sd(unlist(Yorg[-i]), na.rm = TRUE)
-        if (sd.i < 1e-6) {
-          1
-        }
-        else {
-          sd.i
-        }
+    } else
+    {
+      l_pred_ref.cv <- lapply(1:n,function(i){
+        rep(0,ni[i])
+      })
+    }
+    l_pred.cv <- lapply(1:n.Q,function(q){
+          lapply(1:n, function(i) { l_pred_ref.cv[[i]] +  l_pred_db[[q]][[i]] })
+    })
+    mu.cv <- lapply(1:n.Q,function(q){
+      lapply(1:n,function(i){
+        GetMu(Linear_Predictor = l_pred.cv[[q]][[i]],Family = family)
+      })
+    })
+    l_pred_db.i <- lapply(1:n.Q,function(q){
+      lapply(1:n, function(i) {
+        lapply(1:n, function(j) { rep(0,ni[j]) })
+      })
+    })
+    gamma.i.list <- lapply(1:n.Q,function(q){
+      lapply(1:M,function(m){
+        vector("list", length = n)
+      })
+    })
+    err.rate <- lapply(1:n.Q,function(q){
+      err.rate_mat <- matrix(NA, M, 2)
+      colnames(err.rate_mat) <- c("l1", "l2")
+      err.rate_mat
+    })
+    Mopt <- rmse <- rep(NA,n.Q)
+    if(family == "Continuous"){
+      Ymean.i <- lapply(1:n.Q,function(q){
+        sapply(1:n, function(i) {
+          mean(unlist(Yorg[[q]][-i]), na.rm = TRUE)
+        })
+      })
+      Ysd.i <- lapply(1:n.Q,function(q){
+        sapply(1:n, function(i) {
+          sd.i <- sd(unlist(Yorg[[q]][-i]), na.rm = TRUE)
+          if (sd.i < 1e-6) {
+            1
+          }
+          else {
+            sd.i
+          }
+        })
       })
     }
     else{
-      Ymean.i <- unlist(lapply(1:n,function(i){ Ymean  }))
-      Ysd.i   <- unlist(lapply(1:n,function(i){ Ysd  }))
+      Ymean.i <- lapply(1:n.Q,function(q){
+        unlist(lapply(1:n,function(i){ Ymean  }))
+      })
+      Ysd.i   <- lapply(1:n.Q,function(q){
+        unlist(lapply(1:n,function(i){ Ysd  }))
+      })
     }
   }
   else {
@@ -319,34 +524,55 @@ boostmtree <- function(x,
   if(family == "Continuous"){
     NR.iter <- 1
   }
+  if(family == "Nominal"){
+    l_pred_ref <- lapply(1:n,function(i){
+      rep(log(1/Q),ni[i])
+    })
+  } else
+  {
+    l_pred_ref <- lapply(1:n,function(i){
+      rep(0,ni[i])
+    })
+  }
   if (verbose) pb <- txtProgressBar(min = 0, max = M, style = 3)
   for (m in 1:M) {
+    if(m == 1){
+      l_pred <- lapply(1:n.Q,function(q){
+          lapply(1:n, function(i) { l_pred_ref[[i]] +  l_pred_db[[q]][[i]] })
+      })
+      mu <- lapply(1:n.Q,function(q){
+        lapply(1:n,function(i){
+          GetMu(Linear_Predictor =l_pred[[q]][[i]],Family = family)
+        })
+      }) 
+    }
   if (verbose) setTxtProgressBar(pb, m)
     if (verbose && m == M) cat("\n")
+for(q in 1:n.Q) {
     VMat <- lapply(1:n,function(i){
-      VarTemp <- matrix(rho*phi,ni[i],ni[i])
-      diag(VarTemp) <- phi
+      VarTemp <- matrix(rho[q]*phi[q],ni[i],ni[i])
+      diag(VarTemp) <- phi[q]
       VarTemp
     })
     inv.VMat <- lapply(1:n,function(i){
       out <- tryCatch({ qr.solve(VMat[[i]])},
                       error = function(ex){NULL})
-      if(!is.null(out)){
-        out <- out
-      }else{
-        out <- diag(phi,nrow(VMat[[i]]))
+      if(is.null(out)){
+        out <- diag(phi[q],nrow(VMat[[i]]))
       }
       out
     })
-    H_Mu <- Transform_H(Mu = mu, Family = family)
+    H_Mu <- lapply(1:n,function(i){
+      Transform_H(Mu = mu[[q]][[i]], Family = family)
+    })
     if (mod.grad == FALSE) {
       gm.mod <- t(matrix(unlist(lapply(1:n, function(i) {
-         t(D[[i]])%*%H_Mu[[i]]%*%inv.VMat[[i]]%*%(Y[[i]] - mu[[i]])  
+         t(D[[i]])%*%H_Mu[[i]]%*%inv.VMat[[i]]%*%(Y[[q]][[i]] - mu[[q]][[i]])  
       })), nrow = df.D))
     }
     else {
       gm.mod <- t(matrix(unlist(lapply(1:n, function(i) {
-        t(D[[i]])%*%H_Mu[[i]]%*%(Y[[i]] - mu[[i]])
+        t(D[[i]])%*%H_Mu[[i]]%*%(Y[[q]][[i]] - mu[[q]][[i]])
       })), nrow = df.D))
     }
     incoming.data <- cbind(gm.mod, X)
@@ -357,9 +583,13 @@ boostmtree <- function(x,
                          mtry = mtry,
                          nodedepth = nodedepth,
                          nodesize = nodesize,
+                         nsplit = nsplit,
                          importance = "none",
                          bootstrap = bootstrap,
+                         samptype = samptype,
                          ntree = ntree,
+                         xvar.wt = xvar.wt,
+                         case.wt = case.wt,
                          forest.wt = TRUE, 
                          memebership = TRUE)
       Kmax <- max(rfsrc.obj$leaf.count, na.rm = TRUE)
@@ -371,19 +601,24 @@ boostmtree <- function(x,
                          ntree = 1,
                          mtry = mtry,
                          nodesize = nodesize,
+                         nsplit = nsplit,
                          importance = "none",
                          bootstrap = bootstrap,
+                         samptype = samptype,
                          samp = if(bootstrap == "by.user") samp.mat[,m,drop = FALSE] else NULL,
+                         xvar.wt = xvar.wt,
+                         case.wt = case.wt,
                          membership = TRUE,
-                         na.action = "na.impute",
-                         nimpute = 1)
-      baselearner[[m]] <- rfsrc.obj
+                         na.action = na.action,
+                         nimpute = 1,
+                         seed = seed.value)
+      baselearner[[q]][[m]] <- rfsrc.obj
       result.pred <- predict.rfsrc(rfsrc.obj,
                                    membership = TRUE,
                                    ptn.count = K,
                                    importance = "none")
       membership <- membership.org <- c(result.pred$ptn.membership)
-      membership.list[[m]] <- membership.org
+      membership.list[[q]][[m]] <- membership.org
       membership <- as.numeric(factor(membership))
       ptn.id <- unique(membership)
       Kmax <-  length(ptn.id)
@@ -392,21 +627,21 @@ boostmtree <- function(x,
       if (lambda.est.flag) {
         transf.data <- papply(1:n, function(i) {
           if (ni[i] > 1) {
-            ci <- rho.inv.sqrt(ni[i], rho)
-            R.inv.sqrt <- (diag(1, ni[i]) - matrix(ci, ni[i], ni[i])) / sqrt(1 - rho)
-            V.inv.sqrt <- phi^(-1/2)*R.inv.sqrt
+            ci <- rho.inv.sqrt(ni[i], rho[q])
+            R.inv.sqrt <- (diag(1, ni[i]) - matrix(ci, ni[i], ni[i])) / sqrt(1 - rho[q])
+            V.inv.sqrt <- phi[q]^(-1/2)*R.inv.sqrt
           }
           else {
             R.inv.sqrt <- cbind(1)
-            V.inv.sqrt <- phi^(-1/2)*R.inv.sqrt
+            V.inv.sqrt <- phi[q]^(-1/2)*R.inv.sqrt
           }
           if (cv.lambda.flag) {
-            Ynew <- V.inv.sqrt %*% (Y[[i]] - mu.cv[[i]])
+            Ynew <- V.inv.sqrt %*% (Y[[q]][[i]] - mu.cv[[q]][[i]])
           }
           else {
-            Ynew <- V.inv.sqrt %*% (Y[[i]] - mu[[i]])
+            Ynew <- V.inv.sqrt %*% (Y[[q]][[i]] - mu[[q]][[i]])
           }
-            mu.2 <- GetMu_Lambda(Linear_Predictor = 2*l_pred[[i]],Family = family)
+            mu.2 <- GetMu_Lambda(Linear_Predictor = 2*l_pred[[q]][[i]],Family = family)
             LambdaD <- Transform_H(mu.2,Family = family)%*%D[[i]]
             Xnew <- V.inv.sqrt %*% LambdaD[, 1, drop = FALSE]
             Znew <- V.inv.sqrt %*% LambdaD[, -1, drop = FALSE] %*% pen.inv.sqrt.matx
@@ -439,8 +674,8 @@ boostmtree <- function(x,
           }
           lambda.hat <- min(lambda.hat, lambda.max)
         }
-        lambda <- lambda.hat 
-        sigma <- sigma.robust(lambda, rho) 
+        lambda[q] <- lambda.hat 
+        sigma[q] <- sigma.robust(lambda[q], rho[q]) 
       }
       gamma <- lapply(1:Kmax, function(k) {
         pt.k <- (membership == k)
@@ -450,7 +685,7 @@ boostmtree <- function(x,
           gamma.NR.update <- rep(0,df.D)
           for(Iter in 1:NR.iter){
           mu.NR.update <- lapply(which.pt.k,function(i){
-               l_pred_gamma <- l_pred[[i]]  + c(D[[i]]%*%gamma.NR.update)
+               l_pred_gamma <- l_pred[[q]][[i]]  + c(D[[i]]%*%gamma.NR.update)
                out <- GetMu(Linear_Predictor = l_pred_gamma, Family = family)
                out
           })
@@ -462,11 +697,11 @@ boostmtree <- function(x,
           HesMat.temp <- Reduce("+",lapply(seq.pt.k,function(i){
             t(CalD.i[[i]])%*%inv.VMat[[ which.pt.k[i] ]]%*%CalD.i[[i]]
           }))
-          HesMat <- HesMat.temp + (lambda*pen.lsq.matx)
+          HesMat <- HesMat.temp + (lambda[q]*pen.lsq.matx)
           ScoreVec.temp <-  Reduce("+",lapply(seq.pt.k,function(i){
-            t(CalD.i[[i]])%*%inv.VMat[[ which.pt.k[i] ]]%*%(Y[[ which.pt.k[i]   ]] - mu.NR.update[[ i ]] )
+            t(CalD.i[[i]])%*%inv.VMat[[ which.pt.k[i] ]]%*%(Y[[q]][[ which.pt.k[i]   ]] - mu.NR.update[[ i ]] )
           }))
-          ScoreVec <- ScoreVec.temp - (lambda*(pen.lsq.matx%*%gamma.NR.update))
+          ScoreVec <- ScoreVec.temp - (lambda[q]*(pen.lsq.matx%*%gamma.NR.update))
           qr.obj <- tryCatch({qr.solve(HesMat, ScoreVec)}, error = function(ex){NULL})
           if (!is.null(qr.obj)) {
             qr.obj <- qr.obj
@@ -485,17 +720,31 @@ boostmtree <- function(x,
       gamma.matx <- matrix(0, Kmax, df.D + 1)
       gamma.matx[, 1] <- sort(unique(membership.org))
       gamma.matx[, 2:(df.D+1)] <- matrix(unlist(gamma), ncol = df.D, byrow = TRUE)
-      gamma.list[[m]] <- gamma.matx
+      gamma.list[[q]][[m]] <- gamma.matx
       bhat <- t(matrix(unlist(lapply(1:n, function(i) {
         gamma[[membership[i]]]})), nrow = df.D) * nu.vec)
-      l_pred <- lapply(1:n, function(i) { l_pred[[i]] + c(D[[i]] %*% bhat[i, ])  })
-      mu <- GetMu(Linear_Predictor = l_pred,Family = family)
+      l_pred_db[[q]] <- lapply(1:n, function(i) { 
+           l_pred_db_Temp <- l_pred_db[[q]][[i]] + c(D[[i]] %*% bhat[i, ])
+           if(family == "Ordinal" && q > 1){
+               l_pred_db_Temp <- ifelse(l_pred_db_Temp < l_pred_db[[q-1]][[i]],l_pred_db[[q-1]][[i]],l_pred_db_Temp)
+           }
+           l_pred_db_Temp
+        })
+  #----------------------------------------------------------------------------------
+  # Date: 06/06/2020
+  # Following comment added while editing for the nominal/ordinal response
+  # Earlier issue where l_pred_{q + 1} could be less than l_pred_{q} is now resolved.
+  # The issued occured because the condition that I have placed to set
+  # l_pred_{q + 1} = l_pred_{q} for the observations where l_pred_{q + 1} < l_pred_{q}
+  # was applied only to the out-of-bag cases; now it is applied to both in-bag and
+  # out-of-bag sample. 
+  #----------------------------------------------------------------------------------
       if (cv.flag) {
         oob <- which(rfsrc.obj$inbag == 0) 
-        l_pred.i <- lapply(1:n,function(i) {
-          if( any(i == oob)){
+        l_pred_db.i[[q]] <- lapply(1:n,function(i) {
+          if( any(i == oob )){
           mem.i <- membership[i]  
-          l_pred.ij <- l_pred.i[[i]]
+          l_pred.ij <- l_pred_db.i[[q]][[i]]
           gamma.i <- lapply(1:Kmax, function(k) {
             pt.k <- (membership == k)
             which.pt.k <- setdiff(which(pt.k == TRUE) ,i)
@@ -516,11 +765,11 @@ boostmtree <- function(x,
                 HesMat.temp <- Reduce("+",lapply(seq.pt.k,function(j){
                   t(CalD.i[[j]])%*%inv.VMat[[ which.pt.k[j] ]]%*%CalD.i[[j]]
                 }))
-                HesMat <- HesMat.temp + (lambda*pen.lsq.matx)
+                HesMat <- HesMat.temp + (lambda[q]*pen.lsq.matx)
                 ScoreVec.temp <-  Reduce("+",lapply(seq.pt.k,function(j){
-                  t(CalD.i[[j]])%*%inv.VMat[[ which.pt.k[j] ]]%*%(Y[[ which.pt.k[j]   ]] - mu.NR.update[[ j ]] )
+                  t(CalD.i[[j]])%*%inv.VMat[[ which.pt.k[j] ]]%*%(Y[[q]][[ which.pt.k[j]   ]] - mu.NR.update[[ j ]] )
                 }))
-                ScoreVec <- ScoreVec.temp - (lambda*(pen.lsq.matx%*%gamma.NR.update))
+                ScoreVec <- ScoreVec.temp - (lambda[q]*(pen.lsq.matx%*%gamma.NR.update))
                 qr.obj <- tryCatch({qr.solve(HesMat, ScoreVec)}, error = function(ex){NULL})
                 if (!is.null(qr.obj)) {
                   qr.obj <- qr.obj
@@ -539,23 +788,27 @@ boostmtree <- function(x,
           gamma.matx.i <- matrix(0, Kmax, df.D + 1)
           gamma.matx.i[, 1] <- sort(unique(membership.org))
           gamma.matx.i[, 2:(df.D+1)] <- matrix(unlist(gamma.i), ncol = df.D, byrow = TRUE)
-          gamma.i.list[[m]][[i]] <<- gamma.matx.i 
-          lapply(1:n,function(j) {
+          gamma.i.list[[q]][[m]][[i]] <<- gamma.matx.i
+          l_pred_db.ij_Temp <- lapply(1:n,function(j){
             which.j <- which(gamma.matx.i[, 1] == membership.org[j])
-            l_pred.i[[i]][[j]] + c(D[[j]] %*% (gamma.matx.i[which.j, -1] * nu.vec))
+            l_pred_db.ij_Temp <- l_pred.ij[[j]] + c(D[[j]] %*% (gamma.matx.i[which.j, -1] * nu.vec))
           })
+       }else
+       {
+         l_pred_db.ij_Temp <- l_pred_db.i[[q]][[i]]
+       }
+       l_pred_db.ij_Temp
+     }) 
+    if(family == "Ordinal" && q > 1){
+      for(i in 1:n){
+          for(j in 1:n){
+            l_pred_db.ij_Temp <- l_pred_db.i[[q]][[i]][[j]]
+            l_pred_db.ij_Temp <- ifelse(l_pred_db.ij_Temp < l_pred_db.i[[q-1]][[i]][[j]],l_pred_db.i[[q-1]][[i]][[j]],l_pred_db.ij_Temp)
+            l_pred_db.i[[q]][[i]][[j]] <- l_pred_db.ij_Temp
+          } 
+        }
       }
-        else {
-          l_pred.i[[i]]
-      } 
-      })   
-        l_pred.cv <- lapply(1:n,function(i){l_pred.i[[i]][[i]]})
-        mu.cv <- GetMu(Linear_Predictor = l_pred.cv,Family = family)
-        l_pred.cv.org <- lapply(1:n,function(i){l_pred.cv[[i]] * Ysd.i[i] + Ymean.i[i]})
-        mu.cv.org <- GetMu(Linear_Predictor = l_pred.cv.org,Family = family)
-        mu.cv.list[[m]] <- mu.cv.org
-        err.rate[m, ] <- c(l1Dist(Yorg, mu.cv.org), l2Dist(Yorg, mu.cv.org))
-      }
+    }                 
     }
     else{
       forest.wt <- rfsrc.obj$forest.wt
@@ -570,6 +823,7 @@ boostmtree <- function(x,
         pt.i <- (fwt.i != 0)
         if (sum(pt.i) > 0) {
           fwt.i <- fwt.i / sum(fwt.i)
+          # 09/01/2020: Replace gm by gm.mod
           YnewSum <- colSums(fwt.i[pt.i] * gm.mod[pt.i,, drop = FALSE])
           XnewSum <- Reduce("+", lapply(which(pt.i), function(j) {fwt.i[j] * Xnew[[j]]}))
           XnewSum <- XnewSum + sigma * pen.lsq.matx
@@ -592,15 +846,55 @@ boostmtree <- function(x,
                             list(Xnew = Xnew),
                             list(pen = sigma * pen.lsq.matx))
     }
+}
+    if(cv.flag){
+      if(family == "Nominal"){
+        l_pred_ref.cv <- lapply(1:n,function(i){
+          log((1 + (Reduce("+",lapply(1:n.Q,function(q){
+            exp(l_pred_db.i[[q]][[i]][[i]])  
+          }))))^{-1})
+        })
+      }
+      for(q in 1:n.Q){
+        l_pred.cv <-  lapply(1:n,function(i){ l_pred_ref.cv[[i]] + l_pred_db.i[[q]][[i]][[i]]})
+        mu.cv[[q]] <- lapply(1:n,function(i){
+            GetMu(Linear_Predictor = l_pred.cv[[i]],Family = family)
+        })
+        l_pred.cv.org <- lapply(1:n,function(i){l_pred.cv[[i]] * Ysd.i[[q]][i] + Ymean.i[[q]][i]})
+        mu.cv.org <- lapply(1:n,function(i){
+          GetMu(Linear_Predictor = l_pred.cv.org[[i]],Family = family)
+        })
+        mu.cv.list[[q]][[m]] <- mu.cv.org
+        err.rate[[q]][m, ] <- c(l1Dist(Yorg[[q]], mu.cv.org), l2Dist(Yorg[[q]], mu.cv.org))
+      }
+    } else
+    {
+    if(family == "Nominal"){
+      l_pred_ref <- lapply(1:n,function(i){
+        log((1 + (Reduce("+",lapply(1:n.Q,function(q){
+          exp(l_pred_db[[q]][[i]])  
+        }))))^{-1})
+      })
+    }
+    for(q in 1:n.Q){
+    l_pred[[q]] <- lapply(1:n,function(i){
+      l_pred_ref[[i]] + l_pred_db[[q]][[i]]
+    })
+    mu[[q]] <- lapply(1:n,function(i){
+       GetMu(Linear_Predictor = l_pred[[q]][[i]],Family = family)
+    }) 
+    }
+  }
+  for(q in 1:n.Q){
     if (!univariate && rho.fit.flag) {
       if (cv.rho.flag) {
-        resid.data <- data.frame(y  = unlist(lapply(1:n, function(i) {Y[[i]] - mu.cv[[i]]})),
+        resid.data <- data.frame(y  = unlist(lapply(1:n, function(i) {Y[[q]][[i]] - mu.cv[[q]][[i]]})),
                                  x,
                                  tm = unlist(lapply(1:n, function(i) {tm[id == id.unq[i]]})),
                                  id = unlist(lapply(1:n, function(i) {rep(id.unq[i], ni[i])})))
       }
       else {
-        resid.data <- data.frame(y  = unlist(lapply(1:n, function(i) {Y[[i]] - mu[[i]]})),
+        resid.data <- data.frame(y  = unlist(lapply(1:n, function(i) {Y[[q]][[i]] - mu[[q]][[i]]})),
                                  x,
                                  tm = unlist(lapply(1:n, function(i) {tm[id == id.unq[i]]})),
                                  id = unlist(lapply(1:n, function(i) {rep(id.unq[i], ni[i])})))
@@ -614,51 +908,91 @@ boostmtree <- function(x,
                             error = function(ex){NULL})
       }
       if (!is.null(gls.obj)) {
-        phi <- gls.obj$sigma^2
-        rho <- as.numeric(coef(gls.obj$modelStruct$corStruc, unconstrained = FALSE))
-        rho <- max(min(0.999, rho, na.rm = TRUE), -0.999)
+        phi[q] <- gls.obj$sigma^2
+        rho_temp <- as.numeric(coef(gls.obj$modelStruct$corStruc, unconstrained = FALSE))
+        rho[q] <- max(min(0.999, rho_temp, na.rm = TRUE), -0.999)
       }
     }
     if (!univariate) {
-      phi.vec[m] <- phi * Ysd^2
-      rho.vec[m] <- rho
+      phi.mat[m,q] <- phi[q] * Ysd^2
+      rho.mat[m,q] <- rho[q]
     }
     if (!univariate) {
-      sigma <- sigma.robust(lambda, rho)
-      lambda.vec[m] <- lambda
+      sigma[q] <- sigma.robust(lambda[q], rho[q])
+      lambda.mat[m,q] <- lambda[q]
     }
-  }
-  l_pred <- lapply(1:n, function(i) {c(l_pred[[i]] * Ysd + Ymean)})
-  mu <- GetMu(Linear_Predictor = l_pred,Family = family)
-  y <- lapply(1:n, function(i) {y[id == id.unq[i]]})
+    }
+  } 
   if (cv.flag) {
-    diff.err <- abs(err.rate[, "l2"] - min(err.rate[, "l2"], na.rm = TRUE))
-    diff.err[is.na(diff.err)] <- 1
+    nullObj <- lapply(1:n.Q,function(q){
+      diff.err <- abs(err.rate[[q]][, "l2"] - min(err.rate[[q]][, "l2"], na.rm = TRUE))
+      diff.err[is.na(diff.err)] <- 1
       if (sum(diff.err < Ysd * eps) > 0) {
-        Mopt <- min(which(diff.err < eps))
+        Mopt[q] <<- min(which(diff.err < eps))
       }
       else {
-        Mopt <- M
+        Mopt[q] <<- M
       }
-    rmse <- err.rate[Mopt, "l2"]
-    mu <- lapply(1:n,function(i){mu.cv.list[[Mopt]][[i]]})
+      rmse[q] <<- err.rate[[q]][Mopt[q], "l2"]
+      mu[[q]] <<- lapply(1:n,function(i){mu.cv.list[[q]][[ Mopt[q] ]][[i]]})
+      NULL
+    })
+  }else
+  {
+  mu <- lapply(1:n.Q,function(q){
+    lapply(1:n,function(i){
+      l_pred_temp <- c(l_pred[[q]][[i]] * Ysd + Ymean)
+      GetMu(Linear_Predictor = l_pred_temp,Family = family)
+    })
+  })
+  }
+  y <- lapply(1:n, function(i) {y[id == id.unq[i]]})
+  if(family == "Ordinal"){
+    Prob_class <- lapply(1:(n.Q+1),function(q){
+      if(q == 1){
+        out <- lapply(1:n,function(i){
+          mu[[q]][[i]]
+        })
+      }
+      if(q == (n.Q+1)){
+        out <- lapply(1:n,function(i){
+          1 - mu[[q-1]][[i]]
+        })
+      }
+      if(q > 1 && q < (n.Q+1) ){
+        out <- lapply(1:n,function(i){
+          mu[[q]][[i]] - mu[[q-1]][[i]]
+        })
+      }
+      out
+    })
+  } else
+  {
+    Prob_class <- NULL
   }
   obj <- list(x = X,
               xvar.names = xvar.names,
               time = lapply(1:n, function(i) {tm[id == id.unq[i]]}),
               id = id,
               y = y,
+              Yorg = if(family == "Nominal" || family == "Ordinal") Yorg else unlist(Yorg,recursive=FALSE),
               family = family,
               ymean = Ymean,
               ysd = Ysd,
+              na.action = na.action, 
               n = n,
               ni = ni,
+              n.Q = n.Q,
+              Q_set = Q_set,
+              y.unq = if(family != "Continuous") y.unq else NA,
+              y_reference = y_reference,
               tm.unq = tm.unq,
               gamma = gamma.list,
-              mu = mu,
-              lambda = lambda.vec,
-              phi = phi.vec,
-              rho = rho.vec,
+              mu = if(family == "Nominal" || family == "Ordinal") mu else unlist(mu,recursive=FALSE),
+              Prob_class = Prob_class,
+              lambda = if(family == "Nominal" || family == "Ordinal") lambda.mat else as.vector(lambda.mat),
+              phi = if(family == "Nominal" || family == "Ordinal") phi.mat else as.vector(phi.mat),
+              rho = if(family == "Nominal" || family == "Ordinal") rho.mat else as.vector(rho.mat),
               baselearner = baselearner,
               membership = membership.list,
               X.tm = X.tm,
@@ -670,8 +1004,8 @@ boostmtree <- function(x,
               nu = nu,
               ntree = ntree,
               cv.flag = cv.flag,
-              err.rate = if (!is.null(err.rate)) err.rate / Ysd else NULL,
-              rmse = if (!is.null(rmse)) rmse / Ysd else NULL,
+              err.rate = if (!is.null(err.rate)) { if(family == "Nominal" || family == "Ordinal") lapply(1:n.Q,function(q){ err.rate[[q]] / Ysd   }) else err.rate[[1]]/Ysd }  else NULL,
+              rmse = if (!is.null(rmse)) unlist(lapply(1:n.Q,function(q){ rmse[q] / Ysd  })) else NULL,
               Mopt = Mopt,
               gamma.i.list = if(cv.flag) gamma.i.list else NULL,
               forest.tol = forest.tol)

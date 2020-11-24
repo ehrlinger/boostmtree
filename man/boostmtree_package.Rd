@@ -6,8 +6,9 @@
 }
 \description{
   Multivariate extension of Friedman's (2001) gradient descent boosting
-  method for modeling continuous or binary longitudinal data
+  method for modeling longitudinal response
   using multivariate tree base learners.
+  Longitudinal response could be continuous, binary, nominal or ordinal.
   Covariate-time interactions are modeled using penalized B-splines
   (P-splines) with estimated adaptive smoothing parameter.
 }

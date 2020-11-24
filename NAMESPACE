@@ -7,7 +7,7 @@ importFrom("graphics", "abline", "barplot", "layout", "legend",
 importFrom("grDevices", "dev.off", "grey", "pdf")
 importFrom("stats", "as.formula", "coef", "lowess", "model.matrix",
            "predict", "quantile", "rnorm", "runif", "sd", "supsmu",
-           "var","rbinom")
+           "var","rbinom","na.omit")
 importFrom("utils", "txtProgressBar", "setTxtProgressBar")
 
 export(boostmtree,

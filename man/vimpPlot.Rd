@@ -8,6 +8,7 @@ Barplot displaying VIMP.
 }
 \usage{
 vimpPlot(vimp,
+         Q_set = NULL,
          Time_Interaction = TRUE,
          xvar.names = NULL,
          cex.xlab = NULL,
@@ -23,11 +24,16 @@ vimpPlot(vimp,
          ylbl = FALSE,
          seplim = NULL,
          eps = 0.1,
-         Width_Bar = 1)
+         Width_Bar = 1,
+         path_saveplot = NULL,
+         Verbose = TRUE)
 }
 \arguments{
   \item{vimp}{
 VIMP values.
+}
+\item{Q_set}{
+Provide names for various levels of nominal or ordinal response.
 }
   \item{Time_Interaction}{
 Whether VIMP is estimated from a longitudinal data, in which case VIMP
@@ -80,6 +86,8 @@ Amount of gap between the top of the barplot and variable names.
   \item{Width_Bar}{
 Width of the barplot.
 }
+\item{path_saveplot}{Provide the location where plot should be saved. By default the plot will be saved at temporary folder.}
+\item{Verbose}{Display the path where the plot is saved?}
 }
 \details{
 Barplot displaying VIMP. If the analysis is for the univariate case,

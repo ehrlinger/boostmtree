@@ -12,6 +12,7 @@
         y,
         M,
         eps = 1e-5,
+        useCVflag = FALSE,
         ...)
 }
 \arguments{
@@ -34,6 +35,7 @@
     to determine the optimized value obtained by minimizing test-set error.}
   \item{eps}{Tolerance value used for determining the optimal \code{M}.
     For experts only.}
+  \item{useCVflag}{Should the predicted value be based on the estimate derived from oob sample?}  
   \item{...}{Further arguments passed to or from other methods.}
 }
 \details{
@@ -68,15 +70,20 @@
        points for a given test individual.}
      \item{id}{Sorted subject identifier.}
      \item{y}{List containing the test y-values.}
+     \item{Y}{y-values, in the list-format, where nominal or ordinal Response
+     is converted into the binary response.}
      \item{family}{Family of \code{y}.}
      \item{ymean}{Overall mean of y-values for all individuals. If \code{family} = 
-     "Binary", \code{ymean} = 0.}
+     "Binary", "Nominal" or "Ordinal", \code{ymean} = 0.}
      \item{ysd}{Overall standard deviation of y-values for all individuals. If \code{family} = 
-     "Binary", \code{ysd} = 1.}
+     "Binary", "Nominal" or "Ordinal", \code{ysd} = 1.}
      \item{xvar.names}{X-variable names.}
      \item{K}{Number of terminal nodes.}
      \item{n}{Total number of subjects.}
      \item{ni}{Number of repeated measures for each subject.}
+     \item{n.Q}{Number of class labels for non-continuous response.}
+     \item{Q_set}{Class labels for the non-continuous response.}
+     \item{y.unq}{Unique y values for the non-continous response.}
      \item{nu}{Boosting regularization parameter.}
      \item{D}{Design matrix for each subject.}
      \item{df.D}{Number of columns of \code{D}.}
@@ -88,10 +95,12 @@
        containing the terminal node membership for a given boosting
        iteration.}
      \item{mu}{Estimated mean profile at the optimized \code{M}.}
+     \item{Prob_class}{For family == "Ordinal", this provides individual probabilty rather than
+     cumulative probabilty.}
      \item{muhat}{Extrapolated mean profile to all unique time points
        evaluated at the the optimized \code{M}.}
-     \item{phi}{Variance parameter at the optimized \code{M}.}
-     \item{rho}{Correlation parameter at the optimized \code{M}.}
+     \item{Prob_hat_class}{Extrapolated \code{Prob_class} to all unique time points
+       evaluated at the the optimized \code{M}.}
      \item{err.rate}{Test set standardized l1-error and RMSE.}
      \item{rmse}{Test set standardized RMSE at the optimized \code{M}.}
      \item{Mopt}{The optimized \code{M}.}
