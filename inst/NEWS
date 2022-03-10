@@ -1,9 +1,9 @@
 Package: boostmtree
-Version: 1.5.0
-BUILD: bld20201123a
+Version: 1.5.1
+BUILD: bld20220309
 
 ---------------------------------------------------------------------------------
-CHANGES TO RELEASE 1.5.0
+CHANGES TO RELEASE 1.5.1
 ---------------------------------------------------------------------------------
 Added the ability to model a nominal or ordinal longitudinal
 response. With this addition, package now handles continuous, binary,
