@@ -27,7 +27,7 @@
 ####  Dr. Ishwaran's work was funded in part by grant R01 CA163739 from
 ####  the National Cancer Institute.
 ####
-####  Dr. Kogalur's work was funded in part by grant R01 CA163739 from 
+####  Dr. Kogalur's work was funded in part by grant R01 CA163739 from
 ####  the National Cancer Institute.
 ####  ----------------------------------------------------------------
 ####  Written by:
@@ -65,6 +65,6 @@
 
 
 boostmtree.news <- function(...) {
-    newsfile <- file.path(system.file(package="boostmtree"), "NEWS")
-    file.show(newsfile)
+  newsfile <- file.path(system.file(package = "boostmtree"), "NEWS")
+  file.show(newsfile)
 }

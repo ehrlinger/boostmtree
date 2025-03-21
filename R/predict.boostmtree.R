@@ -27,7 +27,7 @@
 ####  Dr. Ishwaran's work was funded in part by grant R01 CA163739 from
 ####  the National Cancer Institute.
 ####
-####  Dr. Kogalur's work was funded in part by grant R01 CA163739 from 
+####  Dr. Kogalur's work was funded in part by grant R01 CA163739 from
 ####  the National Cancer Institute.
 ####  ----------------------------------------------------------------
 ####  Written by:
@@ -72,16 +72,17 @@ predict.boostmtree <- function(object,
                                M,
                                eps = 1e-5,
                                useCVflag = FALSE,
-                               ...)
-{
-  result.predict <- generic.predict.boostmtree(object = object,
-                                               x,
-                                               tm,
-                                               id,
-                                               y,
-                                               M,
-                                               eps = eps,
-                                               useCVflag = useCVflag,
-                                               ...)
+                               ...) {
+  result.predict <- generic.predict.boostmtree(
+    object = object,
+    x,
+    tm,
+    id,
+    y,
+    M,
+    eps = eps,
+    useCVflag = useCVflag,
+    ...
+  )
   return(result.predict)
 }
