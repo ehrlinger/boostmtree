@@ -2,6 +2,10 @@ boostmtree - Boosted multivariate trees for longitudinal data.
 ===============================================================
 
 <!-- badges: start -->
+
+[![cranlogs](http://cranlogs.r-pkg.org/badges/boostmtree)](http://cranlogs.r-pkg.org/badges/boostmtree)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/boostmtree)](https://cran.r-project.org/package=boostmtree)
+
   [![R-CMD-check](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/ehrlinger/boostmtree/graph/badge.svg)](https://app.codecov.io/gh/ehrlinger/boostmtree)
 <!-- badges: end -->
