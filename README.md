@@ -2,25 +2,19 @@ boostmtree - Boosted multivariate trees for longitudinal data.
 ===============================================================
 
 <!-- badges: start -->
-
 [![cranlogs](http://cranlogs.r-pkg.org/badges/boostmtree)](http://cranlogs.r-pkg.org/badges/boostmtree)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/boostmtree)](https://cran.r-project.org/package=boostmtree)
+
+[![active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/badges/latest/active.svg)
 
   [![R-CMD-check](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/ehrlinger/boostmtree/graph/badge.svg)](https://app.codecov.io/gh/ehrlinger/boostmtree)
 <!-- badges: end -->
-  
-Multivariate extension of Friedman's (2001) gradient descent boosting method for modeling longitudinal response using multivariate tree base learners.
-  Longitudinal response could be continuous, binary, nominal or ordinal.
-  Covariate-time interactions are modeled using penalized B-splines
-  (P-splines) with estimated adaptive smoothing parameter.
+Implements Friedman's gradient descent boosting algorithm for modeling longitudinal response using multivariate tree base learners. Longitudinal response could be continuous, binary, nominal or ordinal.  A time-covariate interaction effect is modeled using penalized B-splines (P-splines) with estimated adaptive smoothing parameter. Although the package is design for longitudinal data, it can handle cross-sectional data as well.
 
-Package Overview
-=====
-  This package contains many useful functions and users should read the
-  help file in its entirety for details.  However, we briefly mention
-  several key functions that may make it easier to navigate and
-  understand the layout of the package.
+## Package Overview
+
+  This package contains many useful functions and users should read the help file in its entirety for details.  However, we briefly mention several key functions that may make it easier to navigate and understand the layout of the package.
 
  1. `boostmtree` - This is the main entry point to the package.  It grows a multivariate tree using user supplied training data.  Trees are grown using the `randomForestSRC` R-package.
 
