@@ -90,7 +90,7 @@ vimpPlot <- function(vimp,
   
   
   p <- nrow(vimp[[1]])
-  if (is.na(p)) {
+  if (is.null(p)) {
     p <- nrow(vimp)
   }
   if (is.null(xvar.names)) {
