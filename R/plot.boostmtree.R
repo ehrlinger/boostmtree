@@ -72,8 +72,7 @@ plot.boostmtree <- function(x,
   if (sum(inherits(x, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2 &&
       sum(inherits(x, c("boostmtree", "predict"), TRUE) == c(1, 2)) != 2) {
     stop(
-      "this function only works for objects of class `(boostmtree, grow)'" +
-        " or '(boostmtree, predict)'"
+      "this function only works for objects of class `(boostmtree, grow)'"+" or '(boostmtree, predict)'"
     )
   }
   if (sum(inherits(x, c("boostmtree", "grow"), TRUE) == c(1, 2)) == 2) {

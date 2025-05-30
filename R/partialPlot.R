@@ -93,8 +93,7 @@ partialPlot <- function(object,
   n.xvar <- length(xvar.names)
   if (!is.null(conditional.xvars) && !is.null(conditional.values)) {
     if (length(conditional.xvars) != length(conditional.values)) {
-      stop("conditional x-variable and conditional value vectors " +
-             "are not of same length")
+      stop("conditional x-variable and conditional value vectors "+"are not of same length")
     }
     for (i in seq_along(conditional.xvars)) {
       if (is.factor(object$x[, conditional.xvars[i]])) {
@@ -177,9 +176,7 @@ partialPlot <- function(object,
       x <- object$x[, nm]
       n.x <- length(unique(na.omit(x)))
       if (is.null(xvar.unq)) {
-        x.unq <- sort(unique(na.omit(x)))[
-          unique(as.integer(seq(1, n.x, length = min(npts, n.x))))
-          ]
+        x.unq <- sort(unique(na.omit(x)))[unique(as.integer(seq(1, n.x, length = min(npts, n.x))))]
       } else {
         if (!is.list(xvar.unq)) {
           stop("xvar.unq must be a list of length same as xvar.names")

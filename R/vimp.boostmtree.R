@@ -70,14 +70,12 @@ vimp.boostmtree <- function(object,
   if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2 &&
       sum(inherits(object, c("boostmtree", "predict"), TRUE) == c(1, 2)) != 2) {
     stop(
-      "This function only works for objects of class `(boostmtree, grow)' " +
-        "or '(boostmtree, predict)'"
+      "This function only works for objects of class `(boostmtree, grow)' "+"or '(boostmtree, predict)'"
     )
   }
   if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) == 2) {
     if (!object$cv.flag) {
-      stop("The grow object of boostmtree does not include " +
-             "in-sample CV estimates")
+      stop("The grow object of boostmtree does not include "+"in-sample CV estimates")
     }
     X <- object$x
     P <- ncol(X)
@@ -177,25 +175,18 @@ vimp.boostmtree <- function(object,
             }
             NullObj <- lapply(1:Mopt[q], function(m) {
               if (any(i == oob.list[[q]][[m]])) {
-                membershipNoise.i <- membershipNoise.list[[q]][[m]][
-                  which(oob.list[[q]][[m]] == i) , k , drop = TRUE]
-                membershipOrg.i.vec <- gamma.i.list[[q]][[m]][[i]][, 1, 
-                                                                   drop = TRUE]
-                gamma.noise.i <- t(gamma.i.list[[q]][[m]][[i]][
-                  which(membershipOrg.i.vec == membershipNoise.i), 
-                  -1, drop = FALSE])
+                membershipNoise.i <- membershipNoise.list[[q]][[m]][which(oob.list[[q]][[m]] == i) , k , drop = TRUE]
+                membershipOrg.i.vec <- gamma.i.list[[q]][[m]][[i]][, 1, drop = TRUE]
+                gamma.noise.i <- t(gamma.i.list[[q]][[m]][[i]][which(membershipOrg.i.vec == membershipNoise.i), -1, drop = FALSE])
                 membershipOrg.i <- membership[[q]][[m]][i]
-                gamma.org.i <- t(gamma.i.list[[q]][[m]][[i]][
-                  which(membershipOrg.i.vec == membershipOrg.i), -1,
-                  drop = FALSE])
+                gamma.org.i <- t(gamma.i.list[[q]][[m]][[i]][which(membershipOrg.i.vec == membershipOrg.i), -1, drop = FALSE])
                 gamma.main <- cbind(c(gamma.noise.i[1, 1], gamma.org.i[-1, 1]))
                 out.main <- c(D[[i]] %*% (gamma.main * nu.vec))
                 gamma.int <- cbind(c(gamma.org.i[1, 1], gamma.noise.i[-1, 1]))
                 out.int <- c(D[[i]] %*% (gamma.int * nu.vec))
                 if (k == p) {
                   n.D <- nrow(D[[i]])
-                  out.time <- c(D[[i]][sample(1:n.D, n.D, replace = TRUE), ,
-                                       drop = FALSE] %*% (gamma.org.i * nu.vec))
+                  out.time <- c(D[[i]][sample(1:n.D, n.D, replace = TRUE), , drop = FALSE] %*% (gamma.org.i * nu.vec))
                 }
               } else{
                 out.main <- out.int <- rep(0, ni[i])
@@ -276,12 +267,12 @@ vimp.boostmtree <- function(object,
       for (q in 1:n.Q) {
         for (k in 1:p) {
           l_pred.vimp[[q]][[k]] <- lapply(1:n, function(i) {
-            l_pred.main.i <- l_pred_db.vimp[[q]][[k]][[i]]$l_pred_db.main + 
+            l_pred.main.i <- l_pred_db.vimp[[q]][[k]][[i]]$l_pred_db.main +
               l_pred_ref.vimp[[k]][[i]]$l_pred_ref.main
-            l_pred.int.i <- l_pred_db.vimp[[q]][[k]][[i]]$l_pred_db.int + 
+            l_pred.int.i <- l_pred_db.vimp[[q]][[k]][[i]]$l_pred_db.int +
               l_pred_ref.vimp[[k]][[i]]$l_pred_ref.int
             if (k == p) {
-              l_pred.time.i <- l_pred_db.vimp[[q]][[k]][[i]]$l_pred_db.time + 
+              l_pred.time.i <- l_pred_db.vimp[[q]][[k]][[i]]$l_pred_db.time +
                 l_pred_ref.vimp[[k]][[i]]$l_pred_ref.time
             }
             list(
@@ -299,7 +290,7 @@ vimp.boostmtree <- function(object,
         lapply(1:p, function(k) {
           mu.main <- lapply(1:n, function(i) {
             GetMu(
-              Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.main * Ysd + 
+              Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.main * Ysd +
                 Ymean,
               Family = family
             )
@@ -318,7 +309,7 @@ vimp.boostmtree <- function(object,
           if (k == p) {
             mu.time <- lapply(1:n, function(i) {
               GetMu(
-                Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.time * 
+                Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.time *
                   Ysd + Ymean,
                 Family = family
               )
@@ -343,13 +334,9 @@ vimp.boostmtree <- function(object,
             l_pred_db.i <- rep(0, ni[i])
             NullObj <- lapply(1:Mopt[q], function(m) {
               if (any(i == oob.list[[q]][[m]])) {
-                membershipNoise.i <- membershipNoise.list[[q]][[m]][
-                  which(oob.list[[q]][[m]] == i)   , k , drop = TRUE]
-                membershipOrg.i.vec <- gamma.i.list[[q]][[m]][[i]][, 1,
-                                                                   drop = TRUE]
-                gamma.noise.i <- t(gamma.i.list[[q]][[m]][[i]][
-                  which(membershipOrg.i.vec == membershipNoise.i), -1, 
-                  drop = FALSE])
+                membershipNoise.i <- membershipNoise.list[[q]][[m]][which(oob.list[[q]][[m]] == i)   , k , drop = TRUE]
+                membershipOrg.i.vec <- gamma.i.list[[q]][[m]][[i]][, 1, drop = TRUE]
+                gamma.noise.i <- t(gamma.i.list[[q]][[m]][[i]][which(membershipOrg.i.vec == membershipNoise.i), -1, drop = FALSE])
                 out <- c(D[[i]] %*% (gamma.noise.i * nu.vec))
               }
               else
@@ -499,26 +486,20 @@ vimp.boostmtree <- function(object,
             }
             NullObj <- lapply(1:Mopt[q], function(m) {
               orgMembership  <- gamma[[q]][[m]][, 1]
-              gamma.Org      <- gamma[[q]][[m]][match(membership[[q]][[m]][i],
-                                                      orgMembership), -1, 
-                                                drop = FALSE]
-              membership.k   <- membershipNoise[[q]][[m]][
-                ((k - 1) * n + 1):(k * n)]
+              gamma.Org      <- gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE]
+              membership.k   <- membershipNoise[[q]][[m]][((k - 1) * n + 1):(k * n)]
               membership.k.i <- membership.k[i]
-              gamma.Noise    <- gamma[[q]][[m]][match(membership.k.i, 
-                                                      orgMembership), -1, 
-                                                drop = FALSE]
+              gamma.Noise    <- gamma[[q]][[m]][match(membership.k.i, orgMembership), -1, drop = FALSE]
               gamma.main     <- cbind(c(gamma.Noise[1], gamma.Org[-1]))
               gamma.int      <- cbind(c(gamma.Org[1], gamma.Noise[-1]))
-              l_pred_db.main.i  <<- l_pred_db.main.i + 
+              l_pred_db.main.i  <<- l_pred_db.main.i +
                 c(D[[i]] %*% (gamma.main * nu.vec))
-              l_pred_db.int.i   <<- l_pred_db.int.i  + 
+              l_pred_db.int.i   <<- l_pred_db.int.i  +
                 c(D[[i]] %*% (gamma.int * nu.vec))
               if (k == p) {
                 n.D <- nrow(D[[i]])
-                l_pred_db.time.i <<- l_pred_db.time.i + 
-                  D[[i]][sample(1:n.D, n.D, replace = TRUE), , 
-                         drop = FALSE] %*% t(gamma.Org * nu.vec)
+                l_pred_db.time.i <<- l_pred_db.time.i +
+                  D[[i]][sample(1:n.D, n.D, replace = TRUE), , drop = FALSE] %*% t(gamma.Org * nu.vec)
               }
               NULL
             })
@@ -620,7 +601,7 @@ vimp.boostmtree <- function(object,
           vimp.main[k, q] <<- (err.rate.main - rmse[q]) / rmse[q]
           mu.int <- lapply(1:n, function(i) {
             GetMu(
-              Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.int * Ysd + 
+              Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.int * Ysd +
                 Ymean,
               Family = family
             )
@@ -655,13 +636,10 @@ vimp.boostmtree <- function(object,
             l_pred_db.i <- rep(0, ni[i])
             NullObj <- lapply(1:Mopt[q], function(m) {
               orgMembership  <- gamma[[q]][[m]][, 1]
-              membership.k   <- membershipNoise[[q]][[m]][
-                ((k - 1) * n + 1):(k * n)]
+              membership.k   <- membershipNoise[[q]][[m]][((k - 1) * n + 1):(k * n)]
               membership.k.i <- membership.k[i]
-              gamma.Noise    <- gamma[[q]][[m]][match(membership.k.i, 
-                                                      orgMembership), -1, 
-                                                drop = FALSE]
-              l_pred_db.i <<- l_pred_db.i + 
+              gamma.Noise    <- gamma[[q]][[m]][match(membership.k.i, orgMembership), -1, drop = FALSE]
+              l_pred_db.i <<- l_pred_db.i +
                 c(D[[i]] %*% t(gamma.Noise * nu.vec))
               NULL
             })

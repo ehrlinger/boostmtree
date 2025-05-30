@@ -77,8 +77,7 @@ vimpPlot <- function(vimp,
                      main = "Variable Importance (%)",
                      col = grey(.80),
                      cex.lab = 1.5,
-                     subhead.labels = c("Time-Interactions Effects",
-                                        "Main Effects"),
+                     subhead.labels = c("Time-Interactions Effects", "Main Effects"),
                      ylbl = FALSE,
                      seplim = NULL,
                      eps = 0.1,
@@ -88,7 +87,12 @@ vimpPlot <- function(vimp,
   if (is.null(vimp)) {
     stop("vimp is not present in the object")
   }
+  
+  
   p <- nrow(vimp[[1]])
+  if (is.na(p)) {
+    p <- nrow(vimp)
+  }
   if (is.null(xvar.names)) {
     xvar.names <- paste("x", 1:p, sep = "")
   }
@@ -198,8 +202,7 @@ vimpPlot <- function(vimp,
       )
       # text(c(bp2), -4, rep(xvar.names, 3),srt=270,adj= 0,
       # yaxt="n",cex=if(!is.null(cex.xlab)) cex.xlab else 1)
-      text(xaxishead[1],
-           -yaxishead[1],
+      text(xaxishead[1],-yaxishead[1],
            labels = subhead.labels[1],
            cex = subhead.cexval)
       axis(2, yaxs, yat)

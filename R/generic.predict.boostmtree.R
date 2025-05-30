@@ -263,8 +263,7 @@ generic.predict.boostmtree <- function(object,
       }
       y.unq_test <- sort(unique(y))
       if (any(is.na(match(y.unq_test, y.unq)))) {
-        stop("Unique values of response from training and " +
-               "test data do not match")
+        stop("Unique values of response from training and "+"test data do not match")
       }
     }
     Yq <- lapply(1:n.Q, function(q) {
@@ -327,9 +326,7 @@ generic.predict.boostmtree <- function(object,
           if (m == 1) {
             l_pred_db.list[[q]][[m]] <<- lapply(1:n, function(i) {
               l_pred_db_Temp <- D[[i]] %*%
-                t(gamma[[q]][[m]][match(membership[[q]][[m]][i],
-                                        orgMembership),
-                                  -1, drop = FALSE] * nu.vec)
+                t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE] * nu.vec)
               if (family == "Ordinal" && q > 1) {
                 l_pred_db_Temp <- ifelse(
                   l_pred_db_Temp < l_pred_db.list[[q - 1]][[m]][[i]],
@@ -342,9 +339,7 @@ generic.predict.boostmtree <- function(object,
           } else {
             l_pred_db.list[[q]][[m]] <<- lapply(1:n, function(i) {
               l_pred_db_Temp <- unlist(l_pred_db.list[[q]][[m - 1]][i]) +
-                D[[i]] %*% t(gamma[[q]][[m]][match(membership[[q]][[m]][i],
-                                                   orgMembership),
-                                             -1, drop = FALSE] * nu.vec)
+                D[[i]] %*% t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE] * nu.vec)
               if (family == "Ordinal" && q > 1) {
                 l_pred_db_Temp <- ifelse(
                   l_pred_db_Temp < l_pred_db.list[[q - 1]][[m]][[i]],
@@ -361,10 +356,7 @@ generic.predict.boostmtree <- function(object,
               if (any(i == oob.list[[q]][[m]])) {
                 orgMembership <- gamma[[q]][[m]][[i]][, 1, drop = TRUE]
                 l_pred_db_Temp <- D[[i]] %*%
-                  t(gamma[[q]][[m]][[i]][
-                    match(membership[[q]][[m]][which(oob.list[[q]][[m]] == i)],
-                          orgMembership), 
-                    -1, drop = FALSE] * nu.vec)
+                  t(gamma[[q]][[m]][[i]][match(membership[[q]][[m]][which(oob.list[[q]][[m]] == i)], orgMembership), -1, drop = FALSE] * nu.vec)
                 if (family == "Ordinal" && q > 1) {
                   l_pred_db_Temp <- ifelse(
                     l_pred_db_Temp < l_pred_db.list[[q - 1]][[m]][[i]],
@@ -382,10 +374,7 @@ generic.predict.boostmtree <- function(object,
               if (any(i == oob.list[[q]][[m]])) {
                 orgMembership <- gamma[[q]][[m]][[i]][, 1, drop = TRUE]
                 l_pred_db_Temp <- l_pred_db.list[[q]][[m - 1]][[i]] +
-                  D[[i]] %*% t(gamma[[q]][[m]][[i]][
-                    match(membership[[q]][[m]][which(oob.list[[q]][[m]] == i)],
-                          orgMembership), 
-                    -1, drop = FALSE] * nu.vec)
+                  D[[i]] %*% t(gamma[[q]][[m]][[i]][match(membership[[q]][[m]][which(oob.list[[q]][[m]] == i)], orgMembership), -1, drop = FALSE] * nu.vec)
                 if (family == "Ordinal" && q > 1) {
                   l_pred_db_Temp <- ifelse(
                     l_pred_db_Temp < l_pred_db.list[[q - 1]][[m]][[i]],
@@ -451,8 +440,7 @@ generic.predict.boostmtree <- function(object,
     if (testFlag) {
       err.rate <- lapply(1:n.Q, function(q) {
         err.rate_temp <- matrix(unlist(lapply(1:M, function(m) {
-          c(l1Dist(Y[[q]], mu.list[[q]][[m]]),
-            l2Dist(Y[[q]], mu.list[[q]][[m]]))
+          c(l1Dist(Y[[q]], mu.list[[q]][[m]]), l2Dist(Y[[q]], mu.list[[q]][[m]]))
         })), ncol = 2, byrow = TRUE)
         colnames(err.rate_temp) <- c("l1", "l2")
         err.rate_temp
@@ -601,9 +589,7 @@ generic.predict.boostmtree <- function(object,
         lapply(1:Mopt[q], function(m) {
           orgMembership <- gamma[[q]][[m]][, 1]
           as.vector(X.tm %*%
-                      t(gamma[[q]][[m]][match(membership[[q]][[m]][i], 
-                                              orgMembership), 
-                                        -1, drop = FALSE] * nu.vec))
+                      t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE] * nu.vec))
         })
       })
     })
@@ -739,11 +725,11 @@ generic.predict.boostmtree <- function(object,
         muhat
       } else {
         unlist(muhat, recursive = FALSE)
-      } 
+      }
     } else {
       NULL
-    }, 
-    Prob_hat_class = Prob_hat_class, 
+    },
+    Prob_hat_class = Prob_hat_class,
     err.rate = if (!is.null(err.rate)) {
       if (family == "Nominal" || family == "Ordinal")
         lapply(1:n.Q, function(q) {

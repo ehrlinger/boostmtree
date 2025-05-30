@@ -156,8 +156,7 @@ boostmtree <- function(x,
   }
   user.option <- list(...)
   if (any(is.na(id)) || any(is.na(y)) || any(is.na(tm))) {
-    stop("missing values encountered y or id or tm:" +
-           " remove observations with missing values")
+    stop("missing values encountered y or id or tm:"+" remove observations with missing values")
   }
   x <- as.data.frame(x)
   X <- do.call(rbind, lapply(1:n, function(i) {
@@ -245,8 +244,7 @@ boostmtree <- function(x,
     tm[id == id.unq[i]]
   })
   if (nknots < 0) {
-    warning("bsplines require a positive number of knots: " +
-              " eliminating b-spline fitting")
+    warning("bsplines require a positive number of knots: "+" eliminating b-spline fitting")
     d <- 0
   }
   if (d >= 1) {
@@ -389,7 +387,7 @@ boostmtree <- function(x,
     }
   }
   pen.lsq.matx <- penBSderiv(df.D - 1, pen.ord)
-  if (!univariate && ntree == 1 && 
+  if (!univariate && ntree == 1 &&
       (missing(lambda) || lambda < 0)) {
     if (df.D >= (pen.ord + 2)) {
       lambda.est.flag <- TRUE
@@ -403,8 +401,7 @@ boostmtree <- function(x,
       pen.inv.sqrt.matx <- svd.pen$v %*% (t(svd.pen$v) * d.inv.sqrt)
       lambda <- rep(0, n.Q)
     } else {
-      warning("not enough degrees of freedom to estimate lambda:" +
-                " setting lambda to zero\n")
+      warning("not enough degrees of freedom to estimate lambda:"+" setting lambda to zero\n")
       lambda <- rep(0, n.Q)
     }
   }
@@ -770,8 +767,7 @@ boostmtree <- function(x,
                 out
               })
               CalD.i <- lapply(seq.pt.k, function(i) {
-                out_H_Mat <- Transform_H(Mu = mu.NR.update[[i]],
-                                         Family = family)
+                out_H_Mat <- Transform_H(Mu = mu.NR.update[[i]], Family = family)
                 out <- out_H_Mat %*% D[[which.pt.k[i]]]
                 out
               })
@@ -804,9 +800,7 @@ boostmtree <- function(x,
         })
         gamma.matx <- matrix(0, Kmax, df.D + 1)
         gamma.matx[, 1] <- sort(unique(membership.org))
-        gamma.matx[, 2:(df.D + 1)] <- matrix(unlist(gamma),
-                                             ncol = df.D,
-                                             byrow = TRUE)
+        gamma.matx[, 2:(df.D + 1)] <- matrix(unlist(gamma), ncol = df.D, byrow = TRUE)
         gamma.list[[q]][[m]] <- gamma.matx
         bhat <- t(matrix(unlist(lapply(1:n, function(i) {
           gamma[[membership[i]]]
@@ -851,8 +845,7 @@ boostmtree <- function(x,
                       out
                     })
                     CalD.i <- lapply(seq.pt.k, function(j) {
-                      out_H_Mat <- Transform_H(Mu = mu.NR.update[[j]],
-                                               Family = family)
+                      out_H_Mat <- Transform_H(Mu = mu.NR.update[[j]], Family = family)
                       out <- out_H_Mat %*% D[[which.pt.k[j]]]
                       out
                     })
@@ -985,8 +978,7 @@ boostmtree <- function(x,
           GetMu(Linear_Predictor = l_pred.cv.org[[i]], Family = family)
         })
         mu.cv.list[[q]][[m]] <- mu.cv.org
-        err.rate[[q]][m, ] <- c(l1Dist(Yorg[[q]], mu.cv.org),
-                                l2Dist(Yorg[[q]], mu.cv.org))
+        err.rate[[q]][m, ] <- c(l1Dist(Yorg[[q]], mu.cv.org), l2Dist(Yorg[[q]], mu.cv.org))
       }
     } else {
       if (family == "Nominal") {
@@ -1058,8 +1050,7 @@ boostmtree <- function(x,
         }
         if (!is.null(gls.obj)) {
           phi[q] <- gls.obj$sigma^2
-          rho_temp <- as.numeric(coef(gls.obj$modelStruct$corStruc,
-                                      unconstrained = FALSE))
+          rho_temp <- as.numeric(coef(gls.obj$modelStruct$corStruc, unconstrained = FALSE))
           rho[q] <- max(min(0.999, rho_temp, na.rm = TRUE), -0.999)
         }
       }

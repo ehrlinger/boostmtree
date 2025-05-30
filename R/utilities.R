@@ -291,8 +291,7 @@ gls.rmse  <- function(f,
     NULL
   })
   if (!is.null(gls.grow)) {
-    gls.pred  <- tapply(model.matrix(f, dta[-trn, ]) %*% gls.grow$coef, 
-                        dta[-trn, "id"], function(x) {
+    gls.pred  <- tapply(model.matrix(f, dta[-trn, ]) %*% gls.grow$coef, dta[-trn, "id"], function(x) {
       x
     })
     y.test <- tapply(dta[-trn, "y"], dta[-trn, "id"], function(x) {
@@ -469,8 +468,7 @@ penBSderiv <- function(d, pen.ord = 2) {
       cbind(0, rbind(0, pen.matx))
     } else {
       warning(
-        "not enough degrees of freedom for differencing penalty matrix: " +
-          "setting penalty to zero\n"
+        "not enough degrees of freedom for differencing penalty matrix: "+"setting penalty to zero\n"
       )
       pen.matx <- diag(1, d + 1)
       pen.matx[1, 1] <- 0
@@ -480,6 +478,7 @@ penBSderiv <- function(d, pen.ord = 2) {
     0
   }
 }
+
 plot.profile.prx <- function(obj,
                              col = NULL,
                              rnd.case = NULL,
