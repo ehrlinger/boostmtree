@@ -64,6 +64,21 @@
 ####**********************************************************************
 
 
+
+
+
+
+
+
+##' Show the NEWS file
+##' 
+##' Show the NEWS file of the \pkg{boostmtree} package.
+##' 
+##' 
+##' @param ... Further arguments passed to or from other methods.
+##' @return None.
+##' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
+##' @keywords documentation
 boostmtree.news <- function(...) {
   newsfile <- file.path(system.file(package = "boostmtree"), "NEWS")
   file.show(newsfile)
