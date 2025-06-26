@@ -71,19 +71,21 @@
 
 
 
-##' Print Summary Output
-##' 
-##' Print summary output from the boosting analysis.
-##' 
-##' 
-##' @param x An object of class \code{(boostmtree, grow)} or \code{(boostmtree,
-##' predict)}.
-##' @param ... Further arguments passed to or from other methods.
-##' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
-##' @references Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
-##' Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
-##' longitudinal data, \emph{Machine Learning}, 106(2): 277--305.
-##' @keywords print
+
+
+#' Print Summary Output
+#' 
+#' Print summary output from the boosting analysis.
+#' 
+#' 
+#' @param x An object of class \code{(boostmtree, grow)} or \code{(boostmtree,
+#' predict)}.
+#' @param ... Further arguments passed to or from other methods.
+#' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
+#' @references Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
+#' Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
+#' longitudinal data, \emph{Machine Learning}, 106(2): 277--305.
+#' @keywords print
 print.boostmtree <- function(x, ...) {
   if (sum(inherits(x, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2 &&
       sum(inherits(x, c("boostmtree", "predict"), TRUE) == c(1, 2)) != 2) {

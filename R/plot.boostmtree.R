@@ -70,27 +70,29 @@
 
 
 
-##' Plot Summary Analysis
-##' 
-##' Plot summary analysis of the boosting analysis.
-##' 
-##' Plot summary output, including predicted values and residuals.  Also plots
-##' various parameters against the number of boosting iterations.
-##' 
-##' @param x An object of class \code{(boostmtree, grow)} or \code{(boostmtree,
-##' predict)}.
-##' @param use.rmse Report performance values in terms of standardized
-##' root-mean-squared-error (RMSE) or mean-squared-error (MSE)?  Default is
-##' standardized RMSE.
-##' @param path_saveplot Provide the location where plot should be saved. By
-##' default the plot will be saved at temporary folder.
-##' @param Verbose Display the path where the plot is saved?
-##' @param ... Further arguments passed to or from other methods.
-##' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
-##' @references Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
-##' Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
-##' longitudinal data, \emph{Machine Learning}, 106(2): 277--305.
-##' @keywords plot
+
+
+#' Plot Summary Analysis
+#' 
+#' Plot summary analysis of the boosting analysis.
+#' 
+#' Plot summary output, including predicted values and residuals.  Also plots
+#' various parameters against the number of boosting iterations.
+#' 
+#' @param x An object of class \code{(boostmtree, grow)} or \code{(boostmtree,
+#' predict)}.
+#' @param use.rmse Report performance values in terms of standardized
+#' root-mean-squared-error (RMSE) or mean-squared-error (MSE)?  Default is
+#' standardized RMSE.
+#' @param path_saveplot Provide the location where plot should be saved. By
+#' default the plot will be saved at temporary folder.
+#' @param Verbose Display the path where the plot is saved?
+#' @param ... Further arguments passed to or from other methods.
+#' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
+#' @references Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
+#' Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
+#' longitudinal data, \emph{Machine Learning}, 106(2): 277--305.
+#' @keywords plot
 plot.boostmtree <- function(x,
                             use.rmse = TRUE,
                             path_saveplot = NULL,
