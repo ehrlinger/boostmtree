@@ -10,6 +10,8 @@ boostmtree - Boosted multivariate trees for longitudinal data.
   [![R-CMD-check](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/ehrlinger/boostmtree/graph/badge.svg)](https://app.codecov.io/gh/ehrlinger/boostmtree)
 <!-- badges: end -->
+
+
 Implements Friedman's gradient descent boosting algorithm for modeling longitudinal response using multivariate tree base learners. Longitudinal response could be continuous, binary, nominal or ordinal.  A time-covariate interaction effect is modeled using penalized B-splines (P-splines) with estimated adaptive smoothing parameter. Although the package is design for longitudinal data, it can handle cross-sectional data as well.
 
 ## Package Overview
