@@ -10,3 +10,6 @@ Description: Implements Friedman's gradient descent boosting algorithm for model
 License: GPL (>= 3)
 URL: https://ishwaran.org/ishwaran.html, https://ehrlinger.github.io/boostmtree/
 NeedsCompilation: no
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
