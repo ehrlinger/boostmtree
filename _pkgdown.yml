@@ -8,7 +8,17 @@ template:
   light-switch: true
   theme: atom-one-light
   theme-dark: atom-one-dark
-
+  
+home:
+  sidebar:
+    structure: [badges, links, authors]
+      components:
+        badges:
+          title: Package badges
+          text: |
+            ![](https://img.shields.io/github/r-package/v/melissavanbussel/rmedicine?label=rmedicine)<br>
+            ![](https://img.shields.io/github/actions/workflow/status/melissavanbussel/rmedicine/pkgdown.yaml)<br>
+          
 navbar:
   structure:
     right: [search, github, my_linkedin, lightswitch]
