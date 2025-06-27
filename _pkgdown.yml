@@ -16,8 +16,8 @@ home:
       badges:
         title: Package badges
         text: |
-          ![](https://img.shields.io/github/r-package/v/ehrlinger/ggrandomforests)<br>
-          ![](https://img.shields.io/github/actions/workflow/status/ehrlinger/ggrandomforests/pkgdown.yaml)<br>
+          ![](https://img.shields.io/github/r-package/v/ehrlinger/boostmtree)<br>
+          ![](https://img.shields.io/github/actions/workflow/status/ehrlinger/boostmtree/pkgdown.yaml)<br>
           
 navbar:
   structure:
