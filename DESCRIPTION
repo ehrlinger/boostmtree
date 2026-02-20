@@ -1,8 +1,21 @@
 Package: boostmtree
 Version: 1.5.2
-Date: 2025-06-10
+Date: 2026-02-20
 Title: Boosted Multivariate Trees for Longitudinal Data
-Author: Hemant Ishwaran <hemant.ishwaran@gmail.com>, Amol Pande <amoljpande@gmail.com>
+Authors@R:
+    c(person(given = "Hemant",
+          family = "Ishwaran",
+          role = "aut",
+          email = "hemant.ishwaran@gmail.com"),
+      person(given = "Amol",
+          family = "Pande",
+          role = "aut",
+          email = "amoljpande@gmail.com"),
+      person(given = c("Udaya", "B."),
+          family = "Kogalur",
+          role = c("aut", "cre"),
+          email = "ubk@kogalur.com"))
+Author: Hemant Ishwaran [aut], Amol Pande [aut], Udaya B. Kogalur [aut, cre]
 Maintainer: Udaya B. Kogalur <ubk@kogalur.com>
 Depends: R (>= 3.5.0)
 Imports: randomForestSRC (>= 2.9.0), parallel, splines, nlme

@@ -413,6 +413,10 @@ l2Dist <- function(y1, y2) {
     mean((unlist(y1[[i]]) - unlist(y2[[i]]))^2, na.rm = TRUE)
   })), na.rm = TRUE))
 }
+.stat_split <- function(...) {
+  utils::getFromNamespace("stat.split", "randomForestSRC")(...)
+}
+
 line.plot <- function(x, y, ...) {
   #  n <- length(x)
   #  o <- lapply(1:n, function(i) {
@@ -433,7 +437,7 @@ lowess.mod <- function(x, y, ...) {
   }
 }
 parse.depth <- function(obj) {
-  obj <- stat.split(obj)[[1]]
+  obj <- .stat_split(obj)[[1]]
   depth <- unlist(lapply(seq_along(obj), function(k) {
     if (!is.null(obj[[k]])) {
       min(obj[[k]][, "dpthID"], na.rm = TRUE)
@@ -479,11 +483,13 @@ penBSderiv <- function(d, pen.ord = 2) {
   }
 }
 
-plot.profile.prx <- function(obj,
+plot.profile.prx <- function(x,
                              col = NULL,
                              rnd.case = NULL,
                              cut = .95,
-                             restrictX = TRUE) {
+                             restrictX = TRUE,
+                             ...) {
+  obj <- x
   if (is.null(obj$proximity)) {
     stop("this functionrequires proximity = TRUE in the predict call")
   }

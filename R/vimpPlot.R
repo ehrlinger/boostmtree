@@ -196,7 +196,7 @@ vimpPlot <- function(vimp,
     Plot_Name <- if (n.Q == 1)
       "VIMPplot.pdf"
     else
-      paste("VIMPplot_Prob(y = ", Q_set[q], ")", ".pdf", sep = "")
+      paste("VIMPplot_Prob(", Q_set[q], ")", ".pdf", sep = "")
     pdf(
       file = paste(path_saveplot, "/", Plot_Name, sep = ""),
       width = 10,

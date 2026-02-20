@@ -4,3 +4,9 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.git$
+^\.gitignore$
+^\.Rhistory$
+^\.RData$
+^\.Ruserdata$
+^\.\.[Rr]check$

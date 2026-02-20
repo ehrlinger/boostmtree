@@ -415,20 +415,36 @@ boostmtree <- function(x,
     # Added the following if statement because binary/nominal/ordinal response
     # could be a factor or a character.
     #---------------------------------------------------------------------------
+    y_levels_original <- NULL
     if (!is.numeric(y)) {
-      y <- as.numeric(factor(y))
+      y_factor <- factor(y)
+      y_levels_original <- levels(y_factor)
+      y <- as.numeric(y_factor)
     }
     y.unq <- sort(unique(y))
     Q   <- length(y.unq)
     if (family == "Nominal") {
+      display_levels <- if (!is.null(y_levels_original))
+        y_levels_original
+      else
+        sort(unique(y))
+      if (!is.null(y_reference) && !is.numeric(y_reference)) {
+        converted_ref <- match(y_reference, display_levels)
+        if (is.na(converted_ref)) {
+          stop(paste(
+            "y_reference must take any one of the following:",
+            paste(display_levels, collapse = " " )
+          ))
+        }
+        y_reference <- converted_ref
+      }
       if (is.null(y_reference)) {
         y_reference <- min(y.unq)
       } else {
         if (length(y_reference) != 1 || is.na(match(y_reference, y.unq))) {
           stop(paste(
             "y_reference must take any one of the following:",
-            y.unq,
-            sep = " "
+            paste(display_levels, collapse = " " )
           ))
         }
       }
@@ -936,7 +952,8 @@ boostmtree <- function(x,
           xvar.wt = xvar.wt,
           case.wt = case.wt,
           forest.wt = TRUE,
-          memebership = TRUE
+          memebership = TRUE,
+          seed = seed.value
         )
         Kmax <- max(rfsrc.obj$leaf.count, na.rm = TRUE)
         baselearner[[m]] <- list(forest = rfsrc.obj)
@@ -1371,8 +1388,9 @@ boostmtree <- function(x,
       diff.err <- abs(err.rate[[q]][, "l2"] -
                         min(err.rate[[q]][, "l2"], na.rm = TRUE))
       diff.err[is.na(diff.err)] <- 1
-      if (sum(diff.err < Ysd * eps) > 0) {
-        Mopt[q] <<- min(which(diff.err < eps))
+      tol <- Ysd * eps
+      if (sum(diff.err < tol) > 0) {
+        Mopt[q] <<- min(which(diff.err < tol))
       } else {
         Mopt[q] <<- M
       }

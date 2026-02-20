@@ -285,11 +285,14 @@ generic.predict.boostmtree <- function(object,
     })
   }
   if (ntree == 1) {
-    rf.cores.old <- getOption("rf.cores")
-    mc.cores.old <- getOption("mc.cores")
+    old_core_options <- list(
+      rf.cores = getOption("rf.cores"),
+      mc.cores = getOption("mc.cores")
+    )
+    options(rf.cores = 1, mc.cores = 1)
+    on.exit(options(old_core_options), add = TRUE)
     for (q in 1:n.Q) {
       nullObj <- papply(1:M, function(m) {
-        options(rf.cores = 1, mc.cores = 1)
         if (!useCVflag) {
           membership[[q]][[m]] <<- c(
             predict.rfsrc(
@@ -453,8 +456,9 @@ generic.predict.boostmtree <- function(object,
         diff.err <- abs(err.rate[[q]][, "l2"] -
                           min(err.rate[[q]][, "l2"], na.rm = TRUE))
         diff.err[is.na(diff.err)] <- 1
-        if (sum(diff.err < Ysd * eps) > 0) {
-          Mopt[q] <- min(which(diff.err < eps))
+        tol <- Ysd * eps
+        if (sum(diff.err < tol) > 0) {
+          Mopt[q] <- min(which(diff.err < tol))
         } else {
           Mopt[q] <- M
         }
@@ -560,8 +564,9 @@ generic.predict.boostmtree <- function(object,
     if (!Mflag && testFlag) {
       diff.err <- abs(err.rate[, "l2"] - min(err.rate[, "l2"], na.rm = TRUE))
       diff.err[is.na(diff.err)] <- 1
-      if (sum(diff.err < Ysd * eps) > 0) {
-        Mopt <- min(which(diff.err < eps))
+      tol <- Ysd * eps
+      if (sum(diff.err < tol) > 0) {
+        Mopt <- min(which(diff.err < tol))
       } else {
         Mopt <- M
       }

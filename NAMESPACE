@@ -24,4 +24,5 @@ export(boostmtree,
 S3method(print, boostmtree)
 S3method(plot, boostmtree)
 S3method(predict, boostmtree)
+S3method(plot, profile.prx)
 

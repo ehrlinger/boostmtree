@@ -192,24 +192,42 @@ marginalPlot <- function(object,
     stop("x-variable names provided do not match original variable names")
   }
   n.xvar <- length(xvar.names)
+  total_n <- nrow(object$x)
+  if (missing(subset)) {
+    subset_idx <- seq_len(total_n)
+  } else {
+    subset_idx <- if (is.logical(subset)) which(subset) else as.integer(subset)
+    subset_idx <- subset_idx[!is.na(subset_idx)]
+    subset_idx <- subset_idx[subset_idx >= 1 & subset_idx <= total_n]
+    if (length(subset_idx) == 0) {
+      stop("subset selects no observations")
+    }
+  }
+  x_data <- object$x[subset_idx, , drop = FALSE]
+  time_subset <- object$time[subset_idx]
   tmOrg <- sort(unique(unlist(object$time)))
   if (missing(tm.unq)) {
-    tm.unq <- unique(quantile(tmOrg, (1:9) / 10, na.rm = TRUE))
-    tm.pt <- sapply(tm.unq, function(tt) {
-      #assign original time values
-      max(which.min(abs(tmOrg - tt)))
-    })
+    subset_tm_values <- sort(unique(unlist(time_subset)))
+    tm_labels <- unique(as.numeric(quantile(subset_tm_values, (1:9) / 10, na.rm = TRUE)))
+    tm_labels <- tm_labels[!is.na(tm_labels)]
+    if (length(tm_labels) == 0) {
+      tm_labels <- subset_tm_values
+    }
   } else {
-    tm.pt <- sapply(tm.unq, function(tt) {
-      #assign original time values
-      max(which.min(abs(tmOrg - tt)))
-    })
+    tm_labels <- tm.unq
+  }
+  if (length(tm_labels) == 0) {
+    tm_labels <- tmOrg
+  }
+  tm.pt <- sapply(tm_labels, function(tt) {
+    # assign original time values
+    max(which.min(abs(tmOrg - tt)))
+  })
+  if (length(tm.pt) == 0) {
+    tm.pt <- seq_along(tmOrg)
   }
   n.tm <- length(tm.pt)
-  if (!missing(subset)) {
-    object$x <- object$x[subset, , drop = FALSE]
-  }
-  n <- nrow(object$x)
+  n <- nrow(x_data)
   family <- object$family
   n.Q <- object$n.Q
   Q_set <- object$Q_set
@@ -227,38 +245,24 @@ marginalPlot <- function(object,
       }))
     }
   }
+  pred_obj <- predict.boostmtree(object = object)
   for (q in 1:n.Q) {
-    if (n.tm == 1) {
-      if (family == "Nominal" || family == "Ordinal") {
-        muhat <- cbind(matrix(
-          unlist(predict.boostmtree(object = object)$muhat[[q]]),
-          nrow = n,
-          byrow = TRUE
-        )[, tm.pt])
-      } else {
-        muhat <- cbind(matrix(
-          unlist(predict.boostmtree(object = object)$muhat),
-          nrow = n,
-          byrow = TRUE
-        )[, tm.pt])
-      }
+    if (family == "Nominal" || family == "Ordinal") {
+      muhat_source <- pred_obj$muhat[[q]][subset_idx]
     } else {
-      if (family == "Nominal" || family == "Ordinal") {
-        muhat <- matrix(unlist(predict.boostmtree(object = object)$muhat[[q]]),
-                        nrow = n,
-                        byrow = TRUE)[, tm.pt]
-      } else {
-        muhat <- matrix(unlist(predict.boostmtree(object = object)$muhat),
-                        nrow = n,
-                        byrow = TRUE)[, tm.pt]
-      }
+      muhat_source <- pred_obj$muhat[subset_idx]
     }
+    muhat <- matrix(
+      unlist(muhat_source),
+      nrow = n,
+      byrow = TRUE
+    )[, tm.pt, drop = FALSE]
     p.obj[[q]] <- lapply(1:n.xvar, function(nm) {
-      x <- object$x[, xvar.names[nm]]
+      x <- x_data[, xvar.names[nm]]
       RawDt <- lapply(1:n.tm, function(nt) {
         cbind(x, muhat[, nt])
       })
-      names(RawDt) <- paste("time = ", tm.unq, sep = "")
+      names(RawDt) <- paste("time = ", tm_labels, sep = "")
       RawDt
     })
     names(p.obj[[q]]) <- xvar.names
@@ -276,12 +280,12 @@ marginalPlot <- function(object,
         height = 10
       )
       l.obj[[q]] <- lapply(1:n.xvar, function(nm) {
-        x <- object$x[, xvar.names[nm]]
+        x <- x_data[, xvar.names[nm]]
         lo.fit <- lapply(1:n.tm, function(nt) {
           fit <- lowess(x, muhat[, nt])
           cbind(fit$x, fit$y)
         })
-        names(lo.fit) <- paste("time = ", tm.unq, sep = "")
+        names(lo.fit) <- paste("time = ", tm_labels, sep = "")
         lo.fit
       })
       names(l.obj[[q]]) <- xvar.names
@@ -304,14 +308,14 @@ marginalPlot <- function(object,
           type = "n",
           xlim = c(xmin, xmax),
           ylim = c(ymin, ymax),
-          xlab = xvar.names[pp],
-          ylab = "Predicted response"
+          xlab = xvar.names[pp]
         )
         for (nn in 1:n.tm) {
-          lines(l.obj[[q]][[pp]][[nn]][, 1],
-                l.obj[[q]][[pp]][[nn]][, 2],
-                type = "l",
-                col = nn)
+          lines(
+            l.obj[[q]][[pp]][[nn]][, 1],
+            l.obj[[q]][[pp]][[nn]][, 2],
+            col = nn
+          )
         }
       }
       dev.off()
