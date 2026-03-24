@@ -1,25 +1,22 @@
 ---
 title: "Longitudinal Data Analysis with boostmtree"
-output: rmarkdown::html_vignette
+format: html
+execute:
+  freeze: auto
+  echo: true
+  warning: false
+  fig-width: 7
+  fig-height: 5
+  fig-align: center
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
 vignette: >
   %\VignetteIndexEntry{Longitudinal Data Analysis with boostmtree}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
-
-```{r setup, include = FALSE}
-NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment  = "#>",
-  fig.width  = 7,
-  fig.height = 5,
-  fig.align  = "center",
-  cache      = NOT_CRAN,
-  eval       = NOT_CRAN,
-  purl       = NOT_CRAN
-)
-```
 
 ## Motivation
 
@@ -47,7 +44,8 @@ datasets bundled with the package.
 The `spirometry` dataset contains 9,471 post-lung-transplant FEV1%
 measurements from 509 patients along with 23 baseline clinical covariates.
 
-```{r spirometry-load, cache = FALSE}
+```{r}
+#| label: spirometry-load
 library(boostmtree)
 
 data(spirometry, package = "boostmtree")
@@ -71,7 +69,8 @@ into four components:
 | `id`     | Subject identifier vector (length `n_obs`) |
 | `y`      | Response vector (length `n_obs`) |
 
-```{r spirometry-split}
+```{r}
+#| label: spirometry-split
 set.seed(2024)
 
 ## Train/test split by subject
@@ -88,7 +87,10 @@ The code below shows the full production fit (M = 200, cv.flag = TRUE).  To
 keep vignette build time short, pre-computed results are loaded from the
 package's `inst/extdata/` directory when available.
 
-```{r spirometry-fit, echo = TRUE, eval = FALSE}
+```{r}
+#| label: spirometry-fit
+#| echo: true
+#| eval: false
 ## Full production fit — stored in inst/extdata/fit_spi.rds
 fit_spi <- boostmtree(
   x       = spirometry$features[trn_idx, ],
@@ -104,7 +106,9 @@ fit_spi <- boostmtree(
 )
 ```
 
-```{r spirometry-fit-load, include = FALSE}
+```{r}
+#| label: spirometry-fit-load
+#| include: false
 ## Check installed package first, then source tree (local pkgdown builds)
 fit_spi_path <- system.file("extdata", "fit_spi.rds", package = "boostmtree")
 if (!nzchar(fit_spi_path)) {
@@ -130,13 +134,15 @@ if (nzchar(fit_spi_path)) {
 }
 ```
 
-```{r spirometry-print}
+```{r}
+#| label: spirometry-print
 print(fit_spi)
 ```
 
 ### Diagnostics
 
-```{r spirometry-plot}
+```{r}
+#| label: spirometry-plot
 plot(fit_spi)
 ```
 
@@ -146,7 +152,8 @@ iterations (`M`) are needed or if the current budget is sufficient.
 
 ### Test-set prediction
 
-```{r spirometry-predict}
+```{r}
+#| label: spirometry-predict
 pred_spi <- predict(
   fit_spi,
   x  = spirometry$features[!trn_idx, ],
@@ -160,7 +167,8 @@ print(pred_spi)
 
 ### Variable importance
 
-```{r spirometry-vimp}
+```{r}
+#| label: spirometry-vimp
 vimp_spi <- vimp.boostmtree(fit_spi)
 vimpPlot(vimp_spi)
 ```
@@ -172,7 +180,8 @@ interesting: their impact on FEV1% changes over post-transplant time.
 
 ### Marginal dependence
 
-```{r spirometry-marginal}
+```{r}
+#| label: spirometry-marginal
 ## Inspect the top-4 most important variables
 top4 <- rownames(vimp_spi[[1]])[order(abs(vimp_spi[[1]][, 1]),
                                        decreasing = TRUE)][1:4]
@@ -186,7 +195,8 @@ marginalPlot(fit_spi, xvar.names = top4, plot.it = TRUE)
 The `AF` dataset tracks weekly AF presence/absence (binary) for 228 patients
 enrolled in a surgical ablation trial, with up to 12 months follow-up.
 
-```{r af-load, cache = FALSE}
+```{r}
+#| label: af-load
 data(AF, package = "boostmtree")
 
 cat("Patients:    ", length(unique(AF$id)), "\n")
@@ -200,7 +210,8 @@ cat("AF prevalence: ", round(mean(AF$y == 1) * 100, 1), "%\n")
 For binary responses, set `family = "Binary"`.  The model fits the log-odds on
 the linear predictor scale; predictions are returned as probabilities.
 
-```{r af-split}
+```{r}
+#| label: af-split
 set.seed(2024)
 
 subjects_af <- unique(AF$id)
@@ -214,7 +225,10 @@ cat("Test subjects:    ", sum(!trn_af), "\n")
 The code below shows the full production fit.  Pre-computed results are loaded
 from `inst/extdata/fit_af.rds` when available.
 
-```{r af-fit, echo = TRUE, eval = FALSE}
+```{r}
+#| label: af-fit
+#| echo: true
+#| eval: false
 ## Full production fit — stored in inst/extdata/fit_af.rds
 fit_af <- boostmtree(
   x       = AF$feature[trn_af, ],
@@ -229,7 +243,9 @@ fit_af <- boostmtree(
 )
 ```
 
-```{r af-fit-load, include = FALSE}
+```{r}
+#| label: af-fit-load
+#| include: false
 ## Check installed package first, then source tree (local pkgdown builds)
 fit_af_path <- system.file("extdata", "fit_af.rds", package = "boostmtree")
 if (!nzchar(fit_af_path)) {
@@ -254,17 +270,20 @@ if (nzchar(fit_af_path)) {
 }
 ```
 
-```{r af-print}
+```{r}
+#| label: af-print
 print(fit_af)
 ```
 
-```{r af-plot}
+```{r}
+#| label: af-plot
 plot(fit_af)
 ```
 
 ### Test-set prediction
 
-```{r af-predict}
+```{r}
+#| label: af-predict
 pred_af <- predict(
   fit_af,
   x  = AF$feature[!trn_af, ],
@@ -278,7 +297,8 @@ print(pred_af)
 
 ### Variable importance
 
-```{r af-vimp}
+```{r}
+#| label: af-vimp
 vimp_af <- vimp.boostmtree(fit_af)
 vimpPlot(vimp_af)
 ```
@@ -288,7 +308,8 @@ vimpPlot(vimp_af)
 The predicted probability of AF over time can be examined by computing
 marginal predictions at the observed time points.
 
-```{r af-marginal}
+```{r}
+#| label: af-marginal
 marginalPlot(fit_af, xvar.names = colnames(AF$feature)[1:4], plot.it = TRUE)
 ```
 
@@ -300,7 +321,8 @@ marginalPlot(fit_af, xvar.names = colnames(AF$feature)[1:4], plot.it = TRUE)
 we compare OOB RMSE across the four simulation scenarios for a continuous
 response.
 
-```{r simulation-compare}
+```{r}
+#| label: simulation-compare
 results <- lapply(0:3, function(m) {
   set.seed(m + 100)
   dta <- simLong(n = 50, ntest = 0, N = 4, model = m,

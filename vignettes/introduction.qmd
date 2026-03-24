@@ -1,25 +1,22 @@
 ---
 title: "Introduction to boostmtree"
-output: rmarkdown::html_vignette
+format: html
+execute:
+  freeze: auto
+  echo: true
+  warning: false
+  fig-width: 7
+  fig-height: 5
+  fig-align: center
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
 vignette: >
   %\VignetteIndexEntry{Introduction to boostmtree}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
-
-```{r setup, include = FALSE}
-NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment  = "#>",
-  fig.width  = 7,
-  fig.height = 5,
-  fig.align  = "center",
-  cache      = NOT_CRAN,
-  eval       = NOT_CRAN,
-  purl       = NOT_CRAN
-)
-```
 
 ## Overview
 
@@ -60,7 +57,8 @@ covariate–time interaction complexity.  Four simulation models are provided:
 | 2 | `y ~ x1 + x3 + x4 + time^2 * x2^2` (quadratic interaction) |
 | 3 | `y ~ x1 + x3 + exp(x4) + time^2 * x2^2 * x3` (complex) |
 
-```{r simulate}
+```{r}
+#| label: simulate
 library(boostmtree)
 
 set.seed(42)
@@ -94,7 +92,8 @@ The main entry point is `boostmtree()`.  Key tuning parameters are:
 | `cv.flag` | Use OOB cross-validation for optimal `M` | `FALSE` |
 | `nknots`  | Number of B-spline knots | 10 |
 
-```{r fit, cache = TRUE}
+```{r}
+#| label: fit
 ## Extract training indices
 trn <- dta$trn
 
@@ -121,7 +120,8 @@ a separate held-out validation set.
 
 `plot.boostmtree()` produces a multi-panel diagnostic display:
 
-```{r plot-fit}
+```{r}
+#| label: plot-fit
 plot(fit)
 ```
 
@@ -133,7 +133,8 @@ Panels include:
 
 ## Predicting on new data
 
-```{r predict, cache = TRUE}
+```{r}
+#| label: predict
 pred <- predict(
   fit,
   x  = dta$dtaL$features[-trn, ],
@@ -148,7 +149,8 @@ print(pred)
 When outcomes are provided, `predict()` reports the test-set RMSE (for
 Continuous) or misclassification rate (for Binary/Nominal/Ordinal).
 
-```{r plot-pred}
+```{r}
+#| label: plot-pred
 plot(pred)
 ```
 
@@ -158,7 +160,8 @@ plot(pred)
 objects (training data) it uses OOB samples; for predict objects it uses the
 test set.
 
-```{r vimp, cache = TRUE}
+```{r}
+#| label: vimp
 vimp_obj <- vimp.boostmtree(fit)
 ```
 
@@ -166,7 +169,8 @@ vimp_obj <- vimp.boostmtree(fit)
 (above the x-axis) represent main effects and negative bars (below) represent
 time-interaction effects.
 
-```{r vimp-plot}
+```{r}
+#| label: vimp-plot
 vimpPlot(vimp_obj)
 ```
 
@@ -178,7 +182,8 @@ vimpPlot(vimp_obj)
 (unadjusted) predicted mean at each group.  It is fast and useful for
 initial exploration.
 
-```{r marginal}
+```{r}
+#| label: marginal
 marginalPlot(fit, xvar.names = c("x1", "x2"), plot.it = TRUE)
 ```
 
@@ -188,7 +193,8 @@ marginalPlot(fit, xvar.names = c("x1", "x2"), plot.it = TRUE)
 point, providing a confounder-adjusted relationship.  It is slower but more
 interpretable in the presence of correlated predictors.
 
-```{r partial, cache = TRUE}
+```{r}
+#| label: partial
 partialPlot(fit, xvar.names = c("x1", "x2"), npts = 10)
 ```
 
@@ -197,7 +203,8 @@ partialPlot(fit, xvar.names = c("x1", "x2"), npts = 10)
 The workflow is identical for binary outcomes.  Simply set
 `family = "Binary"` and supply a 0/1 integer or two-level factor as `y`.
 
-```{r binary, cache = TRUE}
+```{r}
+#| label: binary
 set.seed(7)
 dta_bin <- simLong(n = 50, ntest = 0, N = 4, model = 1,
                    family = "Binary", q = 2)

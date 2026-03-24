@@ -58,8 +58,6 @@ footer:
     built_with_pkgdown: "This site was built using [pkgdown](https://pkgdown.r-lib.org/)!&nbsp;&nbsp;<img src='https://pkgdown.r-lib.org/logo.png' alt='pkgdown logo' width='25'>"
 
 reference:
-  run_dont_test: false
-
   - title: "Core Modelling"
     desc: >
       Fit and predict boosted multivariate tree models for longitudinal data.

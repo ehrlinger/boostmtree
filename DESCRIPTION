@@ -39,6 +39,7 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
+    quarto,
     ggplot2,
     ggRandomForests,
     hvtiPlotR,
@@ -49,6 +50,6 @@ Remotes:
     ehrlinger/hvtiPlotR,
     ehrlinger/hvtiRutilities
 Config/testthat/edition: 3
-VignetteBuilder: knitr
+VignetteBuilder: quarto
 Encoding: UTF-8
 RoxygenNote: 7.3.3
