@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -263,7 +263,7 @@ generic.predict.boostmtree <- function(object,
       }
       y.unq_test <- sort(unique(y))
       if (any(is.na(match(y.unq_test, y.unq)))) {
-        stop("Unique values of response from training and "+"test data do not match")
+        stop("Unique values of response from training and test data do not match")
       }
     }
     Yq <- lapply(1:n.Q, function(q) {
@@ -285,10 +285,8 @@ generic.predict.boostmtree <- function(object,
     })
   }
   if (ntree == 1) {
-    old_core_options <- list(
-      rf.cores = getOption("rf.cores"),
-      mc.cores = getOption("mc.cores")
-    )
+    old_core_options <- list(rf.cores = getOption("rf.cores"),
+                             mc.cores = getOption("mc.cores"))
     options(rf.cores = 1, mc.cores = 1)
     on.exit(options(old_core_options), add = TRUE)
     for (q in 1:n.Q) {

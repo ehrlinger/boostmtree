@@ -2,8 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
-docs
+docs/*
+!docs/articles
 
 ..Rcheck/
 
-NAMESPACE
+inst/extdata/fit_spi.rds
+inst/extdata/fit_af.rds

@@ -10,3 +10,6 @@
 ^\.RData$
 ^\.Ruserdata$
 ^\.\.[Rr]check$
+^inst/extdata/fit_spi\.rds$
+^inst/extdata/fit_af\.rds$
+^vignettes/.*_cache$

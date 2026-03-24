@@ -42,7 +42,6 @@ NULL
 #' 
 #' 
 #' @name boostmtree-package
-#' @docType package
 #' @section Package Overview: This package contains many useful functions and
 #' users should read the help file in its entirety for details.  However, we
 #' briefly mention several key functions that may make it easier to navigate
@@ -75,7 +74,7 @@ NULL
 #' Ishwaran H. (2017).  Boosted multivariate trees for longitudinal data,
 #' \emph{Machine Learning}, 106(2): 277--305.
 #' @keywords package
-NULL
+"_PACKAGE"
 
 
 

@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -73,30 +73,30 @@
 
 
 #' Prediction for Boosted multivariate trees for longitudinal data.
-#' 
+#'
 #' Obtain predicted values.  Also returns test-set performance if the test data
 #' contains y-outcomes.
-#' 
+#'
 #' The predicted time profile and performance values are obtained for test data
 #' from the boosted object grown on the training data.
-#' 
+#'
 #' R-side parallel processing is implemented by replacing the R function
 #' \command{lapply} with \command{mclapply} found in the \pkg{parallel}
 #' package.  You can set the number of cores accessed by \command{mclapply} by
 #' issuing the command \command{options(mc.cores = x)}, where \command{x} is
 #' the number of cores.  As an example, issuing the following options command
 #' uses all available cores:
-#' 
+#'
 #' \command{options(mc.cores=detectCores())}
-#' 
+#'
 #' However, this can create high RAM usage, especially when using function
 #' \command{partialPlot} which calls the \command{predict} function.
-#' 
+#'
 #' Note that all performance values (for example prediction error) are
 #' standardized by the overall y-standard deviation.  Thus, reported RMSE
 #' (root-mean-squared-error) is actually standardized RMSE.  Values are
 #' reported at the optimal stopping time.
-#' 
+#'
 #' @param object A boosting object of class \code{(boostmtree, grow)}.
 #' @param x Data frame (or matrix) containing test set x-values.  Rows must be
 #' duplicated to match the number of time points for an individual. If missing,
@@ -156,9 +156,10 @@
 #' Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
 #' longitudinal data, \emph{Machine Learning}, 106(2): 277--305.
 #' @keywords predict boosting
+#' @export
 #' @examples
-#' 
-#' \dontrun{
+#'
+#' \donttest{
 #' ##------------------------------------------------------------
 #' ## Synthetic example (Response is continuous)
 #' ##
@@ -166,41 +167,41 @@
 #' ##  largish number of noisy variables
 #' ##
 #' ##  Illustrates how modified gradient improves performance
-#' ##  also compares performance to ideal and well specified linear models 
+#' ##  also compares performance to ideal and well specified linear models
 #' ##----------------------------------------------------------------------------
-#' 
+#'
 #' ## simulate the data
 #' ## simulation 2: main effects (x1, x3, x4), quad-time-interaction (x2)
 #' dtaO <- simLong(n = 100, ntest = 100, model = 2, family = "Continuous", q = 25)
-#' 
+#'
 #' ## save the data as both a list and data frame
 #' dtaL <- dtaO$dtaL
 #' dta <- dtaO$dta
-#' 
+#'
 #' ## get the training data
 #' trn <- dtaO$trn
-#' 
+#'
 #' ## save formulas for linear model comparisons
 #' f.true <- dtaO$f.true
 #' f.linr <- "y~g( x1+x2+x3+x4+x1*time+x2*time+x3*time+x4*time )"
-#' 
-#' 
+#'
+#'
 #' ## modified tree gradient (default)
 #' o.1 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn],dtaL$y[trn],
 #'        family = "Continuous",M = 350)
 #' p.1 <- predict(o.1, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
-#' 
+#'
 #' ## non-modified tree gradient (nmtg)
 #' o.2 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
 #'        family = "Continuous",M = 350, mod.grad = FALSE)
 #' p.2 <- predict(o.2, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
-#' 
+#'
 #' ## set rho = 0
 #' o.3 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
 #'        family = "Continuous",M = 350, rho = 0)
 #' p.3 <- predict(o.3, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
-#' 
-#' 
+#'
+#'
 #' ##rmse values compared to generalized least squares (GLS)
 #' ##for true model and well specified linear models (LM)
 #' cat("true LM           :", boostmtree:::gls.rmse(f.true,dta,trn),"\n")
@@ -208,44 +209,44 @@
 #' cat("boostmtree        :", p.1$rmse,"\n")
 #' cat("boostmtree  (nmtg):", p.2$rmse,"\n")
 #' cat("boostmtree (rho=0):", p.3$rmse,"\n")
-#' 
+#'
 #' ##predicted value plots
 #' plot(p.1)
 #' plot(p.2)
 #' plot(p.3)
-#' 
-#' 
-#' 
+#'
+#'
+#'
 #' ##------------------------------------------------------------
 #' ## Synthetic example (Response is binary)
 #' ##
 #' ##  High correlation, quadratic time with quadratic interaction
 #' ##  largish number of noisy variables
 #' ##----------------------------------------------------------------------------
-#' 
+#'
 #' ## simulate the data
 #' ## simulation 2: main effects (x1, x3, x4), quad-time-interaction (x2)
 #' dtaO <- simLong(n = 100, ntest = 100, model = 2, family = "Binary", q = 25)
-#' 
+#'
 #' ## save the data as both a list and data frame
 #' dtaL <- dtaO$dtaL
 #' dta <- dtaO$dta
-#' 
+#'
 #' ## get the training data
 #' trn <- dtaO$trn
-#' 
+#'
 #' ## save formulas for linear model comparisons
 #' f.true <- dtaO$f.true
 #' f.linr <- "y~g( x1+x2+x3+x4+x1*time+x2*time+x3*time+x4*time )"
-#' 
-#' 
+#'
+#'
 #' ## modified tree gradient (default)
 #' o.1 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn],dtaL$y[trn],
 #'        family = "Binary",M = 350)
 #' p.1 <- predict(o.1, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
-#' 
+#'
 #' }
-#' 
+#'
 predict.boostmtree <- function(object,
                                x,
                                tm,

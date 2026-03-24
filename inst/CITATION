@@ -1,28 +1,51 @@
 citHeader("To cite boostmtree in publications use:")
 
-titl <- meta$Title
-year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
+# Package citation
 vers <- paste("R package version", meta$Version)
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
 
 bibentry(
-      bibtype = "Manual",
-      title = titl,
-      author = c(
-            person(family = "Ishwaran", given = "H."),
-            person(family = "Pande", given = "A."),
-            person(family = "Kogalur", given = "U.B.")
-      ),
-      year = year,
-      note = vers,
-      url = "https://cran.r-project.org/package=boostmtree",
-      textVersion = paste(
-            "Ishwaran H., Pande A. and Kogalur U.B. (",
-            year,
-            "). ",
-            titl,
-            ", ",
-            vers,
-            ".",
-            sep = ""
-      )
+  bibtype      = "Manual",
+  title        = meta$Title,
+  author       = c(
+    person(family = "Ishwaran",  given = "H."),
+    person(family = "Pande",     given = "A."),
+    person(family = "Kogalur",   given = "U.B."),
+    person(family = "Ehrlinger", given = "J.")
+  ),
+  year         = year,
+  note         = vers,
+  url          = "https://github.com/ehrlinger/boostmtree",
+  textVersion  = paste0(
+    "Ishwaran H., Pande A., Kogalur U.B., and Ehrlinger J. (",
+    year, "). ", meta$Title, ", ", vers, "."
+  )
+)
+
+# Methodology paper
+bibentry(
+  bibtype   = "Article",
+  title     = "Boosted Multivariate Trees for Longitudinal Data",
+  author    = c(
+    person(family = "Pande",      given = "A."),
+    person(family = "Li",         given = "L."),
+    person(family = "Rajeswaran", given = "J."),
+    person(family = "Ehrlinger",  given = "J."),
+    person(family = "Kogalur",    given = "U.B."),
+    person(family = "Blackstone", given = "E.H."),
+    person(family = "Ishwaran",   given = "H.")
+  ),
+  journal   = "Machine Learning",
+  year      = "2017",
+  volume    = "106",
+  number    = "2",
+  pages     = "277--305",
+  doi       = "10.1007/s10994-016-5597-1",
+  textVersion = paste(
+    "Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,",
+    "Blackstone E.H., and Ishwaran H. (2017).",
+    "Boosted Multivariate Trees for Longitudinal Data.",
+    "Machine Learning, 106(2):277-305.",
+    "doi:10.1007/s10994-016-5597-1"
+  )
 )

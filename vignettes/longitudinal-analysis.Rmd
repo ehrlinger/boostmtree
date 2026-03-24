@@ -1,0 +1,378 @@
+---
+title: "Longitudinal Data Analysis with boostmtree"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Longitudinal Data Analysis with boostmtree}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  fig.width  = 7,
+  fig.height = 5,
+  fig.align  = "center",
+  cache      = NOT_CRAN,
+  eval       = NOT_CRAN,
+  purl       = NOT_CRAN
+)
+```
+
+## Motivation
+
+Longitudinal studies collect repeated measurements on the same subjects over
+time.  The correlation among repeated measures, unbalanced observation
+schedules, and the possibility that covariate effects change with time all
+present challenges for standard regression methods.
+
+**boostmtree** addresses these challenges by:
+
+1. Using *multivariate tree* base learners that naturally accommodate
+   non-linear and interaction effects among covariates.
+2. Modeling covariate–time interactions via penalized B-splines, whose
+   smoothing parameter is estimated adaptively at each boosting step.
+3. Handling unbalanced panels (different numbers of observations per subject)
+   without imputation.
+
+This vignette demonstrates the full analysis workflow using the two real
+datasets bundled with the package.
+
+---
+
+## Spirometry: Continuous longitudinal response
+
+The `spirometry` dataset contains 9,471 post-lung-transplant FEV1%
+measurements from 509 patients along with 23 baseline clinical covariates.
+
+```{r spirometry-load, cache = FALSE}
+library(boostmtree)
+
+data(spirometry, package = "boostmtree")
+
+cat("Patients:         ", length(unique(spirometry$id)), "\n")
+cat("Total obs:        ", length(spirometry$y), "\n")
+cat("Covariates:       ", ncol(spirometry$features), "\n")
+cat("FEV1% range:      ", round(range(spirometry$y), 1), "\n")
+cat("Time range (yrs): ", round(range(spirometry$time), 2), "\n")
+```
+
+### Data structure
+
+`boostmtree()` expects data in *long format* (one row per observation), split
+into four components:
+
+| Argument | Description |
+|:---------|:------------|
+| `x`      | `n_obs × p` covariate matrix (time-invariant per subject) |
+| `tm`     | Numeric vector of observation times (length `n_obs`) |
+| `id`     | Subject identifier vector (length `n_obs`) |
+| `y`      | Response vector (length `n_obs`) |
+
+```{r spirometry-split}
+set.seed(2024)
+
+## Train/test split by subject
+subjects  <- unique(spirometry$id)
+n_train   <- floor(0.8 * length(subjects))
+trn_subj  <- sample(subjects, n_train)
+trn_idx   <- spirometry$id %in% trn_subj
+
+cat("Training subjects:", sum(trn_idx), "\n")
+cat("Test subjects:    ", sum(!trn_idx), "\n")
+```
+
+The code below shows the full production fit (M = 200, cv.flag = TRUE).  To
+keep vignette build time short, pre-computed results are loaded from the
+package's `inst/extdata/` directory when available.
+
+```{r spirometry-fit, echo = TRUE, eval = FALSE}
+## Full production fit — stored in inst/extdata/fit_spi.rds
+fit_spi <- boostmtree(
+  x       = spirometry$features[trn_idx, ],
+  tm      = spirometry$time[trn_idx],
+  id      = spirometry$id[trn_idx],
+  y       = spirometry$y[trn_idx],
+  family  = "Continuous",
+  M       = 200,
+  nu      = 0.05,
+  K       = 5,
+  cv.flag = TRUE,
+  verbose = FALSE
+)
+```
+
+```{r spirometry-fit-load, include = FALSE}
+## Check installed package first, then source tree (local pkgdown builds)
+fit_spi_path <- system.file("extdata", "fit_spi.rds", package = "boostmtree")
+if (!nzchar(fit_spi_path)) {
+  src <- file.path("inst", "extdata", "fit_spi.rds")
+  if (file.exists(src)) fit_spi_path <- src
+}
+if (nzchar(fit_spi_path)) {
+  fit_spi <- readRDS(fit_spi_path)
+} else {
+  ## Fallback: reduced fit when no pre-computed object is available
+  fit_spi <- boostmtree(
+    x       = spirometry$features[trn_idx, ],
+    tm      = spirometry$time[trn_idx],
+    id      = spirometry$id[trn_idx],
+    y       = spirometry$y[trn_idx],
+    family  = "Continuous",
+    M       = 50,
+    nu      = 0.05,
+    K       = 5,
+    cv.flag = TRUE,
+    verbose = FALSE
+  )
+}
+```
+
+```{r spirometry-print}
+print(fit_spi)
+```
+
+### Diagnostics
+
+```{r spirometry-plot}
+plot(fit_spi)
+```
+
+The top-left panel shows OOB error (RMSE) vs. boosting iteration.  The dashed
+vertical line marks the selected `Mopt`.  Use this to judge whether more
+iterations (`M`) are needed or if the current budget is sufficient.
+
+### Test-set prediction
+
+```{r spirometry-predict}
+pred_spi <- predict(
+  fit_spi,
+  x  = spirometry$features[!trn_idx, ],
+  tm = spirometry$time[!trn_idx],
+  id = spirometry$id[!trn_idx],
+  y  = spirometry$y[!trn_idx]
+)
+
+print(pred_spi)
+```
+
+### Variable importance
+
+```{r spirometry-vimp}
+vimp_spi <- vimp.boostmtree(fit_spi)
+vimpPlot(vimp_spi)
+```
+
+The bar chart separates *main effects* (bars above the axis, labelled in the
+upper section) from *time-interaction effects* (bars below the axis).
+Variables with both a main effect and a time-interaction effect are the most
+interesting: their impact on FEV1% changes over post-transplant time.
+
+### Marginal dependence
+
+```{r spirometry-marginal}
+## Inspect the top-4 most important variables
+top4 <- rownames(vimp_spi[[1]])[order(abs(vimp_spi[[1]][, 1]),
+                                       decreasing = TRUE)][1:4]
+marginalPlot(fit_spi, xvar.names = top4, plot.it = TRUE)
+```
+
+---
+
+## Atrial Fibrillation: Binary longitudinal response
+
+The `AF` dataset tracks weekly AF presence/absence (binary) for 228 patients
+enrolled in a surgical ablation trial, with up to 12 months follow-up.
+
+```{r af-load, cache = FALSE}
+data(AF, package = "boostmtree")
+
+cat("Patients:    ", length(unique(AF$id)), "\n")
+cat("Total obs:   ", length(AF$y), "\n")
+cat("Covariates:  ", ncol(AF$feature), "\n")
+cat("AF prevalence: ", round(mean(AF$y == 1) * 100, 1), "%\n")
+```
+
+### Model fit
+
+For binary responses, set `family = "Binary"`.  The model fits the log-odds on
+the linear predictor scale; predictions are returned as probabilities.
+
+```{r af-split}
+set.seed(2024)
+
+subjects_af <- unique(AF$id)
+trn_af_subj <- sample(subjects_af, floor(0.75 * length(subjects_af)))
+trn_af      <- AF$id %in% trn_af_subj
+
+cat("Training subjects:", sum(trn_af), "\n")
+cat("Test subjects:    ", sum(!trn_af), "\n")
+```
+
+The code below shows the full production fit.  Pre-computed results are loaded
+from `inst/extdata/fit_af.rds` when available.
+
+```{r af-fit, echo = TRUE, eval = FALSE}
+## Full production fit — stored in inst/extdata/fit_af.rds
+fit_af <- boostmtree(
+  x       = AF$feature[trn_af, ],
+  tm      = AF$time[trn_af],
+  id      = AF$id[trn_af],
+  y       = AF$y[trn_af],
+  family  = "Binary",
+  M       = 200,
+  nu      = 0.05,
+  cv.flag = TRUE,
+  verbose = FALSE
+)
+```
+
+```{r af-fit-load, include = FALSE}
+## Check installed package first, then source tree (local pkgdown builds)
+fit_af_path <- system.file("extdata", "fit_af.rds", package = "boostmtree")
+if (!nzchar(fit_af_path)) {
+  src <- file.path("inst", "extdata", "fit_af.rds")
+  if (file.exists(src)) fit_af_path <- src
+}
+if (nzchar(fit_af_path)) {
+  fit_af <- readRDS(fit_af_path)
+} else {
+  ## Fallback: reduced fit when no pre-computed object is available
+  fit_af <- boostmtree(
+    x       = AF$feature[trn_af, ],
+    tm      = AF$time[trn_af],
+    id      = AF$id[trn_af],
+    y       = AF$y[trn_af],
+    family  = "Binary",
+    M       = 50,
+    nu      = 0.05,
+    cv.flag = TRUE,
+    verbose = FALSE
+  )
+}
+```
+
+```{r af-print}
+print(fit_af)
+```
+
+```{r af-plot}
+plot(fit_af)
+```
+
+### Test-set prediction
+
+```{r af-predict}
+pred_af <- predict(
+  fit_af,
+  x  = AF$feature[!trn_af, ],
+  tm = AF$time[!trn_af],
+  id = AF$id[!trn_af],
+  y  = AF$y[!trn_af]
+)
+
+print(pred_af)
+```
+
+### Variable importance
+
+```{r af-vimp}
+vimp_af <- vimp.boostmtree(fit_af)
+vimpPlot(vimp_af)
+```
+
+### Marginal time trends
+
+The predicted probability of AF over time can be examined by computing
+marginal predictions at the observed time points.
+
+```{r af-marginal}
+marginalPlot(fit_af, xvar.names = colnames(AF$feature)[1:4], plot.it = TRUE)
+```
+
+---
+
+## Simulation study: comparing models
+
+`simLong()` supports systematic benchmarking across simulation models.  Below
+we compare OOB RMSE across the four simulation scenarios for a continuous
+response.
+
+```{r simulation-compare}
+results <- lapply(0:3, function(m) {
+  set.seed(m + 100)
+  dta <- simLong(n = 50, ntest = 0, N = 4, model = m,
+                 family = "Continuous", q = 2)
+  fit <- boostmtree(
+    x       = dta$dtaL$features,
+    tm      = dta$dtaL$time,
+    id      = dta$dtaL$id,
+    y       = dta$dtaL$y,
+    family  = "Continuous",
+    M       = 50,
+    cv.flag = TRUE,
+    verbose = FALSE
+  )
+  data.frame(
+    model    = paste0("Model ", m),
+    formula  = dta$f.true,
+    Mopt     = fit$Mopt[1],
+    OOB_RMSE = round(min(fit$rmse, na.rm = TRUE), 3)
+  )
+})
+
+do.call(rbind, results)
+```
+
+As expected, error increases with model complexity (richer covariate–time
+interactions), but boosting adapts `Mopt` accordingly.
+
+---
+
+## Tuning guide
+
+| Parameter | Effect | Recommendation |
+|:----------|:-------|:---------------|
+| `M`       | Maximum iterations | Start at 200–500; increase if OOB error is still decreasing at `M` |
+| `nu`      | Shrinkage (learning rate) | Smaller values (0.01–0.05) give better results but need larger `M` |
+| `K`       | Tree terminal nodes | 3–10; smaller values give smoother fits |
+| `nknots`  | B-spline knots for time interaction | 5–15; more knots = more flexible time curves |
+| `cv.flag` | OOB-based optimal stopping | Always use `TRUE`; safeguards against overfitting |
+| `ntree`   | Trees per base learner (passed to `randomForestSRC`) | 50–200 |
+
+### Learning rate vs. iterations trade-off
+
+A smaller `nu` makes each update more conservative, reducing overfitting risk
+but requiring more iterations to converge.  A common strategy is:
+
+```r
+# Initial exploration
+fit_fast <- boostmtree(x, tm, id, y, M = 100, nu = 0.1, cv.flag = TRUE)
+
+# Refine with slower learning rate
+fit_full <- boostmtree(x, tm, id, y,
+                       M   = fit_fast$Mopt * 5,
+                       nu  = 0.02,
+                       cv.flag = TRUE)
+```
+
+---
+
+## References
+
+Friedman J.H. (2001). Greedy function approximation: a gradient boosting
+machine. *Annals of Statistics*, 29(5): 1189–1232.
+
+Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B., Blackstone E.H.,
+Ishwaran H. (2017). Boosted multivariate trees for longitudinal data. *Machine
+Learning*, 106(2): 277–305.
+doi: [10.1007/s10994-016-5597-1](https://doi.org/10.1007/s10994-016-5597-1)
+
+Gillinov A.M. et al. (2015). Surgical ablation of atrial fibrillation during
+mitral valve surgery. *New England Journal of Medicine*, 372(15): 1399–1408.
+
+Mason D.P. et al. (2012). Effect of changes in postoperative spirometry on
+survival after lung transplantation. *Journal of Thoracic and Cardiovascular
+Surgery*, 144: 197–203.
