@@ -307,10 +307,12 @@
 #' ##-------------------------------------------------------------
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 #' boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-#'                  family = "Continuous", M = 300, cv.flag = TRUE)
+#'                  family = "Continuous", M = 20, cv.flag = TRUE)
 #' plot(boost.cv.grow)
 #' print(boost.cv.grow)
+#' }
 #'
+#' \dontrun{
 #' ##----------------------------------------------------------------------------
 #' ## spirometry data (Response is continuous)
 #' ##----------------------------------------------------------------------------
@@ -346,13 +348,13 @@
 #'   trn <- sample(1:nrow(x), size = nrow(x) * (2 / 3), replace = FALSE)
 #'
 #'   ## run boosting in univariate mode
-#'   o <- boostmtree(x = x[trn,], y = y[trn],family = "Continuous")
+#'   o <- boostmtree(x = x[trn,], y = y[trn], M = 20, family = "Continuous")
 #'   o.p <- predict(o, x = x[-trn, ], y = y[-trn])
 #'   print(o)
 #'   plot(o.p)
 #'
 #'   ## run boosting in univariate mode to obtain RMSE and vimp
-#'   o.cv <- boostmtree(x = x, y = y, M = 100,family = "Continuous",cv.flag = TRUE)
+#'   o.cv <- boostmtree(x = x, y = y, M = 20, family = "Continuous", cv.flag = TRUE)
 #'   print(o.cv)
 #'   plot(o.cv)
 #' }
@@ -776,13 +778,8 @@ boostmtree <- function(x,
       .sigma_robust(lambda[q], rho[q])
     }))
   }
-  Y.names <- paste("Y", 1:df.D, sep = "")
-  rfsrc.f <- as.formula(paste(
-    "Multivar(",
-    paste(Y.names, collapse = ","),
-    paste(") ~ ."),
-    sep = ""
-  ))
+  Y.names <- paste0("Y", 1:df.D)
+  rfsrc.f <- as.formula(paste0("Multivar(", paste(Y.names, collapse = ","), ") ~ ."))
   cv.flag <- cv.flag && (ntree == 1)
   cv.lambda.flag <- cv.flag &&
     is.hidden.CVlambda(user.option) && lambda.est.flag
@@ -914,6 +911,7 @@ boostmtree <- function(x,
         out <- tryCatch({
           qr.solve(VMat[[i]])
         }, error = function(ex) {
+          message("qr.solve failed (VMat): ", conditionMessage(ex))
           NULL
         })
         if (is.null(out)) {
@@ -1096,6 +1094,7 @@ boostmtree <- function(x,
               qr.obj <- tryCatch({
                 qr.solve(HesMat, ScoreVec)
               }, error = function(ex) {
+                message("qr.solve failed (Hessian NR): ", conditionMessage(ex))
                 NULL
               })
               if (!is.null(qr.obj)) {
@@ -1175,6 +1174,7 @@ boostmtree <- function(x,
                     qr.obj <- tryCatch({
                       qr.solve(HesMat, ScoreVec)
                     }, error = function(ex) {
+                      message("qr.solve failed (Hessian NR): ", conditionMessage(ex))
                       NULL
                     })
                     if (!is.null(qr.obj)) {
@@ -1241,6 +1241,7 @@ boostmtree <- function(x,
             qr.obj <- tryCatch({
               qr.solve(XnewSum, YnewSum)
             }, error = function(ex) {
+              message("qr.solve failed (WLS step): ", conditionMessage(ex))
               NULL
             })
             if (!is.null(qr.obj)) {
@@ -1348,6 +1349,7 @@ boostmtree <- function(x,
               correlation = corCompSymm(form = ~ 1 |
                                           id))
         }, error = function(ex) {
+          message("gls (full model) failed: ", conditionMessage(ex))
           NULL
         })
         if (is.null(gls.obj)) {
@@ -1357,6 +1359,7 @@ boostmtree <- function(x,
                 correlation = corCompSymm(form = ~ 1 |
                                             id))
           }, error = function(ex) {
+            message("gls (intercept-only) failed: ", conditionMessage(ex))
             NULL
           })
         }

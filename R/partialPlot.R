@@ -131,7 +131,7 @@
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 #'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 300)
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 20)
 #'
 #' #plot results
 #' #x1 has a linear main effect
@@ -153,14 +153,16 @@
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Binary")$dtaL
 #'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary",M = 300)
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary",M = 20)
 #'
 #' #plot results
 #' #x1 has a linear main effect
 #' #x2 is quadratic with quadratic time trend
 #' pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
 #' pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
+#' }
 #'
+#' \dontrun{
 #' ##----------------------------------------------------------------------------
 #' ## spirometry data
 #' ##----------------------------------------------------------------------------
@@ -284,14 +286,14 @@ partialPlot <- function(object,
   }
   if (n.Q > 1) {
     names(p.obj) <- unlist(lapply(1:n.Q, function(q) {
-      paste("y = ", Q_set[q], sep = "")
+      paste0("y = ", Q_set[q])
     }))
   }
   if (plot.it) {
     l.obj <- vector("list", n.Q)
     if (n.Q > 1) {
       names(l.obj) <- unlist(lapply(1:n.Q, function(q) {
-        paste("y = ", Q_set[q], sep = "")
+        paste0("y = ", Q_set[q])
       }))
     }
   }
@@ -357,7 +359,7 @@ partialPlot <- function(object,
         })), na.rm = TRUE)
         c(xu, mn.x)
       }))
-      colnames(rObj) <- c("x", paste("y.", seq_along(tm.pt), sep = ""))
+      colnames(rObj) <- c("x", paste0("y.", seq_along(tm.pt)))
       rObj
     })
     names(p.obj[[q]]) <- xvar.names

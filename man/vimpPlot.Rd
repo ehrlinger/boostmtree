@@ -108,11 +108,11 @@ x-axis. In either case, negative vimp value is set to zero.
 ## high correlation, quadratic time with quadratic interaction
 ##-------------------------------------------------------------
 #simulate the data
-dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
+dta <- simLong(n = 20, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call
 boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-              family = "Continuous",M = 300, cv.flag = TRUE)
+              family = "Continuous",M = 20, cv.flag = TRUE)
 vimp.grow <- vimp.boostmtree(object = boost.grow)
 
 # VIMP plot

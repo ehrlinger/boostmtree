@@ -68,10 +68,10 @@ Pande et al. (2017).
 ##----------------------------------------------------------------------------
 
 ## set the number of boosting iterations
-M <- 500
+M <- 20
 
 ## simulation 0: only main effects (x1, x3, x4)
-dta <- simLong(n = 100, ntest = 100, model = 0, family = "Continuous", q = 5)
+dta <- simLong(n = 20, ntest = 5, model = 0, family = "Continuous", q = 5)
 trn <- dta$trn
 dtaL <- dta$dtaL
 dta <- dta$dta
@@ -86,10 +86,10 @@ pred.0 <- predict(obj.0, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], 
 ##----------------------------------------------------------------------------
 
 ## set the number of boosting iterations
-M <- 500
+M <- 20
 
 ## simulation 0: only main effects (x1, x3, x4)
-dta <- simLong(n = 100, ntest = 100, model = 0, family = "Binary", q = 5)
+dta <- simLong(n = 20, ntest = 5, model = 0, family = "Binary", q = 5)
 trn <- dta$trn
 dtaL <- dta$dtaL
 dta <- dta$dta

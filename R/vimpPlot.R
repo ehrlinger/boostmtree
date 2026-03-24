@@ -127,11 +127,11 @@
 #' ## high correlation, quadratic time with quadratic interaction
 #' ##-------------------------------------------------------------
 #' #simulate the data
-#' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
+#' dta <- simLong(n = 20, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 #'
 #' #basic boosting call
 #' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-#'               family = "Continuous",M = 300, cv.flag = TRUE)
+#'               family = "Continuous",M = 20, cv.flag = TRUE)
 #' vimp.grow <- vimp.boostmtree(object = boost.grow)
 #'
 #' # VIMP plot
@@ -170,14 +170,14 @@ vimpPlot <- function(vimp,
     p <- nrow(vimp)
   }
   if (is.null(xvar.names)) {
-    xvar.names <- paste("x", 1:p, sep = "")
+    xvar.names <- paste0("x", 1:p)
   }
   vimp <- lapply(vimp, function(v) {
     v * 100
   })
   n.Q <- ncol(vimp[[1]])
   if (is.null(Q_set)) {
-    Q_set <- paste("V", seq(n.Q), sep = "")
+    Q_set <- paste0("V", seq(n.Q))
   }
   for (q in 1:n.Q) {
     if (is.null(path_saveplot)) {

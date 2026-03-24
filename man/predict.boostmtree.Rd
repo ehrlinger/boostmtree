@@ -111,7 +111,7 @@ reported at the optimal stopping time.
 
 ## simulate the data
 ## simulation 2: main effects (x1, x3, x4), quad-time-interaction (x2)
-dtaO <- simLong(n = 100, ntest = 100, model = 2, family = "Continuous", q = 25)
+dtaO <- simLong(n = 20, ntest = 10, model = 2, family = "Continuous", q = 5)
 
 ## save the data as both a list and data frame
 dtaL <- dtaO$dtaL
@@ -127,17 +127,17 @@ f.linr <- "y~g( x1+x2+x3+x4+x1*time+x2*time+x3*time+x4*time )"
 
 ## modified tree gradient (default)
 o.1 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn],dtaL$y[trn],
-       family = "Continuous",M = 350)
+       family = "Continuous",M = 20)
 p.1 <- predict(o.1, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
 ## non-modified tree gradient (nmtg)
 o.2 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
-       family = "Continuous",M = 350, mod.grad = FALSE)
+       family = "Continuous",M = 20, mod.grad = FALSE)
 p.2 <- predict(o.2, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
 ## set rho = 0
 o.3 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
-       family = "Continuous",M = 350, rho = 0)
+       family = "Continuous",M = 20, rho = 0)
 p.3 <- predict(o.3, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
 
@@ -165,7 +165,7 @@ plot(p.3)
 
 ## simulate the data
 ## simulation 2: main effects (x1, x3, x4), quad-time-interaction (x2)
-dtaO <- simLong(n = 100, ntest = 100, model = 2, family = "Binary", q = 25)
+dtaO <- simLong(n = 20, ntest = 10, model = 2, family = "Binary", q = 5)
 
 ## save the data as both a list and data frame
 dtaL <- dtaO$dtaL
@@ -181,7 +181,7 @@ f.linr <- "y~g( x1+x2+x3+x4+x1*time+x2*time+x3*time+x4*time )"
 
 ## modified tree gradient (default)
 o.1 <- boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn],dtaL$y[trn],
-       family = "Binary",M = 350)
+       family = "Binary",M = 20)
 p.1 <- predict(o.1, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 
 }

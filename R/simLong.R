@@ -116,10 +116,10 @@
 #' ##----------------------------------------------------------------------------
 #'
 #' ## set the number of boosting iterations
-#' M <- 500
+#' M <- 20
 #'
 #' ## simulation 0: only main effects (x1, x3, x4)
-#' dta <- simLong(n = 100, ntest = 100, model = 0, family = "Continuous", q = 5)
+#' dta <- simLong(n = 20, ntest = 5, model = 0, family = "Continuous", q = 5)
 #' trn <- dta$trn
 #' dtaL <- dta$dtaL
 #' dta <- dta$dta
@@ -134,10 +134,10 @@
 #' ##----------------------------------------------------------------------------
 #'
 #' ## set the number of boosting iterations
-#' M <- 500
+#' M <- 20
 #'
 #' ## simulation 0: only main effects (x1, x3, x4)
-#' dta <- simLong(n = 100, ntest = 100, model = 0, family = "Binary", q = 5)
+#' dta <- simLong(n = 20, ntest = 5, model = 0, family = "Binary", q = 5)
 #' trn <- dta$trn
 #' dtaL <- dta$dtaL
 #' dta <- dta$dta
@@ -231,7 +231,7 @@ simLong <-  function(n = 100,
     y)
   })))
   d <- q + 4
-  colnames(dta) <- c(paste("x", 1:d, sep = ""), "time", "id", "y")
+  colnames(dta) <- c(paste0("x", 1:d), "time", "id", "y")
   dtaL <- list(
     features = dta[, 1:d],
     time = dta$time,

@@ -61,7 +61,7 @@ unadjusted predicted y-values over a set of time points specified by
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Continuous", M = 300)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Continuous", M = 20)
 
 #plot results
 #x1 has a linear main effect
@@ -82,7 +82,7 @@ marginalPlot(boost.grow,plot.it = TRUE)
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Binary")$dtaL
 
 #basic boosting call
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Binary", M = 300)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Binary", M = 20)
 
 #plot results
 #x1 has a linear main effect
@@ -93,7 +93,9 @@ marginalPlot(boost.grow, "x2",plot.it = TRUE)
 #Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"
 # in the current working directory.
 marginalPlot(boost.grow,plot.it = TRUE)
+}
 
+\dontrun{
 ##----------------------------------------------------------------------------
 ## spirometry data
 ##----------------------------------------------------------------------------

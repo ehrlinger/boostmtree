@@ -249,6 +249,7 @@ blup.solve <- function(transf.data, membership, sigma, Kmax) {
     fix.eff <- tryCatch({
       qr.solve(A, b)
     }, error = function(ex) {
+      message("qr.solve failed (fixed effects): ", conditionMessage(ex))
       NULL
     })
     if (is.null(fix.eff)) {
@@ -257,6 +258,7 @@ blup.solve <- function(transf.data, membership, sigma, Kmax) {
     rnd.eff <- tryCatch({
       qr.solve(Q, ZY - t(XZ) %*% fix.eff)
     }, error = function(ex) {
+      message("qr.solve failed (random effects): ", conditionMessage(ex))
       NULL
     })
     if (is.null(rnd.eff)) {

@@ -114,7 +114,7 @@
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 #'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Continuous", M = 300)
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Continuous", M = 20)
 #'
 #' #plot results
 #' #x1 has a linear main effect
@@ -135,7 +135,7 @@
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Binary")$dtaL
 #'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Binary", M = 300)
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Binary", M = 20)
 #'
 #' #plot results
 #' #x1 has a linear main effect
@@ -146,7 +146,9 @@
 #' #Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"
 #' # in the current working directory.
 #' marginalPlot(boost.grow,plot.it = TRUE)
+#' }
 #'
+#' \dontrun{
 #' ##----------------------------------------------------------------------------
 #' ## spirometry data
 #' ##----------------------------------------------------------------------------
@@ -217,14 +219,14 @@ marginalPlot <- function(object,
   p.obj <- vector("list", n.Q)
   if (n.Q > 1) {
     names(p.obj) <- unlist(lapply(1:n.Q, function(q) {
-      paste("y = ", Q_set[q], sep = "")
+      paste0("y = ", Q_set[q])
     }))
   }
   if (plot.it) {
     l.obj <- vector("list", n.Q)
     if (n.Q > 1) {
       names(l.obj) <- unlist(lapply(1:n.Q, function(q) {
-        paste("y = ", Q_set[q], sep = "")
+        paste0("y = ", Q_set[q])
       }))
     }
   }
@@ -259,7 +261,7 @@ marginalPlot <- function(object,
       RawDt <- lapply(1:n.tm, function(nt) {
         cbind(x, muhat[, nt])
       })
-      names(RawDt) <- paste("time = ", tm.unq, sep = "")
+      names(RawDt) <- paste0("time = ", tm.unq)
       RawDt
     })
     names(p.obj[[q]]) <- xvar.names

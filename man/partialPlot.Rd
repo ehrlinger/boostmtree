@@ -94,7 +94,7 @@ of the data using \code{subset}. Further conditioning can be imposed using
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 300)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 20)
 
 #plot results
 #x1 has a linear main effect
@@ -116,14 +116,16 @@ pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Binary")$dtaL
 
 #basic boosting call
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary",M = 300)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary",M = 20)
 
 #plot results
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
+}
 
+\dontrun{
 ##----------------------------------------------------------------------------
 ## spirometry data
 ##----------------------------------------------------------------------------

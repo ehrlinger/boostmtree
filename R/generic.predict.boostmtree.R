@@ -226,12 +226,8 @@ generic.predict.boostmtree <- function(object,
       }
     }
   }
-  id.index <- lapply(1:n, function(i) {
-    which(id == id.unq[i])
-  })
-  ni <- unlist(lapply(1:n, function(i) {
-    length(id.index[[i]])
-  }))
+  id.index <- unname(split(seq_along(id), id)[as.character(id.unq)])
+  ni <- lengths(id.index)
   tm.unq_train <- object$tm.unq
   tm.index <- lapply(1:n, function(i) {
     AppoxMatch(unlist(tm)[id.index[[i]]], tm.unq_train)
@@ -290,42 +286,45 @@ generic.predict.boostmtree <- function(object,
     options(rf.cores = 1, mc.cores = 1)
     on.exit(options(old_core_options), add = TRUE)
     for (q in 1:n.Q) {
-      nullObj <- papply(1:M, function(m) {
+      ms_result <- papply(1:M, function(m) {
         if (!useCVflag) {
-          membership[[q]][[m]] <<- c(
-            predict.rfsrc(
+          list(
+            membership = c(predict.rfsrc(
               baselearner[[q]][[m]],
               newdata = X,
               membership = TRUE,
               ptn.count = K,
               na.action = na.action,
               importance = "none"
-            )$ptn.membership
+            )$ptn.membership),
+            oob = NULL
           )
         } else {
           oob <- which(baselearner[[q]][[m]]$inbag == 0)
-          oob.list[[q]][[m]] <<- oob
-          membership[[q]][[m]] <<- c(
-            predict.rfsrc(
+          list(
+            membership = c(predict.rfsrc(
               baselearner[[q]][[m]],
               newdata = X[oob, , drop = FALSE],
               membership = TRUE,
               ptn.count = K,
               na.action = na.action,
               importance = "none"
-            )$ptn.membership
+            )$ptn.membership),
+            oob = oob
           )
         }
-        NULL
       })
-      rm(nullObj)
+      membership[[q]] <- lapply(ms_result, `[[`, "membership")
+      if (useCVflag) {
+        oob.list[[q]] <- lapply(ms_result, `[[`, "oob")
+      }
     }
     for (q in 1:n.Q) {
-      nullObj <- lapply(1:M, function(m) {
+      for (m in 1:M) {
         if (!useCVflag) {
           orgMembership <- gamma[[q]][[m]][, 1]
           if (m == 1) {
-            l_pred_db.list[[q]][[m]] <<- lapply(1:n, function(i) {
+            l_pred_db.list[[q]][[m]] <- lapply(1:n, function(i) {
               l_pred_db_Temp <- D[[i]] %*%
                 t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE] * nu.vec)
               if (family == "Ordinal" && q > 1) {
@@ -338,7 +337,7 @@ generic.predict.boostmtree <- function(object,
               l_pred_db_Temp
             })
           } else {
-            l_pred_db.list[[q]][[m]] <<- lapply(1:n, function(i) {
+            l_pred_db.list[[q]][[m]] <- lapply(1:n, function(i) {
               l_pred_db_Temp <- unlist(l_pred_db.list[[q]][[m - 1]][i]) +
                 D[[i]] %*% t(gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE] * nu.vec)
               if (family == "Ordinal" && q > 1) {
@@ -353,7 +352,7 @@ generic.predict.boostmtree <- function(object,
           }
         } else {
           if (m == 1) {
-            l_pred_db.list[[q]][[m]] <<- lapply(1:n, function(i) {
+            l_pred_db.list[[q]][[m]] <- lapply(1:n, function(i) {
               if (any(i == oob.list[[q]][[m]])) {
                 orgMembership <- gamma[[q]][[m]][[i]][, 1, drop = TRUE]
                 l_pred_db_Temp <- D[[i]] %*%
@@ -371,7 +370,7 @@ generic.predict.boostmtree <- function(object,
               l_pred_db_Temp
             })
           } else {
-            l_pred_db.list[[q]][[m]] <<- lapply(1:n, function(i) {
+            l_pred_db.list[[q]][[m]] <- lapply(1:n, function(i) {
               if (any(i == oob.list[[q]][[m]])) {
                 orgMembership <- gamma[[q]][[m]][[i]][, 1, drop = TRUE]
                 l_pred_db_Temp <- l_pred_db.list[[q]][[m - 1]][[i]] +
@@ -390,13 +389,11 @@ generic.predict.boostmtree <- function(object,
             })
           }
         }
-        NULL
-      })
-      rm(nullObj)
+      }
     }
     if (family == "Nominal") {
-      nullObj <- lapply(1:M, function(m) {
-        l_pred_ref[[m]] <<- lapply(1:n, function(i) {
+      l_pred_ref <- lapply(1:M, function(m) {
+        lapply(1:n, function(i) {
           log((1 + (Reduce(
             "+", lapply(1:n.Q, function(q) {
               exp(l_pred_db.list[[q]][[m]][[i]])
@@ -405,17 +402,13 @@ generic.predict.boostmtree <- function(object,
             -1
           })
         })
-        NULL
       })
-      rm(nullObj)
     } else {
-      nullObj <- lapply(1:M, function(m) {
-        l_pred_ref[[m]] <<- lapply(1:n, function(i) {
+      l_pred_ref <- lapply(1:M, function(m) {
+        lapply(1:n, function(i) {
           rep(0, ni[i])
         })
-        NULL
       })
-      rm(nullObj)
     }
     l_pred.list <- lapply(1:n.Q, function(q) {
       lapply(1:M, function(m) {
@@ -515,6 +508,7 @@ generic.predict.boostmtree <- function(object,
           qr.obj <- tryCatch({
             qr.solve(XnewSum, YnewSum)
           }, error = function(ex) {
+            message("qr.solve failed (WLS step): ", conditionMessage(ex))
             NULL
           })
           if (!is.null(qr.obj)) {

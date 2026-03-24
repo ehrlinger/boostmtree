@@ -277,10 +277,12 @@ plot(boost.grow)
 ##-------------------------------------------------------------
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-                 family = "Continuous", M = 300, cv.flag = TRUE)
+                 family = "Continuous", M = 20, cv.flag = TRUE)
 plot(boost.cv.grow)
 print(boost.cv.grow)
+}
 
+\dontrun{
 ##----------------------------------------------------------------------------
 ## spirometry data (Response is continuous)
 ##----------------------------------------------------------------------------
@@ -316,13 +318,13 @@ if (library("mlbench", logical.return = TRUE)) {
   trn <- sample(1:nrow(x), size = nrow(x) * (2 / 3), replace = FALSE)
 
   ## run boosting in univariate mode
-  o <- boostmtree(x = x[trn,], y = y[trn],family = "Continuous")
+  o <- boostmtree(x = x[trn,], y = y[trn], M = 20, family = "Continuous")
   o.p <- predict(o, x = x[-trn, ], y = y[-trn])
   print(o)
   plot(o.p)
 
   ## run boosting in univariate mode to obtain RMSE and vimp
-  o.cv <- boostmtree(x = x, y = y, M = 100,family = "Continuous",cv.flag = TRUE)
+  o.cv <- boostmtree(x = x, y = y, M = 20, family = "Continuous", cv.flag = TRUE)
   print(o.cv)
   plot(o.cv)
 }

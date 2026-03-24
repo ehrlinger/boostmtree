@@ -41,11 +41,11 @@ individually or a joint VIMP is calculated for all the covariates specified in
 ## VIMP is based on in-sample CV using out of bag data
 ##-------------------------------------------------------------
 #simulate the data
-dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
+dta <- simLong(n = 20, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call
 boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-              family = "Continuous", M = 300,cv.flag = TRUE)
+              family = "Continuous", M = 20,cv.flag = TRUE)
 vimp.grow <- vimp.boostmtree(object = boost.grow,x.names=c("x1","x2"),joint = FALSE)
 vimp.joint.grow <- vimp.boostmtree(object = boost.grow,x.names=c("x1","x2"),joint = TRUE)
 
@@ -54,7 +54,7 @@ vimp.joint.grow <- vimp.boostmtree(object = boost.grow,x.names=c("x1","x2"),join
 ## VIMP is based on test data
 ##-------------------------------------------------------------
 #simulate the data
-dtaO <- simLong(n = 100, ntest = 100, N = 5, rho =.80, model = 2, family = "Continuous")
+dtaO <- simLong(n = 20, ntest = 10, N = 5, rho =.80, model = 2, family = "Continuous")
 
 ## save the data as both a list and data frame
 dtaL <- dtaO$dtaL
@@ -65,7 +65,7 @@ trn <- dtaO$trn
 
 #basic boosting call
 boost.grow <- boostmtree(dtaL$features[trn,], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
-              family = "Continuous", M = 300)
+              family = "Continuous", M = 20)
 boost.pred <- predict(boost.grow,dtaL$features[-trn,], dtaL$time[-trn], dtaL$id[-trn],
               dtaL$y[-trn])
 vimp.pred <- vimp.boostmtree(object = boost.pred,x.names=c("x1","x2"),joint = FALSE)
