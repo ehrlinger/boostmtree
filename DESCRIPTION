@@ -44,6 +44,10 @@ Suggests:
     hvtiPlotR,
     hvtiRutilities,
     mlbench
+Remotes:
+    ehrlinger/ggRandomForests,
+    ehrlinger/hvtiPlotR,
+    ehrlinger/hvtiRutilities
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Encoding: UTF-8
