@@ -470,7 +470,7 @@ plot.profile.prx <- function(x,
                              ...) {
   obj <- x
   if (is.null(obj$proximity)) {
-    stop("this functionrequires proximity = TRUE in the predict call")
+    stop("this function requires proximity = TRUE in the predict call")
   }
   prx <- obj$proximity
   time <- obj$boost.obj$time

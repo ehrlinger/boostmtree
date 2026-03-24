@@ -9,7 +9,5 @@
 ^\.Rhistory$
 ^\.RData$
 ^\.Ruserdata$
-^\.\.[Rr]check$
-^inst/extdata/fit_spi\.rds$
-^inst/extdata/fit_af\.rds$
+^.*\.[Rr]check$
 ^vignettes/.*_cache$

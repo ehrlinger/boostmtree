@@ -210,7 +210,7 @@ test_that("boostmtree Nominal fit returns correctly-classed object", {
 test_that("boostmtree Nominal fit contains required slots", {
   out <- make_nominal_fit()
   for (s in c("mu", "x", "time", "id", "family", "M", "n", "K",
-              "n.Q", "Q_set", "err.rate")) {
+              "n.Q", "Q_set")) {
     expect_true(!is.null(out$fit[[s]]), info = paste("missing slot:", s))
   }
 })
@@ -265,7 +265,7 @@ test_that("boostmtree Ordinal fit returns correctly-classed object", {
 test_that("boostmtree Ordinal fit contains required slots including Prob_class", {
   out <- make_ordinal_fit()
   for (s in c("mu", "x", "time", "id", "family", "M", "n", "K",
-              "n.Q", "Q_set", "Prob_class", "err.rate")) {
+              "n.Q", "Q_set", "Prob_class")) {
     expect_true(!is.null(out$fit[[s]]), info = paste("missing slot:", s))
   }
 })

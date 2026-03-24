@@ -2,10 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
-docs/*
-!docs/articles
+docs/
 
-..Rcheck/
+*.Rcheck/
+
+vignettes/*_cache/
 
 inst/extdata/fit_spi.rds
 inst/extdata/fit_af.rds
