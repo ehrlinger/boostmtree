@@ -21,6 +21,9 @@ default the plot will be saved at temporary folder.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+Invisibly returns the \code{boostmtree} object \code{x}.
+}
 \description{
 Plot summary analysis of the boosting analysis.
 }

@@ -73,6 +73,12 @@ from oob sample?}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+Invisibly returns a list with components \code{p.obj} (partial
+  effect estimates), \code{l.obj} (lowess smoothed partial plots, or
+  \code{NULL} if \code{plot.it = FALSE}), and \code{time} (time points
+  used for evaluation).
+}
 \description{
 Partial dependence plot of x against adjusted predicted y.
 }

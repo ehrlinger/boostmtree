@@ -463,6 +463,22 @@ penBSderiv <- function(d, pen.ord = 2) {
   }
 }
 
+#' Plot Proximity Profile
+#'
+#' Plot the mean longitudinal profile for a randomly selected subject and its
+#' proximity-matched neighbours.
+#'
+#' @param x An object of class \code{profile.prx} returned by
+#'   \code{\link{predict.boostmtree}} when \code{proximity = TRUE}.
+#' @param col Optional colour vector for matched subjects.
+#' @param rnd.case Index of the focal subject.  If \code{NULL} (default), one
+#'   subject is chosen at random.
+#' @param cut Quantile threshold (default \code{0.95}) used to select
+#'   high-proximity neighbours.
+#' @param restrictX Logical; if \code{TRUE} (default) the x-axis is restricted
+#'   to the time range of the focal subject.
+#' @param ... Further arguments passed to or from other methods.
+#' @return No return value, called for side effects.
 #' @exportS3Method plot profile.prx
 plot.profile.prx <- function(x,
                              col = NULL,
