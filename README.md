@@ -39,6 +39,14 @@ This fork is available from GitHub only:
 remotes::install_github("ehrlinger/boostmtree")
 ```
 
+> **⚠️ Name collision:** Both this fork and the upstream
+> [kogalur/boostmtree](https://cran.r-project.org/package=boostmtree)
+> use the package name `boostmtree`. R's library can only hold one version
+> under that name — installing one overwrites the other. If you need both
+> in the same environment, use a project-level library such as
+> [`renv`](https://rstudio.github.io/renv/) or point `.libPaths()` to a
+> separate directory.
+
 ### Optional enhanced visualization
 
 For ggplot2-based visualization workflows, install the suggested packages:
