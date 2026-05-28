@@ -212,9 +212,8 @@ vimp.boostmtree <- function(object,
       vector("list", p)
     })
     for (q in 1:n.Q) {
-      membershipNoise.list[[q]] <- lapply(1:Mopt[q], function(m) {
-        oob <- which(object$baselearner[[q]][[m]]$inbag == 0)
-        oob.list[[q]][[m]] <<- oob
+      raw <- lapply(1:Mopt[q], function(m) {
+        oob   <- which(object$baselearner[[q]][[m]]$inbag == 0)
         n.oob <- length(oob)
         Xnoise <- do.call(rbind, lapply(1:p, function(k) {
           X.k <- X[oob, , drop = FALSE]
@@ -236,8 +235,10 @@ vimp.boostmtree <- function(object,
           )$ptn.membership
         )
         membershipNoise <- matrix(membershipNoise, nrow = n.oob, byrow = FALSE)
-        membershipNoise
+        list(oob = oob, membershipNoise = membershipNoise)
       })
+      oob.list[[q]]          <- lapply(raw, `[[`, "oob")
+      membershipNoise.list[[q]] <- lapply(raw, `[[`, "membershipNoise")
     }
     if (df.D > 1) {
       vimp.main <- vimp.int <- matrix(NA, nrow = p, ncol = n.Q)
@@ -245,11 +246,7 @@ vimp.boostmtree <- function(object,
       for (q in 1:n.Q) {
         for (k in 1:p) {
           l_pred_db.vimp[[q]][[k]] <- lapply(1:n, function(i) {
-            l_pred_db.main.i <- l_pred_db.int.i <- rep(0, ni[i])
-            if (k == p) {
-              l_pred_db.time.i <- rep(0, ni[i])
-            }
-            NullObj <- lapply(1:Mopt[q], function(m) {
+            acc <- Reduce(function(acc, m) {
               if (any(i == oob.list[[q]][[m]])) {
                 membershipNoise.i <- membershipNoise.list[[q]][[m]][which(oob.list[[q]][[m]] == i) , k , drop = TRUE]
                 membershipOrg.i.vec <- gamma.i.list[[q]][[m]][[i]][, 1, drop = TRUE]
@@ -260,30 +257,28 @@ vimp.boostmtree <- function(object,
                 out.main <- c(D[[i]] %*% (gamma.main * nu.vec))
                 gamma.int <- cbind(c(gamma.org.i[1, 1], gamma.noise.i[-1, 1]))
                 out.int <- c(D[[i]] %*% (gamma.int * nu.vec))
-                if (k == p) {
+                out.time <- if (k == p) {
                   n.D <- nrow(D[[i]])
-                  out.time <- c(D[[i]][sample(1:n.D, n.D, replace = TRUE), , drop = FALSE] %*% (gamma.org.i * nu.vec))
-                }
-              } else{
+                  c(D[[i]][sample(1:n.D, n.D, replace = TRUE), , drop = FALSE] %*% (gamma.org.i * nu.vec))
+                } else NULL
+              } else {
                 out.main <- out.int <- rep(0, ni[i])
-                if (k == p) {
-                  out.time <- rep(0, ni[i])
-                }
+                out.time <- if (k == p) rep(0, ni[i]) else NULL
               }
-              l_pred_db.main.i <<- l_pred_db.main.i + out.main
-              l_pred_db.int.i <<- l_pred_db.int.i + out.int
-              if (k == p) {
-                l_pred_db.time.i <<- l_pred_db.time.i + out.time
-              }
-              NULL
-            })
+              list(
+                main = acc$main + out.main,
+                int  = acc$int  + out.int,
+                time = if (k == p) acc$time + out.time else NULL
+              )
+            }, 1:Mopt[q], init = list(
+              main = rep(0, ni[i]),
+              int  = rep(0, ni[i]),
+              time = if (k == p) rep(0, ni[i]) else NULL
+            ))
             list(
-              l_pred_db.main = l_pred_db.main.i,
-              l_pred_db.int = l_pred_db.int.i,
-              l_pred_db.time = if (k == p)
-                l_pred_db.time.i
-              else
-                NULL
+              l_pred_db.main = acc$main,
+              l_pred_db.int  = acc$int,
+              l_pred_db.time = if (k == p) acc$time else NULL
             )
           })
         }
@@ -362,8 +357,8 @@ vimp.boostmtree <- function(object,
           })
         }
       }
-      nullObj <- lapply(1:n.Q, function(q) {
-        lapply(1:p, function(k) {
+      qk_vals <- lapply(1:n.Q, function(q) {
+        k_vals <- lapply(1:p, function(k) {
           mu.main <- lapply(1:n, function(i) {
             GetMu(
               Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.main * Ysd +
@@ -372,7 +367,6 @@ vimp.boostmtree <- function(object,
             )
           })
           err.rate.main <- l2Dist(Yorg[[q]], mu.main)
-          vimp.main[k, q] <<- (err.rate.main - rmse[q]) / rmse[q]
           mu.int <- lapply(1:n, function(i) {
             GetMu(
               Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.int * Ysd +
@@ -381,8 +375,7 @@ vimp.boostmtree <- function(object,
             )
           })
           err.rate.int <- l2Dist(Yorg[[q]], mu.int)
-          vimp.int[k, q] <<- (err.rate.int - rmse[q]) / rmse[q]
-          if (k == p) {
+          time_val <- if (k == p) {
             mu.time <- lapply(1:n, function(i) {
               GetMu(
                 Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.time *
@@ -391,13 +384,23 @@ vimp.boostmtree <- function(object,
               )
             })
             err.rate.time <- l2Dist(Yorg[[q]], mu.time)
-            vimp.time[q] <<- (err.rate.time - rmse[q]) / rmse[q]
-          }
-          NULL
+            (err.rate.time - rmse[q]) / rmse[q]
+          } else NA_real_
+          list(
+            main = (err.rate.main - rmse[q]) / rmse[q],
+            int  = (err.rate.int  - rmse[q]) / rmse[q],
+            time = time_val
+          )
         })
-        NULL
+        list(
+          main = vapply(k_vals, `[[`, numeric(1), "main"),
+          int  = vapply(k_vals, `[[`, numeric(1), "int"),
+          time = k_vals[[p]]$time
+        )
       })
-      rm(nullObj)
+      vimp.main <- do.call(cbind, lapply(qk_vals, `[[`, "main"))
+      vimp.int  <- do.call(cbind, lapply(qk_vals, `[[`, "int"))
+      vimp.time <- vapply(qk_vals, `[[`, numeric(1), "time")
       rownames(vimp.main) <- x_Names
       rownames(vimp.int) <- paste(x_Names, "time", sep = ":")
       names(vimp.time) <- rep("time", n.Q)
@@ -407,22 +410,16 @@ vimp.boostmtree <- function(object,
       for (q in 1:n.Q) {
         for (k in 1:p) {
           l_pred_db.vimp[[q]][[k]] <- lapply(1:n, function(i) {
-            l_pred_db.i <- rep(0, ni[i])
-            NullObj <- lapply(1:Mopt[q], function(m) {
+            Reduce("+", lapply(1:Mopt[q], function(m) {
               if (any(i == oob.list[[q]][[m]])) {
                 membershipNoise.i <- membershipNoise.list[[q]][[m]][which(oob.list[[q]][[m]] == i)   , k , drop = TRUE]
                 membershipOrg.i.vec <- gamma.i.list[[q]][[m]][[i]][, 1, drop = TRUE]
                 gamma.noise.i <- t(gamma.i.list[[q]][[m]][[i]][which(membershipOrg.i.vec == membershipNoise.i), -1, drop = FALSE])
-                out <- c(D[[i]] %*% (gamma.noise.i * nu.vec))
+                c(D[[i]] %*% (gamma.noise.i * nu.vec))
+              } else {
+                rep(0, ni[i])
               }
-              else
-              {
-                out <- rep(0, ni[i])
-              }
-              l_pred_db.i <<- l_pred_db.i + out
-              NULL
-            })
-            l_pred_db.i
+            }))
           })
         }
       }
@@ -450,19 +447,16 @@ vimp.boostmtree <- function(object,
           })
         }
       }
-      nullObj <- lapply(1:n.Q, function(q) {
-        lapply(1:p, function(k) {
+      vimp[] <- do.call(cbind, lapply(1:n.Q, function(q) {
+        vapply(1:p, function(k) {
           mu.main <- lapply(1:n, function(i) {
             GetMu(Linear_Predictor = l_pred.vimp[[q]][[k]][[i]] * Ysd + Ymean,
                   Family = family)
           })
           err.rate.main <- l2Dist(Yorg[[q]], mu.main)
-          vimp[k, q] <<- (err.rate.main - rmse[q]) / rmse[q]
-          NULL
-        })
-        NULL
-      })
-      rm(nullObj)
+          (err.rate.main - rmse[q]) / rmse[q]
+        }, numeric(1))
+      }))
       rownames(vimp) <- x_Names
     }
   } else {
@@ -556,12 +550,8 @@ vimp.boostmtree <- function(object,
       vimp.time <- rep(NA, n.Q)
       for (q in 1:n.Q) {
         for (k in 1:p) {
-          l_pred_db.vimp[[q]][[k]] <-  lapply(1:n, function(i) {
-            l_pred_db.main.i <- l_pred_db.int.i <- rep(0, ni[i])
-            if (k == p) {
-              l_pred_db.time.i <- rep(0, ni[i])
-            }
-            NullObj <- lapply(1:Mopt[q], function(m) {
+          l_pred_db.vimp[[q]][[k]] <- lapply(1:n, function(i) {
+            acc <- Reduce(function(acc, m) {
               orgMembership  <- gamma[[q]][[m]][, 1]
               gamma.Org      <- gamma[[q]][[m]][match(membership[[q]][[m]][i], orgMembership), -1, drop = FALSE]
               membership.k   <- membershipNoise[[q]][[m]][((k - 1) * n + 1):(k * n)]
@@ -569,24 +559,24 @@ vimp.boostmtree <- function(object,
               gamma.Noise    <- gamma[[q]][[m]][match(membership.k.i, orgMembership), -1, drop = FALSE]
               gamma.main     <- cbind(c(gamma.Noise[1], gamma.Org[-1]))
               gamma.int      <- cbind(c(gamma.Org[1], gamma.Noise[-1]))
-              l_pred_db.main.i  <<- l_pred_db.main.i +
-                c(D[[i]] %*% (gamma.main * nu.vec))
-              l_pred_db.int.i   <<- l_pred_db.int.i  +
-                c(D[[i]] %*% (gamma.int * nu.vec))
-              if (k == p) {
+              out.time <- if (k == p) {
                 n.D <- nrow(D[[i]])
-                l_pred_db.time.i <<- l_pred_db.time.i +
-                  D[[i]][sample(1:n.D, n.D, replace = TRUE), , drop = FALSE] %*% t(gamma.Org * nu.vec)
-              }
-              NULL
-            })
+                D[[i]][sample(1:n.D, n.D, replace = TRUE), , drop = FALSE] %*% t(gamma.Org * nu.vec)
+              } else NULL
+              list(
+                main = acc$main + c(D[[i]] %*% (gamma.main * nu.vec)),
+                int  = acc$int  + c(D[[i]] %*% (gamma.int  * nu.vec)),
+                time = if (k == p) acc$time + out.time else NULL
+              )
+            }, 1:Mopt[q], init = list(
+              main = rep(0, ni[i]),
+              int  = rep(0, ni[i]),
+              time = if (k == p) rep(0, ni[i]) else NULL
+            ))
             list(
-              l_pred_db.main = l_pred_db.main.i,
-              l_pred_db.int = l_pred_db.int.i,
-              l_pred_db.time = if (k == p)
-                l_pred_db.time.i
-              else
-                NULL
+              l_pred_db.main = acc$main,
+              l_pred_db.int  = acc$int,
+              l_pred_db.time = if (k == p) acc$time else NULL
             )
           })
         }
@@ -665,8 +655,8 @@ vimp.boostmtree <- function(object,
           })
         }
       }
-      nullObj <- lapply(1:n.Q, function(q) {
-        lapply(1:p, function(k) {
+      qk_vals <- lapply(1:n.Q, function(q) {
+        k_vals <- lapply(1:p, function(k) {
           mu.main <- lapply(1:n, function(i) {
             GetMu(
               Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.main * Ysd +
@@ -675,7 +665,6 @@ vimp.boostmtree <- function(object,
             )
           })
           err.rate.main <- l2Dist(Y[[q]], mu.main)
-          vimp.main[k, q] <<- (err.rate.main - rmse[q]) / rmse[q]
           mu.int <- lapply(1:n, function(i) {
             GetMu(
               Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.int * Ysd +
@@ -684,8 +673,7 @@ vimp.boostmtree <- function(object,
             )
           })
           err.rate.int <- l2Dist(Y[[q]], mu.int)
-          vimp.int[k, q] <<- (err.rate.int - rmse[q]) / rmse[q]
-          if (k == p) {
+          time_val <- if (k == p) {
             mu.time <- lapply(1:n, function(i) {
               GetMu(
                 Linear_Predictor = l_pred.vimp[[q]][[k]][[i]]$l_pred.time *
@@ -694,13 +682,23 @@ vimp.boostmtree <- function(object,
               )
             })
             err.rate.time <- l2Dist(Y[[q]], mu.time)
-            vimp.time[q] <<- (err.rate.time - rmse[q]) / rmse[q]
-          }
-          NULL
+            (err.rate.time - rmse[q]) / rmse[q]
+          } else NA_real_
+          list(
+            main = (err.rate.main - rmse[q]) / rmse[q],
+            int  = (err.rate.int  - rmse[q]) / rmse[q],
+            time = time_val
+          )
         })
-        NULL
+        list(
+          main = vapply(k_vals, `[[`, numeric(1), "main"),
+          int  = vapply(k_vals, `[[`, numeric(1), "int"),
+          time = k_vals[[p]]$time
+        )
       })
-      rm(nullObj)
+      vimp.main <- do.call(cbind, lapply(qk_vals, `[[`, "main"))
+      vimp.int  <- do.call(cbind, lapply(qk_vals, `[[`, "int"))
+      vimp.time <- vapply(qk_vals, `[[`, numeric(1), "time")
       rownames(vimp.main) <- x_Names
       rownames(vimp.int) <- paste(x_Names, "time", sep = ":")
       names(vimp.time) <- rep("time", n.Q)
@@ -710,17 +708,13 @@ vimp.boostmtree <- function(object,
       for (q in 1:n.Q) {
         for (k in 1:p) {
           l_pred_db.vimp[[q]][[k]] <- lapply(1:n, function(i) {
-            l_pred_db.i <- rep(0, ni[i])
-            NullObj <- lapply(1:Mopt[q], function(m) {
+            Reduce("+", lapply(1:Mopt[q], function(m) {
               orgMembership  <- gamma[[q]][[m]][, 1]
               membership.k   <- membershipNoise[[q]][[m]][((k - 1) * n + 1):(k * n)]
               membership.k.i <- membership.k[i]
               gamma.Noise    <- gamma[[q]][[m]][match(membership.k.i, orgMembership), -1, drop = FALSE]
-              l_pred_db.i <<- l_pred_db.i +
-                c(D[[i]] %*% t(gamma.Noise * nu.vec))
-              NULL
-            })
-            l_pred_db.i
+              c(D[[i]] %*% t(gamma.Noise * nu.vec))
+            }))
           })
         }
       }
@@ -748,19 +742,16 @@ vimp.boostmtree <- function(object,
           })
         }
       }
-      nullObj <- lapply(1:n.Q, function(q) {
-        lapply(1:p, function(k) {
+      vimp[] <- do.call(cbind, lapply(1:n.Q, function(q) {
+        vapply(1:p, function(k) {
           mu.main <- lapply(1:n, function(i) {
             GetMu(Linear_Predictor = l_pred.vimp[[q]][[k]][[i]] * Ysd + Ymean,
                   Family = family)
           })
           err.rate.main <- l2Dist(Y[[q]], mu.main)
-          vimp[k, q] <<- (err.rate.main - rmse[q]) / rmse[q]
-          NULL
-        })
-        NULL
-      })
-      rm(nullObj)
+          (err.rate.main - rmse[q]) / rmse[q]
+        }, numeric(1))
+      }))
       rownames(vimp) <- x_Names
     }
   }
