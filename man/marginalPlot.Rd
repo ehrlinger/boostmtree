@@ -95,7 +95,7 @@ marginalPlot(boost.grow, "x2",plot.it = TRUE)
 marginalPlot(boost.grow,plot.it = TRUE)
 }
 
-\dontrun{
+\donttest{
 ##----------------------------------------------------------------------------
 ## spirometry data
 ##----------------------------------------------------------------------------

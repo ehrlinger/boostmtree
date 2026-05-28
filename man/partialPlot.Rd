@@ -125,7 +125,7 @@ pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
 }
 
-\dontrun{
+\donttest{
 ##----------------------------------------------------------------------------
 ## spirometry data
 ##----------------------------------------------------------------------------
