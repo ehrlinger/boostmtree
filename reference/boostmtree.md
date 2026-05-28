@@ -9,32 +9,34 @@ estimated adaptive smoothing parameter.
 ## Usage
 
 ``` r
-boostmtree(x,
-            tm,
-            id,
-            y,
-            family = c("Continuous","Binary","Nominal","Ordinal"),
-            y_reference = NULL,
-            M = 200,
-            nu = 0.05,
-            na.action = c("na.omit","na.impute")[2],
-            K = 5,
-            mtry = NULL,
-            nknots = 10,
-            d = 3,
-            pen.ord = 3,
-            lambda,
-            rho,
-            lambda.max = 1e6,
-            lambda.iter = 2,
-            svd.tol = 1e-6,
-            forest.tol = 1e-3,
-            verbose = TRUE,
-            cv.flag = FALSE,
-            eps = 1e-5,
-            mod.grad = TRUE,
-            NR.iter = 3,
-            ...)
+boostmtree(
+  x,
+  tm,
+  id,
+  y,
+  family = c("Continuous", "Binary", "Nominal", "Ordinal"),
+  y_reference = NULL,
+  M = 200,
+  nu = 0.05,
+  na.action = c("na.omit", "na.impute")[2],
+  K = 5,
+  mtry = NULL,
+  nknots = 10,
+  d = 3,
+  pen.ord = 3,
+  lambda,
+  rho,
+  lambda.max = 1e+06,
+  lambda.iter = 2,
+  svd.tol = 1e-06,
+  forest.tol = 0.001,
+  verbose = TRUE,
+  cv.flag = FALSE,
+  eps = 1e-05,
+  mod.grad = TRUE,
+  NR.iter = 3,
+  ...
+)
 ```
 
 ## Arguments
@@ -60,8 +62,8 @@ boostmtree(x,
 
 - family:
 
-  Family of the response variable `y`. Use any one from {"Continuous",
-  "Binary","Nominal","Ordinal"} based on the scale of `y`.
+  Family of the response variable `y`. Use any one from `"Continuous"`,
+  `"Binary"`, `"Nominal"`, or `"Ordinal"` based on the scale of `y`.
 
 - y_reference:
 
@@ -70,20 +72,22 @@ boostmtree(x,
 
 - M:
 
-  Number of boosting iterations
+  Number of boosting iterations. Must be a positive integer.
 
 - nu:
 
-  Boosting regularization parameter. A value in (0,1\].
+  Boosting regularization (shrinkage) parameter. Must be positive;
+  typical values are 0.01–0.1. Smaller values require larger `M`.
 
 - na.action:
 
-  Remove missing values (casewise) or impute it. Default is to impute
-  the missign values.
+  Remove missing values (casewise) or impute them. Default is to impute
+  the missing values.
 
 - K:
 
-  Number of terminal nodes used for the multivariate tree learner.
+  Number of terminal nodes used for the multivariate tree learner. Must
+  be a positive integer; typical values are 3–10.
 
 - mtry:
 
@@ -157,77 +161,12 @@ boostmtree(x,
 
 - NR.iter:
 
-  Number of Newton-Raphson iteration. Applied for `family` =
-  {Binary","Nominal","Ordinal"}.
+  Number of Newton-Raphson iteration. Applied for `family` = `"Binary"`,
+  `"Nominal"`, or `"Ordinal"`.
 
 - ...:
 
   Further arguments passed to or from other methods.
-
-## Details
-
-Each individual has observed y-values, over possibly different time
-points, with possibly differing number of time points. Given y, the time
-points, and x, the conditional mean time profile of y is estimated using
-gradient boosting in which the gradient is derived from a criterion
-function involving a working variance matrix for y specified as an
-equicorrelation matrix with parameter *rho* multiplied by a variance
-parameter *phi*. Multivariate trees are used for base learners and
-weighted least squares is used for solving the terminal node
-optimization problem. This provides solutions to the core parameters of
-the algorithm. For ancillary parameters, a mixed-model formulation is
-used to estimate the smoothing parameter associated with the B-splines
-used for the time-interaction effect, although the user can manually set
-the smoothing parameter as well. Ancillary parameters *rho* and *phi*
-are estimated using GLS (generalized least squares).
-
-In the original boostmtree algorithm (Pande et al., 2017), the
-equicorrelation parameter *rho* is used in two places in the algorithm:
-(1) for growing trees using the gradient, which depends upon *rho*; and
-(2) for solving the terminal node optimization problem which also uses
-the gradient. However, Pande (2017) observed that setting *rho* to zero
-in the gradient used for growing trees improved performance of the
-algorithm, especially in high dimensions. For this reason the default
-setting used in this algorithm is to set *rho* to zero in the gradient
-for (1). The `rho` in the gradient for (2) is not touched. The option
-`mod.grad` specifies whether a modified gradient is used in the tree
-growing process and is TRUE by default.
-
-By default, trees are grown from a bootstrap sample of the data – thus
-the boosting method employed here is a modified example of stochastic
-gradient descent boosting (Friedman, 2002). Stochastic descent often
-improves performance and has the added advantage that out-of-sample data
-(out-of-bag, OOB) can be used to calculate variable importance (VIMP).
-
-The package implements R-side parallel processing by replacing the R
-function `lapply` with `mclapply` found in the parallel package. You can
-set the number of cores accessed by `mclapply` by issuing the command
-`options(mc.cores = x)`, where `x` is the number of cores. The options
-command can also be placed in the users .Rprofile file for convenience.
-You can, alternatively, initialize the environment variable `MC_CORES`
-in your shell environment.
-
-As an example, issuing the following options command uses all available
-cores for R-side parallel processing:
-
-`options(mc.cores=detectCores())`
-
-However, be cautious when setting `mc.cores`. This can create not only
-high CPU usage but also high RAM usage, especially when using functions
-`partialPlot` and `predict`.
-
-The method can impute the missing observations in x (covariates) using
-on the fly imputation. Details regarding can be found in the
-randomForestSRC package. If missing values are present in the `tm`, `id`
-or `y`, the user should either impute or delete these values before
-executing the function.
-
-Finally note `cv.flag` can be used for an in-sample cross-validated
-estimate of prediction error. This is used to determine the optimized
-number of boosting iterations *Mopt*. The final mu predictor is
-evaluated at this value and is cross-validated. The prediction error
-returned via `err.rate` is standardized by the overall standard
-deviation of y.
 
 ## Value
 
@@ -413,9 +352,70 @@ An object of class `(boostmtree, grow)` with the following components:
 
   Forest tolerance value (needed for prediction).
 
-## Author
+## Details
 
-Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
+Each individual has observed y-values, over possibly different time
+points, with possibly differing number of time points. Given y, the time
+points, and x, the conditional mean time profile of y is estimated using
+gradient boosting in which the gradient is derived from a criterion
+function involving a working variance matrix for y specified as an
+equicorrelation matrix with parameter *rho* multiplied by a variance
+parameter *phi*. Multivariate trees are used for base learners and
+weighted least squares is used for solving the terminal node
+optimization problem. This provides solutions to the core parameters of
+the algorithm. For ancillary parameters, a mixed-model formulation is
+used to estimate the smoothing parameter associated with the B-splines
+used for the time-interaction effect, although the user can manually set
+the smoothing parameter as well. Ancillary parameters *rho* and *phi*
+are estimated using GLS (generalized least squares).
+
+In the original boostmtree algorithm (Pande et al., 2017), the
+equicorrelation parameter *rho* is used in two places in the algorithm:
+(1) for growing trees using the gradient, which depends upon *rho*; and
+(2) for solving the terminal node optimization problem which also uses
+the gradient. However, Pande (2017) observed that setting *rho* to zero
+in the gradient used for growing trees improved performance of the
+algorithm, especially in high dimensions. For this reason the default
+setting used in this algorithm is to set *rho* to zero in the gradient
+for (1). The `rho` in the gradient for (2) is not touched. The option
+`mod.grad` specifies whether a modified gradient is used in the tree
+growing process and is TRUE by default.
+
+By default, trees are grown from a bootstrap sample of the data – thus
+the boosting method employed here is a modified example of stochastic
+gradient descent boosting (Friedman, 2002). Stochastic descent often
+improves performance and has the added advantage that out-of-sample data
+(out-of-bag, OOB) can be used to calculate variable importance (VIMP).
+
+The package implements R-side parallel processing by replacing the R
+function `lapply` with `mclapply` found in the parallel package. You can
+set the number of cores accessed by `mclapply` by issuing the command
+`options(mc.cores = x)`, where `x` is the number of cores. The options
+command can also be placed in the users .Rprofile file for convenience.
+You can, alternatively, initialize the environment variable `MC_CORES`
+in your shell environment.
+
+As an example, issuing the following options command uses all available
+cores for R-side parallel processing:
+
+`options(mc.cores=detectCores())`
+
+However, be cautious when setting `mc.cores`. This can create not only
+high CPU usage but also high RAM usage, especially when using functions
+`partialPlot` and `predict`.
+
+The method can impute the missing observations in x (covariates) using
+on the fly imputation. Details regarding can be found in the
+randomForestSRC package. If missing values are present in the `tm`, `id`
+or `y`, the user should either impute or delete these values before
+executing the function.
+
+Finally note `cv.flag` can be used for an in-sample cross-validated
+estimate of prediction error. This is used to determine the optimized
+number of boosting iterations *Mopt*. The final mu predictor is
+evaluated at this value and is cross-validated. The prediction error
+returned via `err.rate` is standardized by the overall standard
+deviation of y.
 
 ## References
 
@@ -442,9 +442,14 @@ Miller School of Medicine, University of Miami.
 [`simLong`](https://ehrlinger.github.io/boostmtree/reference/simLong.md),
 [`vimpPlot`](https://ehrlinger.github.io/boostmtree/reference/vimpPlot.md)
 
+## Author
+
+Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
+
 ## Examples
 
 ``` r
+
 ##------------------------------------------------------------
 ## synthetic example (Response y is continuous)
 ## 0.8 correlation, quadratic time with quadratic interaction
@@ -454,10 +459,15 @@ dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call (M set to a small value for illustration)
 boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 20)
-#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
 
 #print results
 print(boost.grow)
+#> boostmtree summary
 #> model                       : mtree-Pspline learner 
 #> fitting mode                : grow 
 #> Family                      : Continuous 
@@ -473,7 +483,7 @@ print(boost.grow)
 
 #plot.results
 plot(boost.grow)
-#> Plot will be saved at:/tmp/RtmpmB5Lnt
+#> Plot saved to: /tmp/RtmplzDByJ/boostmtree_plot.pdf
 
 ##------------------------------------------------------------
 ## synthetic example (Response y is binary)
@@ -484,10 +494,56 @@ dta <- simLong(n = 50, N = 5, rho =.80, model = 2, family = "Binary")$dtaL
 
 #basic boosting call (M set to a small value for illustration)
 boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary", M = 20)
-#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==============================================                        |  65%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=================================================                     |  70%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |====================================================                  |  75%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |========================================================              |  80%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |============================================================          |  85%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |===============================================================       |  90%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==================================================================    |  95%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |======================================================================| 100%
 
 #print results
 print(boost.grow)
+#> boostmtree summary
 #> model                       : mtree-Pspline learner 
 #> fitting mode                : grow 
 #> Family                      : Binary 
@@ -503,19 +559,163 @@ print(boost.grow)
 
 #plot.results
 plot(boost.grow)
-#> Plot will be saved at:/tmp/RtmpmB5Lnt
+#> Plot saved to: /tmp/RtmplzDByJ/boostmtree_plot.pdf
 
-if (FALSE) { # \dontrun{
+# \donttest{
 ##------------------------------------------------------------
 ## Same synthetic example as above with continuous response
 ## but with in-sample cross-validation estimate for RMSE
 ##-------------------------------------------------------------
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-                 family = "Continuous", M = 300, cv.flag = TRUE)
+                 family = "Continuous", M = 20, cv.flag = TRUE)
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=======                                                               |  10%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |============================================================          |  85%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 plot(boost.cv.grow)
+#> Plot saved to: /tmp/RtmplzDByJ/boostmtree_plot.pdf
 print(boost.cv.grow)
+#> boostmtree summary
+#> model                       : mtree-Pspline learner 
+#> fitting mode                : grow 
+#> Family                      : Continuous 
+#> number of K-terminal nodes  : 5 
+#> regularization parameter    : 0.05 
+#> sample size                 : 50 
+#> number of variables         : 4 
+#> number of unique time points: 15 
+#> avg. number of time points  : 8.1 
+#> B-spline dimension          : 14 
+#> penalization order          : 3 
+#> boosting iterations         : 20 
+#> optimized number iterations : 20 
+#> optimized rho               : 0.2364 
+#> optimized phi               : 4.0124 
+#> OOB cv RMSE                 : 0.7375 
+# }
 
+if (FALSE) { # \dontrun{
 ##----------------------------------------------------------------------------
 ## spirometry data (Response is continuous)
 ##----------------------------------------------------------------------------
@@ -551,13 +751,13 @@ if (library("mlbench", logical.return = TRUE)) {
   trn <- sample(1:nrow(x), size = nrow(x) * (2 / 3), replace = FALSE)
 
   ## run boosting in univariate mode
-  o <- boostmtree(x = x[trn,], y = y[trn],family = "Continuous")
+  o <- boostmtree(x = x[trn,], y = y[trn], M = 20, family = "Continuous")
   o.p <- predict(o, x = x[-trn, ], y = y[-trn])
   print(o)
   plot(o.p)
 
   ## run boosting in univariate mode to obtain RMSE and vimp
-  o.cv <- boostmtree(x = x, y = y, M = 100,family = "Continuous",cv.flag = TRUE)
+  o.cv <- boostmtree(x = x, y = y, M = 20, family = "Continuous", cv.flag = TRUE)
   print(o.cv)
   plot(o.cv)
 }

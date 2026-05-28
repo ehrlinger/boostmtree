@@ -19,12 +19,12 @@ print(x, ...)
 
   Further arguments passed to or from other methods.
 
-## Author
-
-Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
-
 ## References
 
 Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B., Blackstone
 E.H., Ishwaran H. (2017). Boosted multivariate trees for longitudinal
 data, *Machine Learning*, 106(2): 277–305.
+
+## Author
+
+Hemant Ishwaran, Amol Pande and Udaya B. Kogalur

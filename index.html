@@ -5,16 +5,18 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Boosted Multivariate Trees for Longitudinal Data • boostmtree</title>
+<title>boostmtree — Boosted Multivariate Trees for Longitudinal Data • boostmtree</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/Outfit-0.4.10/font.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/Outfit-0.4.10/font.css" rel="stylesheet">
 <link href="deps/Fira_Code-0.4.10/font.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Boosted Multivariate Trees for Longitudinal Data">
-<meta name="description" content="Implements Friedman's gradient descent boosting algorithm for modeling longitudinal response using multivariate tree base learners. Longitudinal response could be continuous, binary, nominal or ordinal. A time-covariate interaction effect is modeled using penalized B-splines (P-splines) with estimated adaptive smoothing parameter. Although the package is design for longitudinal data, it can handle cross-sectional data as well. Implementation details are provided in Pande et al. (2017), Mach Learn &lt;DOI:10.1007/s10994-016-5597-1&gt;.">
-<meta property="og:description" content="Implements Friedman's gradient descent boosting algorithm for modeling longitudinal response using multivariate tree base learners. Longitudinal response could be continuous, binary, nominal or ordinal. A time-covariate interaction effect is modeled using penalized B-splines (P-splines) with estimated adaptive smoothing parameter. Although the package is design for longitudinal data, it can handle cross-sectional data as well. Implementation details are provided in Pande et al. (2017), Mach Learn &lt;DOI:10.1007/s10994-016-5597-1&gt;.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="boostmtree — Boosted Multivariate Trees for Longitudinal Data">
+<meta name="description" content="Gradient descent boosting for longitudinal response data using multivariate tree base learners and penalized B-splines for covariate-time interactions. Supports continuous, binary, nominal, and ordinal responses.
+">
+<meta property="og:description" content="Gradient descent boosting for longitudinal response data using multivariate tree base learners and penalized B-splines for covariate-time interactions. Supports continuous, binary, nominal, and ordinal responses.
+">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -24,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="index.html">boostmtree</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,12 +35,30 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/introduction.html">Get Started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/introduction.html">Introduction to boostmtree</a></li>
+    <li><a class="dropdown-item" href="articles/longitudinal-analysis.html">Longitudinal Data Analysis</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+<li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
+    <li><a class="external-link dropdown-item" href="https://github.com/ehrlinger/boostmtree/releases/tag/v2.0.0">Version 2.0.0</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ehrlinger/boostmtree/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://www.linkedin.com/in/ehrlinger/" aria-label="LinkedIn"><span class="fa fa-linkedin"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
@@ -56,39 +76,291 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="boostmtree---boosted-multivariate-trees-for-longitudinal-data">boostmtree - Boosted multivariate trees for longitudinal data.<a class="anchor" aria-label="anchor" href="#boostmtree---boosted-multivariate-trees-for-longitudinal-data"></a>
+<div class="page-header"><h1 id="boostmtree--boosted-multivariate-trees-for-longitudinal-data">boostmtree — Boosted Multivariate Trees for Longitudinal Data<a class="anchor" aria-label="anchor" href="#boostmtree--boosted-multivariate-trees-for-longitudinal-data"></a>
 </h1></div>
 <!-- badges: start -->
 
-<p><a href="http://www.repostatus.org/badges/latest/active.svg" class="external-link"><img src="http://www.repostatus.org/badges/latest/active.svg" alt="active"></a></p>
-<p><a href="https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/ehrlinger/boostmtree" class="external-link"><img src="https://codecov.io/gh/ehrlinger/boostmtree/graph/badge.svg" alt="Codecov test coverage"></a> <!-- badges: end --></p>
-<p>Implements Friedman’s gradient descent boosting algorithm for modeling longitudinal response using multivariate tree base learners. Longitudinal response could be continuous, binary, nominal or ordinal. A time-covariate interaction effect is modeled using penalized B-splines (P-splines) with estimated adaptive smoothing parameter. Although the package is design for longitudinal data, it can handle cross-sectional data as well.</p>
+<p><strong>boostmtree</strong> implements Friedman’s (2001) gradient descent boosting algorithm for modeling longitudinal responses using multivariate tree base learners. Covariate-time interactions are captured via penalized B-splines (P-splines) with an adaptively estimated smoothing parameter. The package handles continuous, binary, nominal, and ordinal responses, and works equally well for cross-sectional data.</p>
 <div class="section level2">
-<h2 id="package-overview">Package Overview<a class="anchor" aria-label="anchor" href="#package-overview"></a>
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
 </h2>
-<p>This package contains many useful functions and users should read the help file in its entirety for details. However, we briefly mention several key functions that may make it easier to navigate and understand the layout of the package.</p>
-<ol style="list-style-type: decimal">
-<li><p><code>boostmtree</code> - This is the main entry point to the package. It grows a multivariate tree using user supplied training data. Trees are grown using the <code>randomForestSRC</code> R-package.</p></li>
-<li><p><code>predict.boostmtree</code> - Used for prediction. Predicted values are obtained by dropping the user supplied test data down the grow forest. The resulting object has class (<code>rfsrc</code>, <code>predict</code>).</p></li>
-</ol>
+<ul>
+<li>Gradient boosting with multivariate tree base learners (powered by <a href="https://cran.r-project.org/package=randomForestSRC" class="external-link">randomForestSRC</a>)</li>
+<li>P-spline modeling of covariate × time interactions with adaptive smoothing</li>
+<li>Stochastic gradient descent with bootstrap sampling and OOB error estimation</li>
+<li>In-sample cross-validation for optimal stopping iteration selection</li>
+<li>Variable importance (VIMP) via permutation, including joint VIMP</li>
+<li>Partial and marginal dependence plots</li>
+<li>Supports <strong>Continuous</strong>, <strong>Binary</strong>, <strong>Nominal</strong>, and <strong>Ordinal</strong> longitudinal responses</li>
+<li>Parallel processing via the <code>parallel</code> package</li>
+<li>Missing covariate imputation (on-the-fly, via <code>randomForestSRC</code>)</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Install the released version from CRAN:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"boostmtree"</span><span class="op">)</span></span></code></pre></div>
+<p>Install the development version from GitHub:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/boostmtree"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="optional-enhanced-visualization">Optional enhanced visualization<a class="anchor" aria-label="anchor" href="#optional-enhanced-visualization"></a>
+</h3>
+<p>For ggplot2-based visualization workflows, install the suggested packages:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/ggRandomForests"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/hvtiPlotR"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/hvtiRutilities"</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<div class="section level3">
+<h3 id="simulated-continuous-longitudinal-data">Simulated continuous longitudinal data<a class="anchor" aria-label="anchor" href="#simulated-continuous-longitudinal-data"></a>
+</h3>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ehrlinger.github.io/boostmtree/">boostmtree</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Simulate training and test data (model 1: linear time × covariate interaction)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
+<span><span class="va">dta</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simLong.html">simLong</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, ntest <span class="op">=</span> <span class="fl">100</span>, model <span class="op">=</span> <span class="fl">1</span>, family <span class="op">=</span> <span class="st">"Continuous"</span>, q <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Fit the model</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/boostmtree.html">boostmtree</a></span><span class="op">(</span></span>
+<span>  x  <span class="op">=</span> <span class="va">dta</span><span class="op">$</span><span class="va">dtaL</span><span class="op">$</span><span class="va">features</span><span class="op">[</span><span class="va">dta</span><span class="op">$</span><span class="va">trn</span>, <span class="op">]</span>,</span>
+<span>  tm <span class="op">=</span> <span class="va">dta</span><span class="op">$</span><span class="va">dtaL</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="va">dta</span><span class="op">$</span><span class="va">trn</span><span class="op">]</span>,</span>
+<span>  id <span class="op">=</span> <span class="va">dta</span><span class="op">$</span><span class="va">dtaL</span><span class="op">$</span><span class="va">id</span><span class="op">[</span><span class="va">dta</span><span class="op">$</span><span class="va">trn</span><span class="op">]</span>,</span>
+<span>  y  <span class="op">=</span> <span class="va">dta</span><span class="op">$</span><span class="va">dtaL</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="va">dta</span><span class="op">$</span><span class="va">trn</span><span class="op">]</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"Continuous"</span>,</span>
+<span>  M  <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  cv.flag <span class="op">=</span> <span class="cn">TRUE</span>   <span class="co"># enables OOB-based optimal stopping</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="predict-on-held-out-data">Predict on held-out data<a class="anchor" aria-label="anchor" href="#predict-on-held-out-data"></a>
+</h3>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
+<span>  <span class="va">fit</span>,</span>
+<span>  x  <span class="op">=</span> <span class="va">dta</span><span class="op">$</span><span class="va">dtaL</span><span class="op">$</span><span class="va">features</span><span class="op">[</span><span class="op">-</span><span class="va">dta</span><span class="op">$</span><span class="va">trn</span>, <span class="op">]</span>,</span>
+<span>  tm <span class="op">=</span> <span class="va">dta</span><span class="op">$</span><span class="va">dtaL</span><span class="op">$</span><span class="va">time</span><span class="op">[</span><span class="op">-</span><span class="va">dta</span><span class="op">$</span><span class="va">trn</span><span class="op">]</span>,</span>
+<span>  id <span class="op">=</span> <span class="va">dta</span><span class="op">$</span><span class="va">dtaL</span><span class="op">$</span><span class="va">id</span><span class="op">[</span><span class="op">-</span><span class="va">dta</span><span class="op">$</span><span class="va">trn</span><span class="op">]</span>,</span>
+<span>  y  <span class="op">=</span> <span class="va">dta</span><span class="op">$</span><span class="va">dtaL</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="op">-</span><span class="va">dta</span><span class="op">$</span><span class="va">trn</span><span class="op">]</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="variable-importance">Variable importance<a class="anchor" aria-label="anchor" href="#variable-importance"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Individual VIMP for all covariates</span></span>
+<span><span class="va">vimp_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/vimp.boostmtree.html">vimp.boostmtree</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/vimpPlot.html">vimpPlot</a></span><span class="op">(</span><span class="va">vimp_obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Joint VIMP for a pair of variables</span></span>
+<span><span class="va">vimp_joint</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/vimp.boostmtree.html">vimp.boostmtree</a></span><span class="op">(</span><span class="va">fit</span>, x.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span>, joint <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="partial-and-marginal-dependence-plots">Partial and marginal dependence plots<a class="anchor" aria-label="anchor" href="#partial-and-marginal-dependence-plots"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Marginal plot (fast, unadjusted)</span></span>
+<span><span class="fu"><a href="reference/marginalPlot.html">marginalPlot</a></span><span class="op">(</span><span class="va">fit</span>, xvar.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x1"</span>, <span class="st">"x2"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Partial dependence plot (slower, confounder-adjusted)</span></span>
+<span><span class="fu"><a href="reference/partialPlot.html">partialPlot</a></span><span class="op">(</span><span class="va">fit</span>, xvar.names <span class="op">=</span> <span class="st">"x1"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="binary-response--atrial-fibrillation-data">Binary response — Atrial Fibrillation data<a class="anchor" aria-label="anchor" href="#binary-response--atrial-fibrillation-data"></a>
+</h3>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">AF</span>, package <span class="op">=</span> <span class="st">"boostmtree"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fit_af</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/boostmtree.html">boostmtree</a></span><span class="op">(</span></span>
+<span>  x      <span class="op">=</span> <span class="va">AF</span><span class="op">$</span><span class="va">feature</span>,</span>
+<span>  tm     <span class="op">=</span> <span class="va">AF</span><span class="op">$</span><span class="va">time</span>,</span>
+<span>  id     <span class="op">=</span> <span class="va">AF</span><span class="op">$</span><span class="va">id</span>,</span>
+<span>  y      <span class="op">=</span> <span class="va">AF</span><span class="op">$</span><span class="va">y</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"Binary"</span>,</span>
+<span>  M      <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  cv.flag <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit_af</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_af</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Variable importance</span></span>
+<span><span class="va">vimp_af</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/vimp.boostmtree.html">vimp.boostmtree</a></span><span class="op">(</span><span class="va">fit_af</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/vimpPlot.html">vimpPlot</a></span><span class="op">(</span><span class="va">vimp_af</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="continuous-response--spirometry-data">Continuous response — Spirometry data<a class="anchor" aria-label="anchor" href="#continuous-response--spirometry-data"></a>
+</h3>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">spirometry</span>, package <span class="op">=</span> <span class="st">"boostmtree"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fit_spi</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/boostmtree.html">boostmtree</a></span><span class="op">(</span></span>
+<span>  x      <span class="op">=</span> <span class="va">spirometry</span><span class="op">$</span><span class="va">features</span>,</span>
+<span>  tm     <span class="op">=</span> <span class="va">spirometry</span><span class="op">$</span><span class="va">time</span>,</span>
+<span>  id     <span class="op">=</span> <span class="va">spirometry</span><span class="op">$</span><span class="va">id</span>,</span>
+<span>  y      <span class="op">=</span> <span class="va">spirometry</span><span class="op">$</span><span class="va">y</span>,</span>
+<span>  family <span class="op">=</span> <span class="st">"Continuous"</span>,</span>
+<span>  M      <span class="op">=</span> <span class="fl">300</span>,</span>
+<span>  cv.flag <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit_spi</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/marginalPlot.html">marginalPlot</a></span><span class="op">(</span><span class="va">fit_spi</span>, xvar.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">spirometry</span><span class="op">$</span><span class="va">features</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="key-functions">Key Functions<a class="anchor" aria-label="anchor" href="#key-functions"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>Function</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code><a href="reference/boostmtree.html">boostmtree()</a></code></td>
+<td>Fit a boosted multivariate tree model</td>
+</tr>
+<tr>
+<td><code><a href="reference/predict.boostmtree.html">predict.boostmtree()</a></code></td>
+<td>Predict on new data</td>
+</tr>
+<tr>
+<td><code><a href="reference/print.boostmtree.html">print.boostmtree()</a></code></td>
+<td>Print model summary</td>
+</tr>
+<tr>
+<td><code><a href="reference/plot.boostmtree.html">plot.boostmtree()</a></code></td>
+<td>Diagnostic plots (error curve, fitted values, residuals)</td>
+</tr>
+<tr>
+<td><code><a href="reference/vimp.boostmtree.html">vimp.boostmtree()</a></code></td>
+<td>Variable importance scores</td>
+</tr>
+<tr>
+<td><code><a href="reference/vimpPlot.html">vimpPlot()</a></code></td>
+<td>Plot variable importance</td>
+</tr>
+<tr>
+<td><code><a href="reference/marginalPlot.html">marginalPlot()</a></code></td>
+<td>Marginal dependence plots (fast)</td>
+</tr>
+<tr>
+<td><code><a href="reference/partialPlot.html">partialPlot()</a></code></td>
+<td>Partial dependence plots (adjusted)</td>
+</tr>
+<tr>
+<td><code><a href="reference/simLong.html">simLong()</a></code></td>
+<td>Simulate longitudinal data</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="datasets">Datasets<a class="anchor" aria-label="anchor" href="#datasets"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr>
+<th>Dataset</th>
+<th>Subjects</th>
+<th>Observations</th>
+<th>Response</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>AF</code></td>
+<td>228</td>
+<td>7,949</td>
+<td>Binary</td>
+<td>Atrial fibrillation presence/absence after surgical ablation</td>
+</tr>
+<tr>
+<td><code>spirometry</code></td>
+<td>509</td>
+<td>9,471</td>
+<td>Continuous</td>
+<td>FEV1% after lung transplantation</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<p>Full documentation is available at <strong><a href="https://ehrlinger.github.io/boostmtree/" class="uri">https://ehrlinger.github.io/boostmtree/</a></strong>, including:</p>
+<ul>
+<li><a href="https://ehrlinger.github.io/boostmtree/reference/">Reference manual</a></li>
+<li><a href="https://ehrlinger.github.io/boostmtree/articles/introduction.html">Introduction vignette</a></li>
+<li><a href="https://ehrlinger.github.io/boostmtree/articles/longitudinal-analysis.html">Longitudinal analysis vignette</a></li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="authors">Authors<a class="anchor" aria-label="anchor" href="#authors"></a>
 </h2>
-<p>Hemant Ishwaran, Amol Pande and Udaya B. Kogalur</p>
+<ul>
+<li>
+<strong>Hemant Ishwaran</strong> — original methodology</li>
+<li>
+<strong>Amol Pande</strong> — original methodology</li>
+<li>
+<strong>Udaya B. Kogalur</strong> — original implementation</li>
+<li>
+<strong>John Ehrlinger</strong> — current maintainer</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>If you use <strong>boostmtree</strong> in your research, please cite:</p>
+<blockquote>
+<p>Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B., Blackstone E.H., Ishwaran H. (2017). Boosted multivariate trees for longitudinal data. <em>Machine Learning</em>, 106(2): 277–305. doi: <a href="https://doi.org/10.1007/s10994-016-5597-1" class="external-link">10.1007/s10994-016-5597-1</a></p>
+</blockquote>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"boostmtree"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>Friedman J.H. (2001). Greedy function approximation: a gradient boosting machine. <em>Annals of Statistics</em>, 29(5): 1189–1232.</p>
+<p>Friedman J.H. (2002). Stochastic gradient boosting. <em>Computational Statistics &amp; Data Analysis</em>, 38(4): 367–378.</p>
+<p>Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B., Blackstone E.H., Ishwaran H. (2017). Boosted multivariate trees for longitudinal data. <em>Machine Learning</em>, 106(2): 277–305. doi: <a href="https://doi.org/10.1007/s10994-016-5597-1" class="external-link">10.1007/s10994-016-5597-1</a></p>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>GPL (&gt;= 3) — see <a href="LICENSE">LICENSE</a> for details.</p>
 </div>
 </div>
-<div class="section level1">
-<h1 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h1>
-<p>Friedman J.H. (2001). Greedy function approximation: a gradient boosting machine, <code>Ann. of Statist.</code>, 5:1189-1232.</p>
-<p>Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U., Blackstone E.H., Ishwaran H. Boosted Multivariate Trees for Longitudinal Data <code>Mach Learn</code>, . 2017 Feb;106(2):277-305. doi: 10.1007/s10994-016-5597-1.</p>
-</div>
-
-  </main><aside class="col-md-3"><div class="package-badges">
-<h2 data-toc-skip>Package badges</h2>
+  </main><aside class="col-md-3"><div class="package-status">
+<h2 data-toc-skip>Package Status</h2>
 <ul class="list-unstyled">
-<li><p><img src="https://img.shields.io/github/r-package/v/ehrlinger/boostmtree"><br><img src="https://img.shields.io/github/actions/workflow/status/ehrlinger/boostmtree/pkgdown.yaml"><br></p></li>
+<li><p><a href="https://cran.r-project.org/package=boostmtree" class="external-link"><img src="https://www.r-pkg.org/badges/version/boostmtree" alt="CRAN"></a><br><a href="https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a><br><a href="https://app.codecov.io/gh/ehrlinger/boostmtree" class="external-link"><img src="https://codecov.io/gh/ehrlinger/boostmtree/graph/badge.svg" alt="codecov"></a><br><a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPL%20(%3E%3D%203)-blue.svg" alt="License: GPL (&gt;= 3)"></a><br><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a><br><img src="https://img.shields.io/github/r-package/v/ehrlinger/boostmtree" alt="GitHub version"></p></li>
 </ul>
 </div>
 
@@ -96,13 +368,18 @@
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=boostmtree" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/ehrlinger/boostmtree/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/ehrlinger/boostmtree/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Udaya B. Kogalur <br><small class="roles"> Maintainer </small>   </li>
+<li>Hemant Ishwaran <br><small class="roles"> Author </small>   </li>
+<li>Amol Pande <br><small class="roles"> Author </small>   </li>
+<li>Udaya B. Kogalur <br><small class="roles"> Author </small>   </li>
+<li>John Ehrlinger <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-5340-5154" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 

@@ -5,22 +5,24 @@ Partial dependence plot of x against adjusted predicted y.
 ## Usage
 
 ``` r
-partialPlot(object,
-            M = NULL,
-            xvar.names,
-            tm.unq,
-            xvar.unq = NULL,
-            npts = 25,
-            subset,
-            prob.class = FALSE,
-            conditional.xvars = NULL,
-            conditional.values = NULL,
-            plot.it = FALSE,
-            Variable_Factor = FALSE,
-            path_saveplot = NULL,
-            Verbose = TRUE,
-            useCVflag = FALSE,
-            ...)
+partialPlot(
+  object,
+  M = NULL,
+  xvar.names,
+  tm.unq,
+  xvar.unq = NULL,
+  npts = 25,
+  subset,
+  prob.class = FALSE,
+  conditional.xvars = NULL,
+  conditional.values = NULL,
+  plot.it = FALSE,
+  Variable_Factor = FALSE,
+  path_saveplot = NULL,
+  Verbose = TRUE,
+  useCVflag = FALSE,
+  ...
+)
 ```
 
 ## Arguments
@@ -114,19 +116,20 @@ points specified by `tm.unq`. Analysis can be restricted to a subset of
 the data using `subset`. Further conditioning can be imposed using
 `conditional.xvars`.
 
-## Author
-
-Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
-
 ## References
 
 Friedman J.H. Greedy function approximation: a gradient boosting
 machine, *Ann. of Statist.*, 5:1189-1232, 2001.
 
+## Author
+
+Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
+
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+
+# \donttest{
 ##------------------------------------------------------------
 ## Synthetic example (Response is continuous)
 ## high correlation, quadratic time with quadratic interaction
@@ -135,19 +138,27 @@ if (FALSE) { # \dontrun{
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 300)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 20)
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 
 #plot results
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
+#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
+#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
 
 #partial plot using "x2" as the conditional variable
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
                       conditional.xvar = "x2", conditional.values = 1,plot.it = TRUE)
+#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
                       conditional.xvar = "x2", conditional.values = 2,plot.it = TRUE)
+#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
 
 ##------------------------------------------------------------
 ## Synthetic example (Response is binary)
@@ -157,14 +168,55 @@ pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
 dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Binary")$dtaL
 
 #basic boosting call
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary",M = 300)
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary",M = 20)
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==================                                                    |  25%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==========================================                            |  60%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==============================================                        |  65%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |===============================================================       |  90%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
 
 #plot results
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
+#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
+#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
+# }
 
+if (FALSE) { # \dontrun{
 ##----------------------------------------------------------------------------
 ## spirometry data
 ##----------------------------------------------------------------------------

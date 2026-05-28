@@ -1,11 +1,15 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://ehrlinger.github.io/boostmtree/404.html</loc></url>
+<url><loc>https://ehrlinger.github.io/boostmtree/articles/index.html</loc></url>
+<url><loc>https://ehrlinger.github.io/boostmtree/articles/introduction.html</loc></url>
+<url><loc>https://ehrlinger.github.io/boostmtree/articles/longitudinal-analysis.html</loc></url>
 <url><loc>https://ehrlinger.github.io/boostmtree/authors.html</loc></url>
 <url><loc>https://ehrlinger.github.io/boostmtree/index.html</loc></url>
+<url><loc>https://ehrlinger.github.io/boostmtree/news/index.html</loc></url>
 <url><loc>https://ehrlinger.github.io/boostmtree/reference/AF.html</loc></url>
+<url><loc>https://ehrlinger.github.io/boostmtree/reference/boostmtree-package.html</loc></url>
 <url><loc>https://ehrlinger.github.io/boostmtree/reference/boostmtree.html</loc></url>
 <url><loc>https://ehrlinger.github.io/boostmtree/reference/boostmtree.news.html</loc></url>
-<url><loc>https://ehrlinger.github.io/boostmtree/reference/boostmtree_package.html</loc></url>
 <url><loc>https://ehrlinger.github.io/boostmtree/reference/index.html</loc></url>
 <url><loc>https://ehrlinger.github.io/boostmtree/reference/marginalPlot.html</loc></url>
 <url><loc>https://ehrlinger.github.io/boostmtree/reference/partialPlot.html</loc></url>

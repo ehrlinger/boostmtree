@@ -1,30 +1,37 @@
 # Variable Importance (VIMP) plot
 
-Barplot displaying VIMP.
+Barplot displaying VIMP. If the analysis is for the univariate case,
+VIMP is displayed above the x-axis. If the analysis is for the
+longitudinal case, VIMP for covariates (main effects) are shown above
+the x-axis while VIMP for covariate-time interactions (time interaction
+effects) are shown below the x-axis. In either case, negative vimp value
+is set to zero.
 
 ## Usage
 
 ``` r
-vimpPlot(vimp,
-         Q_set = NULL,
-         Time_Interaction = TRUE,
-         xvar.names = NULL,
-         cex.xlab = NULL,
-         ymaxlim = 0,
-         ymaxtimelim = 0,
-         subhead.cexval = 1,
-         yaxishead = NULL,
-         xaxishead = NULL,
-         main = "Variable Importance (%)",
-         col = grey(0.8),
-         cex.lab = 1.5,
-         subhead.labels = c("Time-Interactions Effects", "Main Effects"),
-         ylbl = FALSE,
-         seplim = NULL,
-         eps = 0.1,
-         Width_Bar = 1,
-         path_saveplot = NULL,
-         Verbose = TRUE)
+vimpPlot(
+  vimp,
+  Q_set = NULL,
+  Time_Interaction = TRUE,
+  xvar.names = NULL,
+  cex.xlab = NULL,
+  ymaxlim = 0,
+  ymaxtimelim = 0,
+  subhead.cexval = 1,
+  yaxishead = NULL,
+  xaxishead = NULL,
+  main = "Variable Importance (%)",
+  col = grey(0.8),
+  cex.lab = 1.5,
+  subhead.labels = c("Time-Interactions Effects", "Main Effects"),
+  ylbl = FALSE,
+  seplim = NULL,
+  eps = 0.1,
+  Width_Bar = 1,
+  path_saveplot = NULL,
+  Verbose = TRUE
+)
 ```
 
 ## Arguments
@@ -132,15 +139,6 @@ vimpPlot(vimp,
 
   Display the path where the plot is saved?
 
-## Details
-
-Barplot displaying VIMP. If the analysis is for the univariate case,
-VIMP is displayed above the x-axis. If the analysis is for the
-longitudinal case, VIMP for covariates (main effects) are shown above
-the x-axis while VIMP for covariate-time interactions (time interaction
-effects) are shown below the x-axis. In either case, negative vimp value
-is set to zero.
-
 ## Author
 
 Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
@@ -148,22 +146,69 @@ Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+
+# \donttest{
 ##------------------------------------------------------------
 ## Synthetic example
 ## high correlation, quadratic time with quadratic interaction
 ##-------------------------------------------------------------
 #simulate the data
-dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
+dta <- simLong(n = 20, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 
 #basic boosting call
-boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, 
-              family = "Continuous",M = 300, cv.flag = TRUE)
-vimp.grow <- vimp.boostmtree(object = boost.grow)              
+boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
+              family = "Continuous",M = 20, cv.flag = TRUE)
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |================================                                      |  45%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
+vimp.grow <- vimp.boostmtree(object = boost.grow)
 
 # VIMP plot
 vimpPlot(vimp = vimp.grow, ymaxlim = 20, ymaxtimelim = 20,
          xaxishead = c(3,3), yaxishead = c(65,65),
          cex.xlab = 1, subhead.cexval = 1.2)
-} # }
+#> Warning: length(labels) > max(length(x), length(y));
+#> 'labels' truncated to length 4
+#> Plot saved to: /tmp/RtmplzDByJ/VIMPplot.pdf
+# }
 ```
