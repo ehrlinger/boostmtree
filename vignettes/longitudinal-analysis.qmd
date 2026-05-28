@@ -20,22 +20,15 @@ vignette: >
 
 ## Motivation
 
-Longitudinal studies collect repeated measurements on the same subjects over
-time.  The correlation among repeated measures, unbalanced observation
-schedules, and the possibility that covariate effects change with time all
-present challenges for standard regression methods.
+Standard regression methods struggle with longitudinal data: repeated measures
+are correlated within subjects, observation schedules are often unbalanced, and
+covariate effects can change over time.  **boostmtree** handles all three by
+combining multivariate tree base learners (non-linear covariate effects) with
+adaptive P-splines (covariate–time interactions), without requiring imputation
+or a balanced panel.
 
-**boostmtree** addresses these challenges by:
-
-1. Using *multivariate tree* base learners that naturally accommodate
-   non-linear and interaction effects among covariates.
-2. Modeling covariate–time interactions via penalized B-splines, whose
-   smoothing parameter is estimated adaptively at each boosting step.
-3. Handling unbalanced panels (different numbers of observations per subject)
-   without imputation.
-
-This vignette demonstrates the full analysis workflow using the two real
-datasets bundled with the package.
+This vignette demonstrates the full analysis workflow using the two bundled
+real datasets.
 
 ---
 
@@ -303,10 +296,7 @@ vimp_af <- vimp.boostmtree(fit_af)
 vimpPlot(vimp_af)
 ```
 
-### Marginal time trends
-
-The predicted probability of AF over time can be examined by computing
-marginal predictions at the observed time points.
+### Marginal covariate effects
 
 ```{r}
 #| label: af-marginal

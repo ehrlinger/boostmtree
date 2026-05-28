@@ -158,11 +158,13 @@
 #' @param y_reference Set this value, among the unique \code{y} values when
 #' \code{family} == "Nominal". If NULL, lowest value, among unique \code{y}
 #' values, is used.
-#' @param M Number of boosting iterations
-#' @param nu Boosting regularization parameter.  A value in (0,1].
-#' @param na.action Remove missing values (casewise) or impute it. Default is
-#' to impute the missign values.
+#' @param M Number of boosting iterations. Must be a positive integer.
+#' @param nu Boosting regularization (shrinkage) parameter. Must be positive;
+#' typical values are 0.01–0.1. Smaller values require larger \code{M}.
+#' @param na.action Remove missing values (casewise) or impute them. Default is
+#' to impute the missing values.
 #' @param K Number of terminal nodes used for the multivariate tree learner.
+#' Must be a positive integer; typical values are 3–10.
 #' @param mtry Number of \code{x} variables selected randomly for tree fitting.
 #' Default is use all \code{x} variables.
 #' @param nknots Number of knots used for the B-spline for modeling the time
@@ -500,11 +502,7 @@ boostmtree <- function(x,
     stop("missing values encountered in y, id, or tm: remove observations with missing values")
   }
   x <- as.data.frame(x)
-  # Group all observations by subject (in id.unq order) while preserving the
-  # original within-subject row order. A single stable reindex replaces the
-  # former per-subject lapply scans (which were O(n^2) in the number of
-  # subjects). X is the subject-level design matrix (first row per subject);
-  # id/tm/y are kept consistent with the regrouped x.
+  # Group rows by subject (id.unq order); single stable reindex replaces O(n^2) per-subject scans.
   reorder.idx <- order(match(id, id.unq), seq_along(id))
   x  <- x[reorder.idx, , drop = FALSE]
   id <- id[reorder.idx]

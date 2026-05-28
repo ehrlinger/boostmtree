@@ -53,14 +53,16 @@ based on the scale of \code{y}.}
 \code{family} == "Nominal". If NULL, lowest value, among unique \code{y}
 values, is used.}
 
-\item{M}{Number of boosting iterations}
+\item{M}{Number of boosting iterations. Must be a positive integer.}
 
-\item{nu}{Boosting regularization parameter.  A value in (0,1].}
+\item{nu}{Boosting regularization (shrinkage) parameter. Must be positive;
+typical values are 0.01–0.1. Smaller values require larger \code{M}.}
 
-\item{na.action}{Remove missing values (casewise) or impute it. Default is
-to impute the missign values.}
+\item{na.action}{Remove missing values (casewise) or impute them. Default is
+to impute the missing values.}
 
-\item{K}{Number of terminal nodes used for the multivariate tree learner.}
+\item{K}{Number of terminal nodes used for the multivariate tree learner.
+Must be a positive integer; typical values are 3–10.}
 
 \item{mtry}{Number of \code{x} variables selected randomly for tree fitting.
 Default is use all \code{x} variables.}
