@@ -94,7 +94,7 @@ default the plot will be saved at temporary folder.}
 \item{Verbose}{Display the path where the plot is saved?}
 }
 \value{
-No return value, called for side effects.
+Invisibly returns the vimp list used for plotting.
 }
 \description{
 Barplot displaying VIMP. If the analysis is for the univariate case, VIMP is

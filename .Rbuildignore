@@ -13,3 +13,4 @@
 ^vignettes/.*_cache$
 ^vignettes/_freeze$
 ^vignettes/_quarto\.yml$
+^inst/dev$

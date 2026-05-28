@@ -98,7 +98,10 @@
 #' default the plot will be saved at temporary folder.
 #' @param Verbose Display the path where the plot is saved?
 #' @param ... Further arguments passed to or from other methods.
-#' @return No return value, called for side effects.
+#' @return Invisibly returns a list with components \code{p.obj} (marginal
+#'   effect estimates), \code{l.obj} (lowess smoothed longitudinal estimates,
+#'   or \code{NULL} if \code{plot.it = FALSE}), and \code{time} (time points
+#'   used for evaluation).
 #' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 #' @references Friedman J.H. Greedy function approximation: a gradient boosting
 #' machine, \emph{Ann. of Statist.}, 5:1189-1232, 2001.
