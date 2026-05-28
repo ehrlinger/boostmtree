@@ -118,7 +118,7 @@ partialPlot(fit, xvar.names = "x1")
 data(AF, package = "boostmtree")
 
 fit_af <- boostmtree(
-  x      = AF$features,
+  x      = AF$feature,
   tm     = AF$time,
   id     = AF$id,
   y      = AF$y,

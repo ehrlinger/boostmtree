@@ -8,5 +8,3 @@ docs/
 
 vignettes/*_cache/
 
-inst/extdata/fit_spi.rds
-inst/extdata/fit_af.rds

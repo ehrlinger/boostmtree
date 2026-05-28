@@ -419,13 +419,13 @@ boostmtree <- function(x,
   if (!missing(tm) && length(tm) != n.obs) {
     stop("length of tm must equal the number of rows in x")
   }
-  if (!is.numeric(M) || length(M) != 1 || M < 1) {
+  if (!is.numeric(M) || length(M) != 1 || !is.finite(M) || M < 1 || M != floor(M)) {
     stop("M must be a positive integer")
   }
-  if (!is.numeric(nu) || length(nu) != 1 || nu <= 0) {
+  if (!is.numeric(nu) || length(nu) != 1 || !is.finite(nu) || nu <= 0) {
     stop("nu must be a positive number")
   }
-  if (!is.numeric(K) || length(K) != 1 || K < 1) {
+  if (!is.numeric(K) || length(K) != 1 || !is.finite(K) || K < 1 || K != floor(K)) {
     stop("K must be a positive integer")
   }
   univariate <- FALSE

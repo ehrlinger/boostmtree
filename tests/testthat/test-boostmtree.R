@@ -369,3 +369,30 @@ test_that("boostmtree rejects non-positive K", {
     regexp = "K must be a positive integer"
   )
 })
+
+test_that("boostmtree rejects non-integer M", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm, id = a$id, y = a$y,
+               family = "Continuous", M = 1.5, verbose = FALSE),
+    regexp = "M must be a positive integer"
+  )
+})
+
+test_that("boostmtree rejects non-integer K", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm, id = a$id, y = a$y,
+               family = "Continuous", K = 2.5, verbose = FALSE),
+    regexp = "K must be a positive integer"
+  )
+})
+
+test_that("boostmtree rejects non-finite M", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm, id = a$id, y = a$y,
+               family = "Continuous", M = Inf, verbose = FALSE),
+    regexp = "M must be a positive integer"
+  )
+})

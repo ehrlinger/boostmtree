@@ -72,8 +72,8 @@ n_train   <- floor(0.8 * length(subjects))
 trn_subj  <- sample(subjects, n_train)
 trn_idx   <- spirometry$id %in% trn_subj
 
-cat("Training subjects:", sum(trn_idx), "\n")
-cat("Test subjects:    ", sum(!trn_idx), "\n")
+cat("Training subjects:", length(unique(spirometry$id[trn_idx])), "\n")
+cat("Test subjects:    ", length(unique(spirometry$id[!trn_idx])), "\n")
 ```
 
 The code below shows the full production fit (M = 200, cv.flag = TRUE).  To
@@ -211,8 +211,8 @@ subjects_af <- unique(AF$id)
 trn_af_subj <- sample(subjects_af, floor(0.75 * length(subjects_af)))
 trn_af      <- AF$id %in% trn_af_subj
 
-cat("Training subjects:", sum(trn_af), "\n")
-cat("Test subjects:    ", sum(!trn_af), "\n")
+cat("Training subjects:", length(unique(AF$id[trn_af])), "\n")
+cat("Test subjects:    ", length(unique(AF$id[!trn_af])), "\n")
 ```
 
 The code below shows the full production fit.  Pre-computed results are loaded
