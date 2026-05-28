@@ -116,6 +116,7 @@
 #' @param path_saveplot Provide the location where plot should be saved. By
 #' default the plot will be saved at temporary folder.
 #' @param Verbose Display the path where the plot is saved?
+#' @return Invisibly returns the vimp list used for plotting.
 #' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 #' @keywords plot
 #' @export

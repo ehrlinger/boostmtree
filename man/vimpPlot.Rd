@@ -93,6 +93,9 @@ default the plot will be saved at temporary folder.}
 
 \item{Verbose}{Display the path where the plot is saved?}
 }
+\value{
+Invisibly returns the vimp list used for plotting.
+}
 \description{
 Barplot displaying VIMP. If the analysis is for the univariate case, VIMP is
 displayed above the x-axis. If the analysis is for the longitudinal case,

@@ -38,6 +38,12 @@ default the plot will be saved at temporary folder.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+Invisibly returns a list with components \code{p.obj} (marginal
+  effect estimates), \code{l.obj} (lowess smoothed longitudinal estimates,
+  or \code{NULL} if \code{plot.it = FALSE}), and \code{time} (time points
+  used for evaluation).
+}
 \description{
 Marginal plot of x against the unadjusted predicted y. This is mainly used
 to obtain marginal relationships between x and the unadjusted predicted y.

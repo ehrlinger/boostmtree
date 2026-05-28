@@ -115,6 +115,10 @@
 #' @param useCVflag Should the predicted value be based on the estimate derived
 #' from oob sample?
 #' @param ... Further arguments passed to or from other methods.
+#' @return Invisibly returns a list with components \code{p.obj} (partial
+#'   effect estimates), \code{l.obj} (lowess smoothed partial plots, or
+#'   \code{NULL} if \code{plot.it = FALSE}), and \code{time} (time points
+#'   used for evaluation).
 #' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 #' @references Friedman J.H. Greedy function approximation: a gradient boosting
 #' machine, \emph{Ann. of Statist.}, 5:1189-1232, 2001.
