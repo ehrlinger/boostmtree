@@ -7,11 +7,15 @@
 \method{plot}{profile.prx}(x, col = NULL, rnd.case = NULL, cut = 0.95, restrictX = TRUE, ...)
 }
 \arguments{
-\item{x}{A \code{boostmtree} predict object produced with
-\code{proximity = TRUE}.  Must contain a \code{proximity} matrix.}
+\item{x}{An object of class \code{profile.prx} — a
+\code{boostmtree} predict object that contains a \code{proximity}
+matrix (i.e., produced with \code{proximity = TRUE}).}
 
-\item{col}{Optional integer or character vector of colours, one per
-matched neighbour.  Defaults to \code{1} (black) for every neighbour.}
+\item{col}{Optional colour vector.  Must be indexed by \emph{original
+subject index} — colours are looked up as \code{col[i]} where
+\code{i} is the subject's row number in the proximity matrix.  A
+safe choice is a vector of length \code{nrow(x$proximity)}.
+Defaults to \code{1} (black) for every matched neighbour.}
 
 \item{rnd.case}{Integer index of the reference subject.  If \code{NULL}
 (default) a subject is chosen at random.}

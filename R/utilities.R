@@ -474,10 +474,14 @@ penBSderiv <- function(d, pen.ord = 2) {
 #' (solid black line) are overlaid on the reference subject's smoothed
 #' trajectory (solid blue line).
 #'
-#' @param x A \code{boostmtree} predict object produced with
-#'   \code{proximity = TRUE}.  Must contain a \code{proximity} matrix.
-#' @param col Optional integer or character vector of colours, one per
-#'   matched neighbour.  Defaults to \code{1} (black) for every neighbour.
+#' @param x An object of class \code{profile.prx} — a
+#'   \code{boostmtree} predict object that contains a \code{proximity}
+#'   matrix (i.e., produced with \code{proximity = TRUE}).
+#' @param col Optional colour vector.  Must be indexed by \emph{original
+#'   subject index} — colours are looked up as \code{col[i]} where
+#'   \code{i} is the subject's row number in the proximity matrix.  A
+#'   safe choice is a vector of length \code{nrow(x$proximity)}.
+#'   Defaults to \code{1} (black) for every matched neighbour.
 #' @param rnd.case Integer index of the reference subject.  If \code{NULL}
 #'   (default) a subject is chosen at random.
 #' @param cut Quantile threshold (0–1) for defining neighbours based on
