@@ -39,10 +39,6 @@ This fork is available from GitHub only:
 remotes::install_github("ehrlinger/boostmtree")
 ```
 
-> The upstream package ([kogalur/boostmtree](https://github.com/kogalur/boostmtree))
-> is on CRAN and can be installed with `install.packages("boostmtree")`, but it is
-> a different codebase from this fork.
-
 ### Optional enhanced visualization
 
 For ggplot2-based visualization workflows, install the suggested packages:
