@@ -108,6 +108,12 @@ partialPlot(
 
   Further arguments passed to or from other methods.
 
+## Value
+
+Invisibly returns a list with components `p.obj` (partial effect
+estimates), `l.obj` (lowess smoothed partial plots, or `NULL` if
+`plot.it = FALSE`), and `time` (time points used for evaluation).
+
 ## Details
 
 Partial dependence plot (Friedman, 2001) of x values specified by
@@ -148,17 +154,17 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continu
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf
 
 #partial plot using "x2" as the conditional variable
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
                       conditional.xvar = "x2", conditional.values = 1,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
                       conditional.xvar = "x2", conditional.values = 2,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf
 
 ##------------------------------------------------------------
 ## Synthetic example (Response is binary)
@@ -211,9 +217,9 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary"
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/PartialPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf
 # }
 
 if (FALSE) { # \dontrun{

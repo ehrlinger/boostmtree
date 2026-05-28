@@ -139,6 +139,10 @@ vimpPlot(
 
   Display the path where the plot is saved?
 
+## Value
+
+Invisibly returns the vimp list used for plotting.
+
 ## Author
 
 Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
@@ -209,6 +213,6 @@ vimpPlot(vimp = vimp.grow, ymaxlim = 20, ymaxtimelim = 20,
          cex.xlab = 1, subhead.cexval = 1.2)
 #> Warning: length(labels) > max(length(x), length(y));
 #> 'labels' truncated to length 4
-#> Plot saved to: /tmp/RtmplzDByJ/VIMPplot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/VIMPplot.pdf
 # }
 ```

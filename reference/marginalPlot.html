@@ -122,6 +122,13 @@ default the plot will be saved at temporary folder.</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Invisibly returns a list with components <code>p.obj</code> (marginal
+  effect estimates), <code>l.obj</code> (lowess smoothed longitudinal estimates,
+  or <code>NULL</code> if <code>plot.it = FALSE</code>), and <code>time</code> (time points
+  used for evaluation).</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Marginal plot of x values specified by <code>xvar.names</code> against the
 unadjusted predicted y-values over a set of time points specified by
@@ -161,14 +168,14 @@ machine, <em>Ann. of Statist.</em>, 5:1189-1232, 2001.</p>
 <span class="r-in"><span><span class="co">#x1 has a linear main effect</span></span></span>
 <span class="r-in"><span><span class="co">#x2 is quadratic with quadratic time trend</span></span></span>
 <span class="r-in"><span><span class="fu">marginalPlot</span><span class="op">(</span><span class="va">boost.grow</span>, <span class="st">"x1"</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf</span>
 <span class="r-in"><span><span class="fu">marginalPlot</span><span class="op">(</span><span class="va">boost.grow</span>, <span class="st">"x2"</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"</span></span></span>
 <span class="r-in"><span><span class="co"># in the current working directory.</span></span></span>
 <span class="r-in"><span><span class="fu">marginalPlot</span><span class="op">(</span><span class="va">boost.grow</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">##------------------------------------------------------------</span></span></span>
@@ -210,14 +217,14 @@ machine, <em>Ann. of Statist.</em>, 5:1189-1232, 2001.</p>
 <span class="r-in"><span><span class="co">#x1 has a linear main effect</span></span></span>
 <span class="r-in"><span><span class="co">#x2 is quadratic with quadratic time trend</span></span></span>
 <span class="r-in"><span><span class="fu">marginalPlot</span><span class="op">(</span><span class="va">boost.grow</span>, <span class="st">"x1"</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf</span>
 <span class="r-in"><span><span class="fu">marginalPlot</span><span class="op">(</span><span class="va">boost.grow</span>, <span class="st">"x2"</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"</span></span></span>
 <span class="r-in"><span><span class="co"># in the current working directory.</span></span></span>
 <span class="r-in"><span><span class="fu">marginalPlot</span><span class="op">(</span><span class="va">boost.grow</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>

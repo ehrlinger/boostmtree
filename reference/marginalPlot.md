@@ -60,6 +60,12 @@ marginalPlot(
 
   Further arguments passed to or from other methods.
 
+## Value
+
+Invisibly returns a list with components `p.obj` (marginal effect
+estimates), `l.obj` (lowess smoothed longitudinal estimates, or `NULL`
+if `plot.it = FALSE`), and `time` (time points used for evaluation).
+
 ## Details
 
 Marginal plot of x values specified by `xvar.names` against the
@@ -100,14 +106,14 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Contin
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 marginalPlot(boost.grow, "x1",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf
 marginalPlot(boost.grow, "x2",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf
 
 #Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"
 # in the current working directory.
 marginalPlot(boost.grow,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf
 
 
 ##------------------------------------------------------------
@@ -149,14 +155,14 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Binary
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 marginalPlot(boost.grow, "x1",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf
 marginalPlot(boost.grow, "x2",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf
 
 #Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"
 # in the current working directory.
 marginalPlot(boost.grow,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmplzDByJ/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/MarginalPlot.pdf
 # }
 
 if (FALSE) { # \dontrun{

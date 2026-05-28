@@ -8,6 +8,8 @@ Fit and predict boosted multivariate tree models for longitudinal data.
   : Boosted multivariate trees for longitudinal data
 - [`predict(`*`<boostmtree>`*`)`](https://ehrlinger.github.io/boostmtree/reference/predict.boostmtree.md)
   : Prediction for Boosted multivariate trees for longitudinal data.
+- [`plot(`*`<profile.prx>`*`)`](https://ehrlinger.github.io/boostmtree/reference/plot.profile.prx.md)
+  : Plot Proximity Profile
 
 ## Model Inspection
 

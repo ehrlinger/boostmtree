@@ -19,6 +19,11 @@ print(x, ...)
 
   Further arguments passed to or from other methods.
 
+## Value
+
+Invisibly returns the `boostmtree` object `x`, following the convention
+for print methods.
+
 ## References
 
 Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B., Blackstone

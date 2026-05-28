@@ -34,6 +34,10 @@ plot(x, use.rmse = TRUE, path_saveplot = NULL, Verbose = TRUE, ...)
 
   Further arguments passed to or from other methods.
 
+## Value
+
+Invisibly returns the `boostmtree` object `x`.
+
 ## Details
 
 Plot summary output, including predicted values and residuals. Also

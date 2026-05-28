@@ -483,7 +483,7 @@ print(boost.grow)
 
 #plot.results
 plot(boost.grow)
-#> Plot saved to: /tmp/RtmplzDByJ/boostmtree_plot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/boostmtree_plot.pdf
 
 ##------------------------------------------------------------
 ## synthetic example (Response y is binary)
@@ -559,7 +559,7 @@ print(boost.grow)
 
 #plot.results
 plot(boost.grow)
-#> Plot saved to: /tmp/RtmplzDByJ/boostmtree_plot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/boostmtree_plot.pdf
 
 # \donttest{
 ##------------------------------------------------------------
@@ -694,7 +694,7 @@ boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 plot(boost.cv.grow)
-#> Plot saved to: /tmp/RtmplzDByJ/boostmtree_plot.pdf
+#> Plot saved to: /tmp/RtmpkT6Fbi/boostmtree_plot.pdf
 print(boost.cv.grow)
 #> boostmtree summary
 #> model                       : mtree-Pspline learner 

@@ -1,5 +1,13 @@
 # boostmtree — Boosted Multivariate Trees for Longitudinal Data
 
+> **Fork notice:** This repository is a fork of
+> [kogalur/boostmtree](https://github.com/kogalur/boostmtree) branched
+> at **v1.5.1**. This fork’s v2.0.0 is independent of, and diverges
+> from, the [kogalur
+> v2.0.0](https://cran.r-project.org/package=boostmtree) released on
+> CRAN in May 2026. `install.packages("boostmtree")` installs the
+> upstream kogalur package, **not** this fork.
+
 **boostmtree** implements Friedman’s (2001) gradient descent boosting
 algorithm for modeling longitudinal responses using multivariate tree
 base learners. Covariate-time interactions are captured via penalized
@@ -25,20 +33,22 @@ and works equally well for cross-sectional data.
 
 ## Installation
 
-Install the released version from CRAN:
-
-``` r
-
-install.packages("boostmtree")
-```
-
-Install the development version from GitHub:
+This fork is available from GitHub only:
 
 ``` r
 
 # install.packages("remotes")
 remotes::install_github("ehrlinger/boostmtree")
 ```
+
+> **⚠️ Name collision:** Both this fork and the upstream
+> [kogalur/boostmtree](https://cran.r-project.org/package=boostmtree)
+> use the package name `boostmtree`. R’s library can only hold one
+> version under that name — installing one overwrites the other. If you
+> need both in the same environment, use a project-level library such as
+> [`renv`](https://rstudio.github.io/renv/) or point
+> [`.libPaths()`](https://rdrr.io/r/base/libPaths.html) to a separate
+> directory.
 
 ### Optional enhanced visualization
 
@@ -243,6 +253,8 @@ Fit and predict boosted multivariate tree models for longitudinal data.
   : Boosted multivariate trees for longitudinal data
 - [`predict(`*`<boostmtree>`*`)`](https://ehrlinger.github.io/boostmtree/reference/predict.boostmtree.md)
   : Prediction for Boosted multivariate trees for longitudinal data.
+- [`plot(`*`<profile.prx>`*`)`](https://ehrlinger.github.io/boostmtree/reference/plot.profile.prx.md)
+  : Plot Proximity Profile
 
 ## Model Inspection
 
