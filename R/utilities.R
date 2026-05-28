@@ -619,12 +619,10 @@ papply <- function(X,
   if (lth.which.null > 0) {
     result.lapply <- lapply(which.null, FUN, ...)
   }
-  count <- 0
   result <- lapply(X, function(i) {
     if (any(i == which.null)) {
-      count <<- count + 1
-      result.lapply[[count]]
-    } else{
+      result.lapply[[which(which.null == i)]]
+    } else {
       result.mclapply[[i]]
     }
   })
