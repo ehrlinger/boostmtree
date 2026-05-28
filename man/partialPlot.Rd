@@ -73,6 +73,9 @@ from oob sample?}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Partial dependence plot of x against adjusted predicted y.
 }

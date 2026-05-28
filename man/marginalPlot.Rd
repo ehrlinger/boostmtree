@@ -38,6 +38,9 @@ default the plot will be saved at temporary folder.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Marginal plot of x against the unadjusted predicted y. This is mainly used
 to obtain marginal relationships between x and the unadjusted predicted y.

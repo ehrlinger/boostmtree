@@ -81,6 +81,8 @@
 #' @param x An object of class \code{(boostmtree, grow)} or \code{(boostmtree,
 #' predict)}.
 #' @param ... Further arguments passed to or from other methods.
+#' @return Invisibly returns the \code{boostmtree} object \code{x}, following
+#'   the convention for print methods.
 #' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 #' @references Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B.,
 #' Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for

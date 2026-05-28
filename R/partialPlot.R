@@ -115,6 +115,7 @@
 #' @param useCVflag Should the predicted value be based on the estimate derived
 #' from oob sample?
 #' @param ... Further arguments passed to or from other methods.
+#' @return No return value, called for side effects.
 #' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 #' @references Friedman J.H. Greedy function approximation: a gradient boosting
 #' machine, \emph{Ann. of Statist.}, 5:1189-1232, 2001.

@@ -12,6 +12,10 @@ predict)}.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+Invisibly returns the \code{boostmtree} object \code{x}, following
+  the convention for print methods.
+}
 \description{
 Print summary output from the boosting analysis.
 }
