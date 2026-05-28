@@ -287,3 +287,85 @@ test_that("print.boostmtree works for Ordinal grow object", {
   out <- make_ordinal_fit()
   expect_output(print(out$fit), regexp = "Ordinal")
 })
+
+# ---------------------------------------------------------------------------
+# Input validation
+# ---------------------------------------------------------------------------
+
+make_valid_args <- function(seed = 99) {
+  set.seed(seed)
+  sim <- boostmtree::simLong(
+    n = 6, ntest = 0, N = 2, rho = 0.2,
+    model = 0, family = "Continuous", q = 1
+  )
+  list(
+    x  = sim$dtaL$features,
+    tm = sim$dtaL$time,
+    id = sim$dtaL$id,
+    y  = sim$dtaL$y
+  )
+}
+
+test_that("boostmtree rejects mismatched y length", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm, id = a$id, y = a$y[-1],
+               family = "Continuous", verbose = FALSE),
+    regexp = "length of y"
+  )
+})
+
+test_that("boostmtree rejects mismatched id length", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm, id = a$id[-1], y = a$y,
+               family = "Continuous", verbose = FALSE),
+    regexp = "length of id"
+  )
+})
+
+test_that("boostmtree rejects mismatched tm length", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm[-1], id = a$id, y = a$y,
+               family = "Continuous", verbose = FALSE),
+    regexp = "length of tm"
+  )
+})
+
+test_that("boostmtree rejects empty x", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x[0, , drop = FALSE], tm = numeric(0),
+               id = integer(0), y = numeric(0),
+               family = "Continuous", verbose = FALSE),
+    regexp = "at least one observation"
+  )
+})
+
+test_that("boostmtree rejects non-positive M", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm, id = a$id, y = a$y,
+               family = "Continuous", M = 0, verbose = FALSE),
+    regexp = "M must be a positive integer"
+  )
+})
+
+test_that("boostmtree rejects non-positive nu", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm, id = a$id, y = a$y,
+               family = "Continuous", nu = 0, verbose = FALSE),
+    regexp = "nu must be a positive number"
+  )
+})
+
+test_that("boostmtree rejects non-positive K", {
+  a <- make_valid_args()
+  expect_error(
+    boostmtree(x = a$x, tm = a$tm, id = a$id, y = a$y,
+               family = "Continuous", K = 0, verbose = FALSE),
+    regexp = "K must be a positive integer"
+  )
+})

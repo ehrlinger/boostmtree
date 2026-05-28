@@ -398,6 +398,34 @@ boostmtree <- function(x,
   )))) {
     stop("family must be any one from Continuous, Binary, Nominal or Ordinal")
   }
+  if (missing(x)) {
+    stop("x is required")
+  }
+  if (missing(y)) {
+    stop("y is required")
+  }
+  n.obs <- NROW(x)
+  if (n.obs == 0) {
+    stop("x must contain at least one observation")
+  }
+  if (length(y) != n.obs) {
+    stop("length of y must equal the number of rows in x")
+  }
+  if (!missing(id) && length(id) != n.obs) {
+    stop("length of id must equal the number of rows in x")
+  }
+  if (!missing(tm) && length(tm) != n.obs) {
+    stop("length of tm must equal the number of rows in x")
+  }
+  if (!is.numeric(M) || length(M) != 1 || M < 1) {
+    stop("M must be a positive integer")
+  }
+  if (!is.numeric(nu) || length(nu) != 1 || nu <= 0) {
+    stop("nu must be a positive number")
+  }
+  if (!is.numeric(K) || length(K) != 1 || K < 1) {
+    stop("K must be a positive integer")
+  }
   univariate <- FALSE
   if (missing(tm)) {
     id <- seq_len(nrow(x))
