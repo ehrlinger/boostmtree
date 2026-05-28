@@ -1,8 +1,6 @@
 # boostmtree — Boosted Multivariate Trees for Longitudinal Data
 
 <!-- badges: start -->
-[![CRAN status](https://www.r-pkg.org/badges/version/boostmtree)](https://cran.r-project.org/package=boostmtree)
-[![CRAN downloads](https://cranlogs.r-pkg.org/badges/boostmtree)](https://cranlogs.r-pkg.org/badges/boostmtree)
 [![R-CMD-check](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml)
 [![test coverage](https://codecov.io/gh/ehrlinger/boostmtree/graph/badge.svg)](https://app.codecov.io/gh/ehrlinger/boostmtree)
 [![pkgdown](https://github.com/ehrlinger/boostmtree/actions/workflows/pkgdown.yaml/badge.svg)](https://ehrlinger.github.io/boostmtree/)
@@ -10,6 +8,13 @@
 [![License: GPL (>= 3)](https://img.shields.io/badge/License-GPL%20(%3E%3D%203)-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Repo status: active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 <!-- badges: end -->
+
+> **Fork notice:** This repository is a fork of
+> [kogalur/boostmtree](https://github.com/kogalur/boostmtree) branched
+> at **v1.5.1**. This fork's v2.0.0 is independent of, and diverges
+> from, the [kogalur v2.0.0](https://cran.r-project.org/package=boostmtree)
+> released on CRAN in May 2026. `install.packages("boostmtree")` installs
+> the upstream kogalur package, **not** this fork.
 
 **boostmtree** implements Friedman's (2001) gradient descent boosting algorithm for modeling longitudinal responses using multivariate tree base learners. Covariate-time interactions are captured via penalized B-splines (P-splines) with an adaptively estimated smoothing parameter. The package handles continuous, binary, nominal, and ordinal responses, and works equally well for cross-sectional data.
 
@@ -27,18 +32,16 @@
 
 ## Installation
 
-Install the released version from CRAN:
-
-```r
-install.packages("boostmtree")
-```
-
-Install the development version from GitHub:
+This fork is available from GitHub only:
 
 ```r
 # install.packages("remotes")
 remotes::install_github("ehrlinger/boostmtree")
 ```
+
+> The upstream package ([kogalur/boostmtree](https://github.com/kogalur/boostmtree))
+> is on CRAN and can be installed with `install.packages("boostmtree")`, but it is
+> a different codebase from this fork.
 
 ### Optional enhanced visualization
 
