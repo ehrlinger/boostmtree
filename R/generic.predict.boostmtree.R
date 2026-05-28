@@ -585,28 +585,22 @@ generic.predict.boostmtree <- function(object,
         })
       })
     })
-    # For Ordinal: enforce l_pred_q >= l_pred_{q-1} per (i, m) sequentially,
-    # then sum. Non-Ordinal or single-q case: just sum the pre-built temp values.
-    l_pred_db_hat_Temp_adj <- if (family == "Ordinal" && n.Q >= 2) {
-      Reduce(
-        function(prev_adj, q) {
-          lapply(1:n, function(i) {
-            lapply(1:Mopt[q], function(m) {
-              lp <- l_pred_db_hat_Temp[[q]][[i]][[m]]
-              ifelse(lp < prev_adj[[i]][[m]], prev_adj[[i]][[m]], lp)
-            })
+    # For Ordinal: enforce l_pred_q >= l_pred_{q-1} per (i, m) sequentially
+    # in-place, then sum. Non-Ordinal or single-q case: just sum as-is.
+    if (family == "Ordinal" && n.Q >= 2) {
+      for (q in 2:n.Q) {
+        for (i in seq_len(n)) {
+          l_pred_db_hat_Temp[[q]][[i]] <- lapply(seq_len(Mopt[q]), function(m) {
+            lp <- l_pred_db_hat_Temp[[q]][[i]][[m]]
+            ifelse(lp < l_pred_db_hat_Temp[[q - 1]][[i]][[m]],
+                   l_pred_db_hat_Temp[[q - 1]][[i]][[m]], lp)
           })
-        },
-        seq_len(n.Q)[-1],
-        init       = l_pred_db_hat_Temp[[1]],
-        accumulate = TRUE
-      )
-    } else {
-      l_pred_db_hat_Temp
+        }
+      }
     }
-    l_pred_db_hat <- lapply(1:n.Q, function(q) {
-      lapply(1:n, function(i) {
-        Reduce("+", l_pred_db_hat_Temp_adj[[q]][[i]])
+    l_pred_db_hat <- lapply(seq_len(n.Q), function(q) {
+      lapply(seq_len(n), function(i) {
+        Reduce("+", l_pred_db_hat_Temp[[q]][[i]])
       })
     })
     #if(FALSE){

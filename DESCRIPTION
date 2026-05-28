@@ -41,8 +41,6 @@ Suggests:
     quarto,
     ggplot2,
     ggRandomForests,
-    hvtiPlotR,
-    hvtiRutilities,
     mlbench
 Config/testthat/edition: 3
 VignetteBuilder: quarto
