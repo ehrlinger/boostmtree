@@ -82,9 +82,11 @@ dta <- simLong(n = 20, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 #basic boosting call
 boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
               family = "Continuous", M = 20,cv.flag = TRUE)
-#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
@@ -93,164 +95,6 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |=======                                                               |  10%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |==========                                                            |  15%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |==============                                                        |  20%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |==================                                                    |  25%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |============================                                          |  40%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |================================                                      |  45%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |===================================                                   |  50%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |======================================                                |  55%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |==========================================                            |  60%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |==============================================                        |  65%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |=================================================                     |  70%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |====================================================                  |  75%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |===============================================================       |  90%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |==================================================================    |  95%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |======================================================================| 100%
 vimp.grow <- vimp.boostmtree(object = boost.grow,x.names=c("x1","x2"),joint = FALSE)
 vimp.joint.grow <- vimp.boostmtree(object = boost.grow,x.names=c("x1","x2"),joint = TRUE)
 
@@ -273,22 +117,30 @@ boost.grow <- boostmtree(dtaL$features[trn,], dtaL$time[trn], dtaL$id[trn], dtaL
               family = "Continuous", M = 20)
 #>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |=======                                                               |  10%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%
+#>   |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |==================                                                    |  25%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |==========================================                            |  60%
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #>   |                                                                              |==============================================                        |  65%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#>   |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%
+#>   |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#>   |                                                                              |===============================================================       |  90%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #>   |                                                                              |==================================================================    |  95%
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
-#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #>   |                                                                              |======================================================================| 100%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 boost.pred <- predict(boost.grow,dtaL$features[-trn,], dtaL$time[-trn], dtaL$id[-trn],
               dtaL$y[-trn])
 vimp.pred <- vimp.boostmtree(object = boost.pred,x.names=c("x1","x2"),joint = FALSE)

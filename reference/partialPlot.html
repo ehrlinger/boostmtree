@@ -201,26 +201,26 @@ machine, <em>Ann. of Statist.</em>, 5:1189-1232, 2001.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#basic boosting call</span></span></span>
 <span class="r-in"><span><span class="va">boost.grow</span> <span class="op">&lt;-</span> <span class="fu"><a href="boostmtree.html">boostmtree</a></span><span class="op">(</span><span class="va">dta</span><span class="op">$</span><span class="va">features</span>, <span class="va">dta</span><span class="op">$</span><span class="va">time</span>, <span class="va">dta</span><span class="op">$</span><span class="va">id</span>, <span class="va">dta</span><span class="op">$</span><span class="va">y</span>,family <span class="op">=</span> <span class="st">"Continuous"</span>,M <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#plot results</span></span></span>
 <span class="r-in"><span><span class="co">#x1 has a linear main effect</span></span></span>
 <span class="r-in"><span><span class="co">#x2 is quadratic with quadratic time trend</span></span></span>
 <span class="r-in"><span><span class="va">pp.obj</span> <span class="op">&lt;-</span> <span class="fu">partialPlot</span><span class="op">(</span>object <span class="op">=</span> <span class="va">boost.grow</span>, xvar.names <span class="op">=</span> <span class="st">"x1"</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpAxyv8H/PartialPlot.pdf</span>
 <span class="r-in"><span><span class="va">pp.obj</span> <span class="op">&lt;-</span> <span class="fu">partialPlot</span><span class="op">(</span>object <span class="op">=</span> <span class="va">boost.grow</span>, xvar.names <span class="op">=</span> <span class="st">"x2"</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpAxyv8H/PartialPlot.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#partial plot using "x2" as the conditional variable</span></span></span>
 <span class="r-in"><span><span class="va">pp.obj</span> <span class="op">&lt;-</span> <span class="fu">partialPlot</span><span class="op">(</span>object <span class="op">=</span> <span class="va">boost.grow</span>, xvar.names <span class="op">=</span> <span class="st">"x1"</span>,</span></span>
 <span class="r-in"><span>                      conditional.xvar <span class="op">=</span> <span class="st">"x2"</span>, conditional.values <span class="op">=</span> <span class="fl">1</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpAxyv8H/PartialPlot.pdf</span>
 <span class="r-in"><span><span class="va">pp.obj</span> <span class="op">&lt;-</span> <span class="fu">partialPlot</span><span class="op">(</span>object <span class="op">=</span> <span class="va">boost.grow</span>, xvar.names <span class="op">=</span> <span class="st">"x1"</span>,</span></span>
 <span class="r-in"><span>                      conditional.xvar <span class="op">=</span> <span class="st">"x2"</span>, conditional.values <span class="op">=</span> <span class="fl">2</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpAxyv8H/PartialPlot.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">##------------------------------------------------------------</span></span></span>
 <span class="r-in"><span><span class="co">## Synthetic example (Response is binary)</span></span></span>
@@ -231,54 +231,44 @@ machine, <em>Ann. of Statist.</em>, 5:1189-1232, 2001.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#basic boosting call</span></span></span>
 <span class="r-in"><span><span class="va">boost.grow</span> <span class="op">&lt;-</span> <span class="fu"><a href="boostmtree.html">boostmtree</a></span><span class="op">(</span><span class="va">dta</span><span class="op">$</span><span class="va">features</span>, <span class="va">dta</span><span class="op">$</span><span class="va">time</span>, <span class="va">dta</span><span class="op">$</span><span class="va">id</span>, <span class="va">dta</span><span class="op">$</span><span class="va">y</span>,family <span class="op">=</span> <span class="st">"Binary"</span>,M <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================                                                    |  25%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========================================                            |  60%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============================================                        |  65%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============================================================       |  90%</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#plot results</span></span></span>
 <span class="r-in"><span><span class="co">#x1 has a linear main effect</span></span></span>
 <span class="r-in"><span><span class="co">#x2 is quadratic with quadratic time trend</span></span></span>
 <span class="r-in"><span><span class="va">pp.obj</span> <span class="op">&lt;-</span> <span class="fu">partialPlot</span><span class="op">(</span>object <span class="op">=</span> <span class="va">boost.grow</span>, xvar.names <span class="op">=</span> <span class="st">"x1"</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpAxyv8H/PartialPlot.pdf</span>
 <span class="r-in"><span><span class="va">pp.obj</span> <span class="op">&lt;-</span> <span class="fu">partialPlot</span><span class="op">(</span>object <span class="op">=</span> <span class="va">boost.grow</span>, xvar.names <span class="op">=</span> <span class="st">"x2"</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpkT6Fbi/PartialPlot.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpAxyv8H/PartialPlot.pdf</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co">##----------------------------------------------------------------------------</span></span></span>
 <span class="r-in"><span><span class="co">## spirometry data</span></span></span>
 <span class="r-in"><span><span class="co">##----------------------------------------------------------------------------</span></span></span>
@@ -287,14 +277,500 @@ machine, <em>Ann. of Statist.</em>, 5:1189-1232, 2001.</p>
 <span class="r-in"><span><span class="co">#boosting call: cubic B-splines with 15 knots</span></span></span>
 <span class="r-in"><span><span class="va">spr.obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="boostmtree.html">boostmtree</a></span><span class="op">(</span><span class="va">spirometry</span><span class="op">$</span><span class="va">features</span>, <span class="va">spirometry</span><span class="op">$</span><span class="va">time</span>, <span class="va">spirometry</span><span class="op">$</span><span class="va">id</span>, <span class="va">spirometry</span><span class="op">$</span><span class="va">y</span>,</span></span>
 <span class="r-in"><span>            family <span class="op">=</span> <span class="st">"Continuous"</span>,M <span class="op">=</span> <span class="fl">300</span>, nu <span class="op">=</span> <span class="fl">.025</span>, nknots <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   1%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=                                                                     |   1%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=                                                                     |   2%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==                                                                    |   2%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==                                                                    |   3%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===                                                                   |   4%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===                                                                   |   5%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====                                                                  |   5%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====                                                                  |   6%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====                                                                 |   7%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====                                                                 |   8%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======                                                                |   8%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======                                                                |   9%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======                                                               |   9%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======                                                               |  10%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======                                                               |  11%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========                                                              |  11%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========                                                              |  12%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========                                                             |  12%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========                                                             |  13%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========                                                            |  14%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========                                                            |  15%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===========                                                           |  15%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===========                                                           |  16%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============                                                          |  17%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============                                                          |  18%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=============                                                         |  18%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=============                                                         |  19%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============                                                        |  19%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============                                                        |  20%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============                                                        |  21%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============                                                       |  21%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============                                                       |  22%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |================                                                      |  22%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |================                                                      |  23%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================                                                     |  24%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================                                                     |  25%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================                                                    |  25%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================                                                    |  26%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================                                                   |  27%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================                                                   |  28%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================                                                  |  28%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================                                                  |  29%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====================                                                 |  29%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====================                                                 |  30%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====================                                                 |  31%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================                                                |  31%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================                                                |  32%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======================                                               |  32%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======================                                               |  33%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================                                              |  34%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================                                              |  35%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========================                                             |  35%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========================                                             |  36%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========================                                            |  37%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========================                                            |  38%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===========================                                           |  38%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===========================                                           |  39%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============================                                          |  39%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============================                                          |  40%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============================                                          |  41%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=============================                                         |  41%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=============================                                         |  42%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============================                                        |  42%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============================                                        |  43%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============================                                       |  44%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============================                                       |  45%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |================================                                      |  45%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |================================                                      |  46%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================                                     |  47%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================                                     |  48%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================================                                    |  48%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================================                                    |  49%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================                                   |  49%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================                                   |  50%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================                                   |  51%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================================                                  |  51%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================================                                  |  52%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====================================                                 |  52%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====================================                                 |  53%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================                                |  54%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================                                |  55%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======================================                               |  55%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======================================                               |  56%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================================                              |  57%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================================                              |  58%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========================================                             |  58%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========================================                             |  59%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========================================                            |  59%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========================================                            |  60%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========================================                            |  61%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===========================================                           |  61%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===========================================                           |  62%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============================================                          |  62%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============================================                          |  63%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=============================================                         |  64%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=============================================                         |  65%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============================================                        |  65%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============================================                        |  66%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============================================                       |  67%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============================================                       |  68%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |================================================                      |  68%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |================================================                      |  69%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================================                     |  69%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================================                     |  70%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================================                     |  71%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================================================                    |  71%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================================================                    |  72%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================================                   |  72%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================================                   |  73%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================================================                  |  74%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================================================                  |  75%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====================================================                 |  75%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=====================================================                 |  76%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================                |  77%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================                |  78%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======================================================               |  78%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=======================================================               |  79%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================================================              |  79%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================================================              |  80%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |========================================================              |  81%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========================================================             |  81%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=========================================================             |  82%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========================================================            |  82%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==========================================================            |  83%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===========================================================           |  84%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===========================================================           |  85%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============================================================          |  85%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |============================================================          |  86%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=============================================================         |  87%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=============================================================         |  88%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============================================================        |  88%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==============================================================        |  89%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============================================================       |  89%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============================================================       |  90%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> qr.solve failed (Hessian NR): singular matrix 'a' in solve</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===============================================================       |  91%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |================================================================      |  91%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |================================================================      |  92%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================================================     |  92%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |=================================================================     |  93%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================================================================    |  94%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |==================================================================    |  95%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================================================   |  95%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================================================   |  96%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================================================================  |  97%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |====================================================================  |  98%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================================================== |  98%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |===================================================================== |  99%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================|  99%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |======================================================================| 100%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> gls (full model) failed: computed "gls" fit is singular, rank 25</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#partial plot of double-lung group at 5 years</span></span></span>
 <span class="r-in"><span><span class="va">dltx</span> <span class="op">&lt;-</span> <span class="fu">partialPlot</span><span class="op">(</span>object <span class="op">=</span> <span class="va">spr.obj</span>, xvar.names <span class="op">=</span> <span class="st">"AGE"</span>,</span></span>
 <span class="r-in"><span>                    tm.unq <span class="op">=</span> <span class="fl">5</span>, subset<span class="op">=</span><span class="va">spr.obj</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">DOUBLE</span><span class="op">==</span><span class="fl">1</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpAxyv8H/PartialPlot.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#partial plot of single-lung group at 5 years</span></span></span>
 <span class="r-in"><span><span class="va">sltx</span> <span class="op">&lt;-</span> <span class="fu">partialPlot</span><span class="op">(</span>object <span class="op">=</span> <span class="va">spr.obj</span>, xvar.names <span class="op">=</span> <span class="st">"AGE"</span>,</span></span>
 <span class="r-in"><span>                    tm.unq <span class="op">=</span> <span class="fl">5</span>, subset<span class="op">=</span><span class="va">spr.obj</span><span class="op">$</span><span class="va">x</span><span class="op">$</span><span class="va">DOUBLE</span><span class="op">==</span><span class="fl">0</span>,plot.it <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Plot saved to: /tmp/RtmpAxyv8H/PartialPlot.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">#combine the two plots: we use lowess smoothed values</span></span></span>
 <span class="r-in"><span><span class="va">dltx</span> <span class="op">&lt;-</span> <span class="va">dltx</span><span class="op">$</span><span class="va">l.obj</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
@@ -304,7 +780,8 @@ machine, <em>Ann. of Statist.</em>, 5:1189-1232, 2001.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">dltx</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, <span class="va">dltx</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">sltx</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, <span class="va">sltx</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>, lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DLTx"</span>, <span class="st">"SLTx"</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">1</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-plt img"><img src="partialPlot-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

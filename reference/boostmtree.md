@@ -483,7 +483,7 @@ print(boost.grow)
 
 #plot.results
 plot(boost.grow)
-#> Plot saved to: /tmp/RtmpkT6Fbi/boostmtree_plot.pdf
+#> Plot saved to: /tmp/RtmpAxyv8H/boostmtree_plot.pdf
 
 ##------------------------------------------------------------
 ## synthetic example (Response y is binary)
@@ -559,7 +559,7 @@ print(boost.grow)
 
 #plot.results
 plot(boost.grow)
-#> Plot saved to: /tmp/RtmpkT6Fbi/boostmtree_plot.pdf
+#> Plot saved to: /tmp/RtmpAxyv8H/boostmtree_plot.pdf
 
 # \donttest{
 ##------------------------------------------------------------
@@ -694,7 +694,7 @@ boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 plot(boost.cv.grow)
-#> Plot saved to: /tmp/RtmpkT6Fbi/boostmtree_plot.pdf
+#> Plot saved to: /tmp/RtmpAxyv8H/boostmtree_plot.pdf
 print(boost.cv.grow)
 #> boostmtree summary
 #> model                       : mtree-Pspline learner 
@@ -715,7 +715,7 @@ print(boost.cv.grow)
 #> OOB cv RMSE                 : 0.7375 
 # }
 
-if (FALSE) { # \dontrun{
+# \donttest{
 ##----------------------------------------------------------------------------
 ## spirometry data (Response is continuous)
 ##----------------------------------------------------------------------------
@@ -724,7 +724,223 @@ data(spirometry, package = "boostmtree")
 #boosting call: cubic B-splines with 15 knots
 spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spirometry$y,
                         family = "Continuous",M = 100, nu = .025, nknots = 15)
+#>   |                                                                              |                                                                      |   0%  |                                                                              |=                                                                     |   1%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=                                                                     |   2%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==                                                                    |   3%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===                                                                   |   4%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====                                                                  |   5%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====                                                                  |   6%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=====                                                                 |   7%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |======                                                                |   8%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |======                                                                |   9%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=======                                                               |  10%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |========                                                              |  11%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |========                                                              |  12%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=========                                                             |  13%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==========                                                            |  14%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==========                                                            |  15%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===========                                                           |  16%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |============                                                          |  17%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=============                                                         |  18%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=============                                                         |  19%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==============                                                        |  20%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===============                                                       |  21%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===============                                                       |  22%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |================                                                      |  23%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=================                                                     |  24%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==================                                                    |  25%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==================                                                    |  26%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===================                                                   |  27%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====================                                                  |  28%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====================                                                  |  29%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=====================                                                 |  30%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |======================                                                |  31%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |======================                                                |  32%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=======================                                               |  33%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |========================                                              |  34%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |========================                                              |  35%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=========================                                             |  36%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==========================                                            |  37%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===========================                                           |  38%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===========================                                           |  39%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |============================                                          |  40%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=============================                                         |  41%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=============================                                         |  42%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==============================                                        |  43%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===============================                                       |  44%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |================================                                      |  45%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |================================                                      |  46%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=================================                                     |  47%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==================================                                    |  48%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==================================                                    |  49%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===================================                                   |  50%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====================================                                  |  51%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====================================                                  |  52%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=====================================                                 |  53%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |======================================                                |  54%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |======================================                                |  55%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=======================================                               |  56%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |========================================                              |  57%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=========================================                             |  58%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=========================================                             |  59%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==========================================                            |  60%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===========================================                           |  61%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===========================================                           |  62%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |============================================                          |  63%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=============================================                         |  64%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==============================================                        |  65%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==============================================                        |  66%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===============================================                       |  67%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |================================================                      |  68%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |================================================                      |  69%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=================================================                     |  70%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==================================================                    |  71%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==================================================                    |  72%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===================================================                   |  73%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====================================================                  |  74%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====================================================                  |  75%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=====================================================                 |  76%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |======================================================                |  77%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=======================================================               |  78%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=======================================================               |  79%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |========================================================              |  80%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=========================================================             |  81%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=========================================================             |  82%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==========================================================            |  83%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===========================================================           |  84%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |============================================================          |  85%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |============================================================          |  86%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=============================================================         |  87%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==============================================================        |  88%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==============================================================        |  89%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===============================================================       |  90%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |================================================================      |  91%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |================================================================      |  92%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |=================================================================     |  93%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==================================================================    |  94%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |==================================================================    |  95%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===================================================================   |  96%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |====================================================================  |  97%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===================================================================== |  98%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |===================================================================== |  99%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
+#>   |                                                                              |======================================================================| 100%
+#> gls (full model) failed: computed "gls" fit is singular, rank 25
 plot(spr.obj)
+#> Plot saved to: /tmp/RtmpAxyv8H/boostmtree_plot.pdf
 
 
 ##----------------------------------------------------------------------------
@@ -735,7 +951,247 @@ data(AF, package = "boostmtree")
 #boosting call: cubic B-splines with 15 knots
 AF.obj <- boostmtree(AF$feature, AF$time, AF$id, AF$y,
                         family = "Binary",M = 100, nu = .025, nknots = 15)
+#>   |                                                                              |                                                                      |   0%  |                                                                              |=                                                                     |   1%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=                                                                     |   2%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==                                                                    |   3%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===                                                                   |   4%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====                                                                  |   5%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====                                                                  |   6%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=====                                                                 |   7%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |======                                                                |   8%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |======                                                                |   9%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=======                                                               |  10%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |========                                                              |  11%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |========                                                              |  12%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=========                                                             |  13%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==========                                                            |  14%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==========                                                            |  15%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===========                                                           |  16%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |============                                                          |  17%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=============                                                         |  18%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=============                                                         |  19%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==============                                                        |  20%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===============                                                       |  21%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===============                                                       |  22%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |================                                                      |  23%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=================                                                     |  24%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==================                                                    |  25%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==================                                                    |  26%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===================                                                   |  27%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====================                                                  |  28%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====================                                                  |  29%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=====================                                                 |  30%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |======================                                                |  31%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |======================                                                |  32%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=======================                                               |  33%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |========================                                              |  34%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |========================                                              |  35%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=========================                                             |  36%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==========================                                            |  37%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===========================                                           |  38%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===========================                                           |  39%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |============================                                          |  40%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=============================                                         |  41%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=============================                                         |  42%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==============================                                        |  43%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===============================                                       |  44%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |================================                                      |  45%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |================================                                      |  46%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=================================                                     |  47%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==================================                                    |  48%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==================================                                    |  49%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===================================                                   |  50%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====================================                                  |  51%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====================================                                  |  52%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=====================================                                 |  53%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |======================================                                |  54%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |======================================                                |  55%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=======================================                               |  56%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |========================================                              |  57%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=========================================                             |  58%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=========================================                             |  59%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==========================================                            |  60%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===========================================                           |  61%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===========================================                           |  62%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |============================================                          |  63%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=============================================                         |  64%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==============================================                        |  65%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==============================================                        |  66%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===============================================                       |  67%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |================================================                      |  68%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |================================================                      |  69%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=================================================                     |  70%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==================================================                    |  71%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==================================================                    |  72%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===================================================                   |  73%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====================================================                  |  74%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====================================================                  |  75%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=====================================================                 |  76%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |======================================================                |  77%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=======================================================               |  78%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=======================================================               |  79%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |========================================================              |  80%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=========================================================             |  81%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=========================================================             |  82%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==========================================================            |  83%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===========================================================           |  84%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |============================================================          |  85%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |============================================================          |  86%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=============================================================         |  87%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==============================================================        |  88%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==============================================================        |  89%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===============================================================       |  90%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |================================================================      |  91%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |================================================================      |  92%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |=================================================================     |  93%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==================================================================    |  94%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |==================================================================    |  95%
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> qr.solve failed (Hessian NR): singular matrix 'a' in solve
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===================================================================   |  96%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |====================================================================  |  97%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===================================================================== |  98%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |===================================================================== |  99%
+#> gls (full model) failed: missing values in object
+#>   |                                                                              |======================================================================| 100%
+#> gls (full model) failed: missing values in object
 plot(AF.obj)
+#> Plot saved to: /tmp/RtmpAxyv8H/boostmtree_plot.pdf
 
 
 ##----------------------------------------------------------------------------
@@ -761,6 +1217,32 @@ if (library("mlbench", logical.return = TRUE)) {
   print(o.cv)
   plot(o.cv)
 }
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
+#> boostmtree summary
+#> model                       : tree learner 
+#> fitting mode                : grow 
+#> Family                      : Continuous 
+#> number of K-terminal nodes  : 5 
+#> regularization parameter    : 0.05 
+#> sample size                 : 337 
+#> number of variables         : 13 
+#> univariate family           : TRUE 
+#> boosting iterations         : 20 
+#> Plot saved to: /tmp/RtmpAxyv8H/boostmtree_plot.pdf
+#>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
+#> boostmtree summary
+#> model                       : tree learner 
+#> fitting mode                : grow 
+#> Family                      : Continuous 
+#> number of K-terminal nodes  : 5 
+#> regularization parameter    : 0.05 
+#> sample size                 : 506 
+#> number of variables         : 13 
+#> univariate family           : TRUE 
+#> boosting iterations         : 20 
+#> optimized number iterations : 20 
+#> OOB cv RMSE                 : 0.8209 
+#> Plot saved to: /tmp/RtmpAxyv8H/boostmtree_plot.pdf
 
-} # }
+# }
 ```
