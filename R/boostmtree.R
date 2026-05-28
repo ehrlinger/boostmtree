@@ -500,27 +500,17 @@ boostmtree <- function(x,
     stop("missing values encountered in y, id, or tm: remove observations with missing values")
   }
   x <- as.data.frame(x)
-  X <- do.call(rbind, lapply(1:n, function(i) {
-    x[id == id.unq[i], , drop = FALSE][1, , drop = FALSE]
-  }))
-  x <- do.call(rbind, lapply(1:n, function(i) {
-    x[id == id.unq[i], , drop = FALSE]
-  }))
-  #-----------------------------------------------------------------------------
-  # Date: 06/04/2020
-  # Following comment added while editing for the nominal/ordinal response
-  # Added the below three lines so that id, tm and y are consistent with x (as
-  # described on the line above)
-  #-----------------------------------------------------------------------------
-  id <- unlist(lapply(1:n, function(i) {
-    id[id == id.unq[i]]
-  }))
-  tm <- unlist(lapply(1:n, function(i) {
-    tm[id == id.unq[i]]
-  }))
-  y <- unlist(lapply(1:n, function(i) {
-    y[id == id.unq[i]]
-  }))
+  # Group all observations by subject (in id.unq order) while preserving the
+  # original within-subject row order. A single stable reindex replaces the
+  # former per-subject lapply scans (which were O(n^2) in the number of
+  # subjects). X is the subject-level design matrix (first row per subject);
+  # id/tm/y are kept consistent with the regrouped x.
+  reorder.idx <- order(match(id, id.unq), seq_along(id))
+  x  <- x[reorder.idx, , drop = FALSE]
+  id <- id[reorder.idx]
+  tm <- tm[reorder.idx]
+  y  <- y[reorder.idx]
+  X  <- x[!duplicated(id), , drop = FALSE]
   if (any(is.na(X))) {
     RemoveMiss.Obj <- RemoveMiss.Fun(X)
     X <- RemoveMiss.Obj$X
@@ -539,18 +529,13 @@ boostmtree <- function(x,
       id.remove <- id.unq[id_na]
       id.unq <- setdiff(id.unq, id.remove)
       n <- length(id.unq)
-      tm <- unlist(lapply(1:n, function(i) {
-        tm[id == id.unq[i]]
-      }))
-      y <- unlist(lapply(1:n, function(i) {
-        y[id == id.unq[i]]
-      }))
-      x <- do.call(rbind, lapply(1:n, function(i) {
-        x[id == id.unq[i], , drop = FALSE]
-      }))
-      id <- unlist(lapply(1:n, function(i) {
-        id[id == id.unq[i]]
-      }))
+      # Data is already grouped by id.unq order, so dropping whole subjects is
+      # a simple order-preserving filter.
+      keep <- id %in% id.unq
+      x  <- x[keep, , drop = FALSE]
+      id <- id[keep]
+      tm <- tm[keep]
+      y  <- y[keep]
     }
   }
   p <- ncol(X)
