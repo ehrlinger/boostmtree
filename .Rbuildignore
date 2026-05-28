@@ -13,4 +13,6 @@
 ^vignettes/.*_cache$
 ^vignettes/_freeze$
 ^vignettes/_quarto\.yml$
+^inst/extdata/fit_af\.rds$
+^inst/extdata/fit_spi\.rds$
 ^inst/dev$

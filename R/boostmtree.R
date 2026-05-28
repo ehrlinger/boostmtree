@@ -314,7 +314,7 @@
 #' print(boost.cv.grow)
 #' }
 #'
-#' \dontrun{
+#' \donttest{
 #' ##----------------------------------------------------------------------------
 #' ## spirometry data (Response is continuous)
 #' ##----------------------------------------------------------------------------
@@ -1148,7 +1148,7 @@ boostmtree <- function(x,
         #-----------------------------------------------------------------------
         if (cv.flag) {
           oob <- which(rfsrc.obj$inbag == 0)
-          l_pred_db.i[[q]] <- lapply(1:n, function(i) {
+          raw_list <- lapply(1:n, function(i) {
             if (any(i == oob)) {
               mem.i <- membership[i]
               l_pred.ij <- l_pred_db.i[[q]][[i]]
@@ -1205,17 +1205,18 @@ boostmtree <- function(x,
               gamma.matx.i[, 2:(df.D + 1)] <- matrix(unlist(gamma.i),
                                                      ncol = df.D,
                                                      byrow = TRUE)
-              gamma.i.list[[q]][[m]][[i]] <<- gamma.matx.i
               l_pred_db.ij_Temp <- lapply(1:n, function(j) {
                 which.j <- which(gamma.matx.i[, 1] == membership.org[j])
                 l_pred_db.ij_Temp <- l_pred.ij[[j]] +
                   c(D[[j]] %*% (gamma.matx.i[which.j, -1] * nu.vec))
               })
+              list(l_pred = l_pred_db.ij_Temp, gamma = gamma.matx.i)
             } else {
-              l_pred_db.ij_Temp <- l_pred_db.i[[q]][[i]]
+              list(l_pred = l_pred_db.i[[q]][[i]], gamma = NULL)
             }
-            l_pred_db.ij_Temp
           })
+          l_pred_db.i[[q]]       <- lapply(raw_list, `[[`, "l_pred")
+          gamma.i.list[[q]][[m]] <- lapply(raw_list, `[[`, "gamma")
           if (family == "Ordinal" && q > 1) {
             for (i in 1:n) {
               for (j in 1:n) {
@@ -1391,22 +1392,21 @@ boostmtree <- function(x,
     }
   }
   if (cv.flag) {
-    nullObj <- lapply(1:n.Q, function(q) {
+    cv.results <- lapply(1:n.Q, function(q) {
       diff.err <- abs(err.rate[[q]][, "l2"] -
                         min(err.rate[[q]][, "l2"], na.rm = TRUE))
       diff.err[is.na(diff.err)] <- 1
       tol <- Ysd * eps
-      if (sum(diff.err < tol) > 0) {
-        Mopt[q] <<- min(which(diff.err < tol))
-      } else {
-        Mopt[q] <<- M
-      }
-      rmse[q] <<- err.rate[[q]][Mopt[q], "l2"]
-      mu[[q]] <<- lapply(1:n, function(i) {
-        mu.cv.list[[q]][[Mopt[q]]][[i]]
-      })
-      NULL
+      mopt.q <- if (sum(diff.err < tol) > 0) min(which(diff.err < tol)) else M
+      list(
+        Mopt = mopt.q,
+        rmse = err.rate[[q]][mopt.q, "l2"],
+        mu   = lapply(1:n, function(i) mu.cv.list[[q]][[mopt.q]][[i]])
+      )
     })
+    Mopt <- sapply(cv.results, `[[`, "Mopt")
+    rmse <- sapply(cv.results, `[[`, "rmse")
+    mu   <- lapply(cv.results, `[[`, "mu")
   } else {
     mu <- lapply(1:n.Q, function(q) {
       lapply(1:n, function(i) {

@@ -20,7 +20,6 @@ Authors@R:
           role = c("aut", "cre"),
           email = "ehrlinj@ccf.org",
           comment = c(ORCID = "0000-0002-5340-5154")))
-Maintainer: John Ehrlinger <ehrlinj@ccf.org>
 Depends: R (>= 4.1.0)
 Imports: randomForestSRC (>= 2.9.0), parallel, splines, nlme
 Description: Implements Friedman's gradient descent boosting algorithm for
@@ -30,7 +29,7 @@ Description: Implements Friedman's gradient descent boosting algorithm for
     (P-splines) with estimated adaptive smoothing parameter. Although the
     package is designed for longitudinal data, it can handle cross-sectional
     data as well. Implementation details are provided in Pande et al. (2017),
-    Mach Learn <DOI:10.1007/s10994-016-5597-1>.
+    Mach Learn <doi:10.1007/s10994-016-5597-1>.
 License: GPL (>= 3)
 URL: https://ehrlinger.github.io/boostmtree/, https://github.com/ehrlinger/boostmtree
 BugReports: https://github.com/ehrlinger/boostmtree/issues
@@ -42,13 +41,7 @@ Suggests:
     quarto,
     ggplot2,
     ggRandomForests,
-    hvtiPlotR,
-    hvtiRutilities,
     mlbench
-Remotes:
-    ehrlinger/ggRandomForests,
-    ehrlinger/hvtiPlotR,
-    ehrlinger/hvtiRutilities
 Config/testthat/edition: 3
 VignetteBuilder: quarto
 Encoding: UTF-8

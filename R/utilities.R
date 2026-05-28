@@ -463,22 +463,39 @@ penBSderiv <- function(d, pen.ord = 2) {
   }
 }
 
-#' Plot Proximity Profile
+#' Plot Proximity Profile for a \code{profile.prx} Object
 #'
-#' Plot the mean longitudinal profile for a randomly selected subject and its
-#' proximity-matched neighbours.
+#' S3 method for plotting proximity-weighted mean profiles from a
+#' \code{boostmtree} prediction object computed with \code{proximity = TRUE}.
+#' A randomly selected (or user-specified) subject is used as the reference
+#' case.  Subjects whose proximity score to the reference case exceeds the
+#' \code{cut} quantile are treated as neighbours; their smoothed fitted
+#' trajectories (dashed lines) and a proximity-weighted average trajectory
+#' (solid black line) are overlaid on the reference subject's smoothed
+#' trajectory (solid blue line).
 #'
-#' @param x An object of class \code{profile.prx} returned by
-#'   \code{\link{predict.boostmtree}} when \code{proximity = TRUE}.
-#' @param col Optional colour vector for matched subjects.
-#' @param rnd.case Index of the focal subject.  If \code{NULL} (default), one
-#'   subject is chosen at random.
-#' @param cut Quantile threshold (default \code{0.95}) used to select
-#'   high-proximity neighbours.
-#' @param restrictX Logical; if \code{TRUE} (default) the x-axis is restricted
-#'   to the time range of the focal subject.
-#' @param ... Further arguments passed to or from other methods.
-#' @return No return value, called for side effects.
+#' @param x An object of class \code{profile.prx} — a
+#'   \code{boostmtree} predict object that contains a \code{proximity}
+#'   matrix (i.e., produced with \code{proximity = TRUE}).
+#' @param col Optional colour vector.  Must be indexed by \emph{original
+#'   subject index} — colours are looked up as \code{col[i]} where
+#'   \code{i} is the subject's row number in the proximity matrix.  A
+#'   safe choice is a vector of length \code{nrow(x$proximity)}.
+#'   Defaults to \code{1} (black) for every matched neighbour.
+#' @param rnd.case Integer index of the reference subject.  If \code{NULL}
+#'   (default) a subject is chosen at random.
+#' @param cut Quantile threshold (0–1) for defining neighbours based on
+#'   proximity score.  Defaults to \code{0.95}.
+#' @param restrictX Logical.  If \code{TRUE} (default) the x-axis is
+#'   restricted to the observation times of the reference subject.
+#' @param \dots Additional arguments passed to \code{plot()} (currently
+#'   unused).
+#'
+#' @return Invisibly returns the covariate matrix rows corresponding to the
+#'   matched neighbours.
+#'
+#' @seealso \code{\link{predict.boostmtree}}
+#'
 #' @exportS3Method plot profile.prx
 plot.profile.prx <- function(x,
                              col = NULL,
@@ -635,14 +652,9 @@ papply <- function(X,
   if (lth.which.null > 0) {
     result.lapply <- lapply(which.null, FUN, ...)
   }
-  count <- 0
-  result <- lapply(X, function(i) {
-    if (any(i == which.null)) {
-      count <<- count + 1
-      result.lapply[[count]]
-    } else{
-      result.mclapply[[i]]
-    }
-  })
+  result <- result.mclapply
+  if (lth.which.null > 0) { # nocov start
+    result[which.null] <- result.lapply
+  } # nocov end
   return(result)
 }

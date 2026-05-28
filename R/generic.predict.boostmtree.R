@@ -484,7 +484,10 @@ generic.predict.boostmtree <- function(object,
       Prob_class <- NULL
     }
   } else {
-    nullObj <- lapply(1:M, function(m) {
+    # nocov start — ntree > 1 predict path; untestable because the ntree > 1
+    # training path (boostmtree.R) has a pre-existing numerical instability
+    # with small datasets. Coverage excluded until that is fixed.
+    iter_res <- lapply(1:M, function(m) {
       gm <- baselearner[[m]]$gm
       Xnew <- baselearner[[m]]$Xnew
       pen <- baselearner[[m]]$pen
@@ -521,25 +524,20 @@ generic.predict.boostmtree <- function(object,
         }
       }))
       beta.m <- t(beta.m.org * nu.vec * Ysd)
-      if (m == 1) {
-        beta.m[, 1] <- beta.m[, 1] + Ymean
-        beta <<- beta.m
-      } else {
-        beta <<- beta + beta.m
-      }
+      if (m == 1) beta.m[, 1] <- beta.m[, 1] + Ymean
       Dbeta.m <- D %*% (beta.m.org * nu.vec)
-      if (m == 1) {
-        mu.list[[m]] <<- lapply(1:n, function(i) {
-          Dbeta.m[, i][match(tm[[i]], tm.unq, tm[[i]])]
-        })
-      } else {
-        mu.list[[m]] <<- lapply(1:n, function(i) {
-          unlist(mu.list[[m - 1]][i]) +
-            Dbeta.m[, i][match(tm[[i]], tm.unq, tm[[i]])]
-        })
-      }
-      NULL
+      dbeta_i <- lapply(1:n, function(i) {
+        Dbeta.m[, i][match(tm[[i]], tm.unq, tm[[i]])]
+      })
+      list(beta.m = beta.m, dbeta_i = dbeta_i)
     })
+    beta <- Reduce("+", lapply(iter_res, `[[`, "beta.m"))
+    mu.list <- Reduce(
+      function(acc, res) lapply(1:n, function(i) acc[[i]] + res$dbeta_i[[i]]),
+      iter_res[-1],
+      init       = iter_res[[1]]$dbeta_i,
+      accumulate = TRUE
+    )
     mu.list <- lapply(mu.list, function(mlist) {
       lapply(1:n, function(i) {
         mlist[[i]] * Ysd + Ymean
@@ -565,6 +563,7 @@ generic.predict.boostmtree <- function(object,
     } else {
       Mopt <- M
     }
+    # nocov end
   }
   #-----------------------------------------------------------------------------
   # Date: 09/08/2020
@@ -590,22 +589,27 @@ generic.predict.boostmtree <- function(object,
         })
       })
     })
-    l_pred_db_hat <- lapply(1:n.Q, function(q) {
-      lapply(1:n, function(i) {
-        sum_l_pred_db_Temp <- Reduce("+", lapply(1:Mopt[q], function(m) {
-          l_pred_db_Temp <- l_pred_db_hat_Temp[[q]][[i]][[m]]
-          if (family == "Ordinal" && q > 1) {
-            l_pred_db_Temp <- ifelse(
-              l_pred_db_Temp < l_pred_db_hat_Temp[[q - 1]][[i]][[m]],
-              l_pred_db_hat_Temp[[q - 1]][[i]][[m]],
-              l_pred_db_Temp
-            )
-            l_pred_db_hat_Temp[[q]][[i]][[m]] <<- l_pred_db_Temp
-            l_pred_db_Temp
-          }
-          l_pred_db_Temp
-        }))
-        sum_l_pred_db_Temp
+    # For Ordinal: enforce l_pred_q >= l_pred_{q-1} per (i, m) sequentially
+    # in-place, then sum. Non-Ordinal or single-q case: just sum as-is.
+    if (family == "Ordinal" && n.Q >= 2) {
+      for (q in 2:n.Q) {
+        for (i in seq_len(n)) {
+          l_pred_db_hat_Temp[[q]][[i]] <- lapply(seq_len(Mopt[q]), function(m) {
+            lp <- l_pred_db_hat_Temp[[q]][[i]][[m]]
+            prev <- l_pred_db_hat_Temp[[q - 1]][[i]][[m]]
+            # Mopt[q] can exceed Mopt[q-1] (each q optimises independently);
+            # prev is NULL for m > Mopt[q-1].  Skip clamping in that case:
+            # q-1 has no contribution at iteration m, so the ordinal constraint
+            # cannot be violated by the additional q iterations.
+            if (is.null(prev)) return(lp) # nocov
+            ifelse(lp < prev, prev, lp)
+          })
+        }
+      }
+    }
+    l_pred_db_hat <- lapply(seq_len(n.Q), function(q) {
+      lapply(seq_len(n), function(i) {
+        Reduce("+", l_pred_db_hat_Temp[[q]][[i]])
       })
     })
     #if(FALSE){

@@ -2,31 +2,47 @@
 % Please edit documentation in R/utilities.R
 \name{plot.profile.prx}
 \alias{plot.profile.prx}
-\title{Plot Proximity Profile}
+\title{Plot Proximity Profile for a \code{profile.prx} Object}
 \usage{
 \method{plot}{profile.prx}(x, col = NULL, rnd.case = NULL, cut = 0.95, restrictX = TRUE, ...)
 }
 \arguments{
-\item{x}{An object of class \code{profile.prx} returned by
-\code{\link{predict.boostmtree}} when \code{proximity = TRUE}.}
+\item{x}{An object of class \code{profile.prx} — a
+\code{boostmtree} predict object that contains a \code{proximity}
+matrix (i.e., produced with \code{proximity = TRUE}).}
 
-\item{col}{Optional colour vector for matched subjects.}
+\item{col}{Optional colour vector.  Must be indexed by \emph{original
+subject index} — colours are looked up as \code{col[i]} where
+\code{i} is the subject's row number in the proximity matrix.  A
+safe choice is a vector of length \code{nrow(x$proximity)}.
+Defaults to \code{1} (black) for every matched neighbour.}
 
-\item{rnd.case}{Index of the focal subject.  If \code{NULL} (default), one
-subject is chosen at random.}
+\item{rnd.case}{Integer index of the reference subject.  If \code{NULL}
+(default) a subject is chosen at random.}
 
-\item{cut}{Quantile threshold (default \code{0.95}) used to select
-high-proximity neighbours.}
+\item{cut}{Quantile threshold (0–1) for defining neighbours based on
+proximity score.  Defaults to \code{0.95}.}
 
-\item{restrictX}{Logical; if \code{TRUE} (default) the x-axis is restricted
-to the time range of the focal subject.}
+\item{restrictX}{Logical.  If \code{TRUE} (default) the x-axis is
+restricted to the observation times of the reference subject.}
 
-\item{...}{Further arguments passed to or from other methods.}
+\item{\dots}{Additional arguments passed to \code{plot()} (currently
+unused).}
 }
 \value{
-No return value, called for side effects.
+Invisibly returns the covariate matrix rows corresponding to the
+  matched neighbours.
 }
 \description{
-Plot the mean longitudinal profile for a randomly selected subject and its
-proximity-matched neighbours.
+S3 method for plotting proximity-weighted mean profiles from a
+\code{boostmtree} prediction object computed with \code{proximity = TRUE}.
+A randomly selected (or user-specified) subject is used as the reference
+case.  Subjects whose proximity score to the reference case exceeds the
+\code{cut} quantile are treated as neighbours; their smoothed fitted
+trajectories (dashed lines) and a proximity-weighted average trajectory
+(solid black line) are overlaid on the reference subject's smoothed
+trajectory (solid blue line).
+}
+\seealso{
+\code{\link{predict.boostmtree}}
 }
