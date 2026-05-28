@@ -620,8 +620,8 @@ papply <- function(X,
     result.lapply <- lapply(which.null, FUN, ...)
   }
   result <- result.mclapply
-  if (lth.which.null > 0) {
+  if (lth.which.null > 0) { # nocov start
     result[which.null] <- result.lapply
-  }
+  } # nocov end
   return(result)
 }

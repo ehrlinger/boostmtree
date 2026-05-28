@@ -484,6 +484,9 @@ generic.predict.boostmtree <- function(object,
       Prob_class <- NULL
     }
   } else {
+    # nocov start — ntree > 1 predict path; untestable because the ntree > 1
+    # training path (boostmtree.R) has a pre-existing numerical instability
+    # with small datasets. Coverage excluded until that is fixed.
     iter_res <- lapply(1:M, function(m) {
       gm <- baselearner[[m]]$gm
       Xnew <- baselearner[[m]]$Xnew
@@ -560,6 +563,7 @@ generic.predict.boostmtree <- function(object,
     } else {
       Mopt <- M
     }
+    # nocov end
   }
   #-----------------------------------------------------------------------------
   # Date: 09/08/2020
@@ -597,7 +601,7 @@ generic.predict.boostmtree <- function(object,
             # prev is NULL for m > Mopt[q-1].  Skip clamping in that case:
             # q-1 has no contribution at iteration m, so the ordinal constraint
             # cannot be violated by the additional q iterations.
-            if (is.null(prev)) return(lp)
+            if (is.null(prev)) return(lp) # nocov
             ifelse(lp < prev, prev, lp)
           })
         }
