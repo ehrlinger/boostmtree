@@ -463,6 +463,35 @@ penBSderiv <- function(d, pen.ord = 2) {
   }
 }
 
+#' Plot Proximity Profile for a \code{profile.prx} Object
+#'
+#' S3 method for plotting proximity-weighted mean profiles from a
+#' \code{boostmtree} prediction object computed with \code{proximity = TRUE}.
+#' A randomly selected (or user-specified) subject is used as the reference
+#' case.  Subjects whose proximity score to the reference case exceeds the
+#' \code{cut} quantile are treated as neighbours; their smoothed fitted
+#' trajectories (dashed lines) and a proximity-weighted average trajectory
+#' (solid black line) are overlaid on the reference subject's smoothed
+#' trajectory (solid blue line).
+#'
+#' @param x A \code{boostmtree} predict object produced with
+#'   \code{proximity = TRUE}.  Must contain a \code{proximity} matrix.
+#' @param col Optional integer or character vector of colours, one per
+#'   matched neighbour.  Defaults to \code{1} (black) for every neighbour.
+#' @param rnd.case Integer index of the reference subject.  If \code{NULL}
+#'   (default) a subject is chosen at random.
+#' @param cut Quantile threshold (0–1) for defining neighbours based on
+#'   proximity score.  Defaults to \code{0.95}.
+#' @param restrictX Logical.  If \code{TRUE} (default) the x-axis is
+#'   restricted to the observation times of the reference subject.
+#' @param \dots Additional arguments passed to \code{plot()} (currently
+#'   unused).
+#'
+#' @return Invisibly returns the covariate matrix rows corresponding to the
+#'   matched neighbours.
+#'
+#' @seealso \code{\link{predict.boostmtree}}
+#'
 #' @exportS3Method plot profile.prx
 plot.profile.prx <- function(x,
                              col = NULL,
