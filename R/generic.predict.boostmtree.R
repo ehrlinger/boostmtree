@@ -592,8 +592,13 @@ generic.predict.boostmtree <- function(object,
         for (i in seq_len(n)) {
           l_pred_db_hat_Temp[[q]][[i]] <- lapply(seq_len(Mopt[q]), function(m) {
             lp <- l_pred_db_hat_Temp[[q]][[i]][[m]]
-            ifelse(lp < l_pred_db_hat_Temp[[q - 1]][[i]][[m]],
-                   l_pred_db_hat_Temp[[q - 1]][[i]][[m]], lp)
+            prev <- l_pred_db_hat_Temp[[q - 1]][[i]][[m]]
+            # Mopt[q] can exceed Mopt[q-1] (each q optimises independently);
+            # prev is NULL for m > Mopt[q-1].  Skip clamping in that case:
+            # q-1 has no contribution at iteration m, so the ordinal constraint
+            # cannot be violated by the additional q iterations.
+            if (is.null(prev)) return(lp)
+            ifelse(lp < prev, prev, lp)
           })
         }
       }
