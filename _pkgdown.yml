@@ -1,4 +1,5 @@
 url: https://ehrlinger.github.io/boostmtree/
+
 template:
   bootstrap: 5
   bslib:
@@ -8,21 +9,41 @@ template:
   light-switch: true
   theme: atom-one-light
   theme-dark: atom-one-dark
-  
+
 home:
+  title: "boostmtree — Boosted Multivariate Trees for Longitudinal Data"
+  description: >
+    Gradient descent boosting for longitudinal response data using multivariate
+    tree base learners and penalized B-splines for covariate-time interactions.
+    Supports continuous, binary, nominal, and ordinal responses.
   sidebar:
     structure: [badges, links, authors]
     components:
       badges:
-        title: Package badges
+        title: Package Status
         text: |
-          ![](https://img.shields.io/github/r-package/v/ehrlinger/boostmtree)<br>
-          ![](https://img.shields.io/github/actions/workflow/status/ehrlinger/boostmtree/pkgdown.yaml)<br>
-          
+          [![CRAN](https://www.r-pkg.org/badges/version/boostmtree)](https://cran.r-project.org/package=boostmtree)<br>
+          [![R-CMD-check](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml)<br>
+          [![codecov](https://codecov.io/gh/ehrlinger/boostmtree/graph/badge.svg)](https://app.codecov.io/gh/ehrlinger/boostmtree)<br>
+          [![License: GPL (&gt;= 3)](https://img.shields.io/badge/License-GPL%20(%3E%3D%203)-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)<br>
+          [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)<br>
+          ![GitHub version](https://img.shields.io/github/r-package/v/ehrlinger/boostmtree)
+
 navbar:
   structure:
+    left:  [intro, reference, articles, news]
     right: [search, github, my_linkedin, lightswitch]
   components:
+    intro:
+      text: Get Started
+      href: articles/introduction.html
+    articles:
+      text: Articles
+      menu:
+        - text: Introduction to boostmtree
+          href: articles/introduction.html
+        - text: Longitudinal Data Analysis
+          href: articles/longitudinal-analysis.html
     my_linkedin:
       icon: fa-linkedin
       href: https://www.linkedin.com/in/ehrlinger/
@@ -36,3 +57,55 @@ footer:
     developed_by: "John Ehrlinger"
     built_with_pkgdown: "This site was built using [pkgdown](https://pkgdown.r-lib.org/)!&nbsp;&nbsp;<img src='https://pkgdown.r-lib.org/logo.png' alt='pkgdown logo' width='25'>"
 
+reference:
+  - title: "Core Modelling"
+    desc: >
+      Fit and predict boosted multivariate tree models for longitudinal data.
+    contents:
+      - boostmtree
+      - predict.boostmtree
+
+  - title: "Model Inspection"
+    desc: >
+      Print summaries and produce diagnostic plots for fitted models.
+    contents:
+      - print.boostmtree
+      - plot.boostmtree
+
+  - title: "Variable Importance"
+    desc: >
+      Compute and visualise permutation-based variable importance scores.
+    contents:
+      - vimp.boostmtree
+      - vimpPlot
+
+  - title: "Dependence Plots"
+    desc: >
+      Explore covariate effects via marginal and partial dependence plots.
+    contents:
+      - marginalPlot
+      - partialPlot
+
+  - title: "Data Simulation"
+    desc: >
+      Generate synthetic longitudinal datasets for benchmarking and testing.
+    contents:
+      - simLong
+
+  - title: "Datasets"
+    desc: >
+      Real-world longitudinal datasets bundled with the package.
+    contents:
+      - AF
+      - spirometry
+
+  - title: "Package"
+    desc: Package-level documentation and utilities.
+    contents:
+      - boostmtree-package
+      - boostmtree.news
+
+news:
+  releases:
+    - text: "Version 2.0.0"
+      href: https://github.com/ehrlinger/boostmtree/releases/tag/v2.0.0

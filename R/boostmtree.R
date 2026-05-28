@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -73,14 +73,14 @@
 
 
 #' Boosted multivariate trees for longitudinal data
-#' 
+#'
 #' Multivariate extension of Friedman's gradient descent boosting method for
 #' modeling continuous or binary longitudinal response using multivariate tree
 #' base learners (Pande et al., 2017).  Covariate-time interactions are modeled
 #' using penalized B-splines (P-splines) with estimated adaptive smoothing
 #' parameter.
-#' 
-#' 
+#'
+#'
 #' Each individual has observed y-values, over possibly different time points,
 #' with possibly differing number of time points.  Given y, the time points,
 #' and x, the conditional mean time profile of y is estimated using gradient
@@ -95,7 +95,7 @@
 #' effect, although the user can manually set the smoothing parameter as well.
 #' Ancillary parameters \emph{rho} and \emph{phi} are estimated using GLS
 #' (generalized least squares).
-#' 
+#'
 #' In the original boostmtree algorithm (Pande et al., 2017), the
 #' equicorrelation parameter \emph{rho} is used in two places in the algorithm:
 #' (1) for growing trees using the gradient, which depends upon \emph{rho}; and
@@ -107,13 +107,13 @@
 #' \code{rho} in the gradient for (2) is not touched.  The option
 #' \code{mod.grad} specifies whether a modified gradient is used in the tree
 #' growing process and is TRUE by default.
-#' 
+#'
 #' By default, trees are grown from a bootstrap sample of the data -- thus the
 #' boosting method employed here is a modified example of stochastic gradient
 #' descent boosting (Friedman, 2002).  Stochastic descent often improves
 #' performance and has the added advantage that out-of-sample data (out-of-bag,
 #' OOB) can be used to calculate variable importance (VIMP).
-#' 
+#'
 #' The package implements R-side parallel processing by replacing the R
 #' function \command{lapply} with \command{mclapply} found in the
 #' \pkg{parallel} package.  You can set the number of cores accessed by
@@ -122,30 +122,29 @@
 #' placed in the users .Rprofile file for convenience.  You can, alternatively,
 #' initialize the environment variable \command{MC_CORES} in your shell
 #' environment.
-#' 
+#'
 #' As an example, issuing the following options command uses all available
 #' cores for R-side parallel processing:
-#' 
+#'
 #' \command{options(mc.cores=detectCores())}
-#' 
+#'
 #' However, be cautious when setting \command{mc.cores}.  This can create not
 #' only high CPU usage but also high RAM usage, especially when using functions
 #' \command{partialPlot} and \command{predict}.
-#' 
+#'
 #' The method can impute the missing observations in x (covariates) using on
 #' the fly imputation. Details regarding can be found in the
 #' \pkg{randomForestSRC} package. If missing values are present in the
 #' \code{tm}, \code{id} or \code{y}, the user should either impute or delete
 #' these values before executing the function.
-#' 
+#'
 #' Finally note \code{cv.flag} can be used for an in-sample cross-validated
 #' estimate of prediction error.  This is used to determine the optimized
 #' number of boosting iterations \emph{Mopt}.  The final mu predictor is
 #' evaluated at this value and is cross-validated.  The prediction error
 #' returned via \command{err.rate} is standardized by the overall standard
 #' deviation of y.
-#' 
-#' @aliases boostmtree boostmtree
+#'
 #' @param x Data frame (or matrix) containing the x-values.  Rows must be
 #' duplicated to match the number of time points for an individual.  That is,
 #' if individual \emph{i} has \emph{n[i]} outcome y-values, then there must be
@@ -154,15 +153,18 @@
 #' @param id Unique subject identifier, one entry for each row in \code{x}.
 #' @param y Observed y-value, one entry for each row in \code{x}.
 #' @param family Family of the response variable \code{y}. Use any one from
-#' {"Continuous", "Binary","Nominal","Ordinal"} based on the scale of \code{y}.
+#' \code{"Continuous"}, \code{"Binary"}, \code{"Nominal"}, or \code{"Ordinal"}
+#' based on the scale of \code{y}.
 #' @param y_reference Set this value, among the unique \code{y} values when
 #' \code{family} == "Nominal". If NULL, lowest value, among unique \code{y}
 #' values, is used.
-#' @param M Number of boosting iterations
-#' @param nu Boosting regularization parameter.  A value in (0,1].
-#' @param na.action Remove missing values (casewise) or impute it. Default is
-#' to impute the missign values.
+#' @param M Number of boosting iterations. Must be a positive integer.
+#' @param nu Boosting regularization (shrinkage) parameter. Must be positive;
+#' typical values are 0.01–0.1. Smaller values require larger \code{M}.
+#' @param na.action Remove missing values (casewise) or impute them. Default is
+#' to impute the missing values.
 #' @param K Number of terminal nodes used for the multivariate tree learner.
+#' Must be a positive integer; typical values are 3–10.
 #' @param mtry Number of \code{x} variables selected randomly for tree fitting.
 #' Default is use all \code{x} variables.
 #' @param nknots Number of knots used for the B-spline for modeling the time
@@ -192,11 +194,11 @@
 #' Applies only if \command{cv.flag} = TRUE.  For experts only.
 #' @param mod.grad Use a modified gradient? See details below.
 #' @param NR.iter Number of Newton-Raphson iteration. Applied for
-#' \command{family} = {Binary","Nominal","Ordinal"}.
+#' \command{family} = \code{"Binary"}, \code{"Nominal"}, or \code{"Ordinal"}.
 #' @param ... Further arguments passed to or from other methods.
 #' @return An object of class \code{(boostmtree, grow)} with the following
 #' components:
-#' 
+#'
 #' \item{x}{The x-values, but with only one row per individual (i.e. duplicated
 #' rows are removed). Values sorted on \code{id}.} \item{xvar.names}{X-variable
 #' names.} \item{time}{List with each component containing the time points for
@@ -254,108 +256,111 @@
 #' \command{\link{vimpPlot}}
 #' @references Friedman J.H. (2001). Greedy function approximation: a gradient
 #' boosting machine, \emph{Ann. of Statist.}, 5:1189-1232.
-#' 
+#'
 #' Friedman J.H. (2002). Stochastic gradient boosting.  \emph{Comp. Statist.
 #' Data Anal.}, 38(4):367--378.
-#' 
+#'
 #' Pande A., Li L., Rajeswaran J., Ehrlinger J., Kogalur U.B., Blackstone E.H.,
 #' Ishwaran H. (2017).  Boosted multivariate trees for longitudinal data,
 #' \emph{Machine Learning}, 106(2): 277--305.
-#' 
+#'
 #' Pande A. (2017).  \emph{Boosting for longitudinal data}.  Ph.D.
 #' Dissertation, Miller School of Medicine, University of Miami.
 #' @keywords boosting
+#' @export
 #' @examples
-#' 
+#'
 #' ##------------------------------------------------------------
 #' ## synthetic example (Response y is continuous)
 #' ## 0.8 correlation, quadratic time with quadratic interaction
 #' ##-------------------------------------------------------------
 #' #simulate the data (use a small sample size for illustration)
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
-#' 
+#'
 #' #basic boosting call (M set to a small value for illustration)
 #' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 20)
-#' 
+#'
 #' #print results
 #' print(boost.grow)
-#' 
+#'
 #' #plot.results
 #' plot(boost.grow)
-#' 
+#'
 #' ##------------------------------------------------------------
 #' ## synthetic example (Response y is binary)
 #' ## 0.8 correlation, quadratic time with quadratic interaction
 #' ##-------------------------------------------------------------
 #' #simulate the data (use a small sample size for illustration)
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2, family = "Binary")$dtaL
-#' 
+#'
 #' #basic boosting call (M set to a small value for illustration)
 #' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary", M = 20)
-#' 
+#'
 #' #print results
 #' print(boost.grow)
-#' 
+#'
 #' #plot.results
 #' plot(boost.grow)
-#' 
-#' \dontrun{
+#'
+#' \donttest{
 #' ##------------------------------------------------------------
 #' ## Same synthetic example as above with continuous response
 #' ## but with in-sample cross-validation estimate for RMSE
 #' ##-------------------------------------------------------------
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
 #' boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-#'                  family = "Continuous", M = 300, cv.flag = TRUE)
+#'                  family = "Continuous", M = 20, cv.flag = TRUE)
 #' plot(boost.cv.grow)
 #' print(boost.cv.grow)
-#' 
+#' }
+#'
+#' \dontrun{
 #' ##----------------------------------------------------------------------------
 #' ## spirometry data (Response is continuous)
 #' ##----------------------------------------------------------------------------
 #' data(spirometry, package = "boostmtree")
-#' 
+#'
 #' #boosting call: cubic B-splines with 15 knots
 #' spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spirometry$y,
 #'                         family = "Continuous",M = 100, nu = .025, nknots = 15)
 #' plot(spr.obj)
-#' 
-#' 
+#'
+#'
 #' ##----------------------------------------------------------------------------
 #' ## Atrial Fibrillation data (Response is binary)
 #' ##----------------------------------------------------------------------------
 #' data(AF, package = "boostmtree")
-#' 
+#'
 #' #boosting call: cubic B-splines with 15 knots
 #' AF.obj <- boostmtree(AF$feature, AF$time, AF$id, AF$y,
 #'                         family = "Binary",M = 100, nu = .025, nknots = 15)
 #' plot(AF.obj)
-#' 
-#' 
+#'
+#'
 #' ##----------------------------------------------------------------------------
 #' ## sneaky way to use boostmtree for (univariate) regression: boston housing
 #' ##----------------------------------------------------------------------------
-#' 
+#'
 #' if (library("mlbench", logical.return = TRUE)) {
-#' 
+#'
 #'   ## assemble the data
 #'   data(BostonHousing)
 #'   x <- BostonHousing; x$medv <- NULL
 #'   y <- BostonHousing$medv
 #'   trn <- sample(1:nrow(x), size = nrow(x) * (2 / 3), replace = FALSE)
-#' 
+#'
 #'   ## run boosting in univariate mode
-#'   o <- boostmtree(x = x[trn,], y = y[trn],family = "Continuous")
+#'   o <- boostmtree(x = x[trn,], y = y[trn], M = 20, family = "Continuous")
 #'   o.p <- predict(o, x = x[-trn, ], y = y[-trn])
 #'   print(o)
 #'   plot(o.p)
-#' 
+#'
 #'   ## run boosting in univariate mode to obtain RMSE and vimp
-#'   o.cv <- boostmtree(x = x, y = y, M = 100,family = "Continuous",cv.flag = TRUE)
+#'   o.cv <- boostmtree(x = x, y = y, M = 20, family = "Continuous", cv.flag = TRUE)
 #'   print(o.cv)
 #'   plot(o.cv)
 #' }
-#' 
+#'
 #' }
 boostmtree <- function(x,
                        tm,
@@ -384,7 +389,8 @@ boostmtree <- function(x,
                        NR.iter = 3,
                        ...) {
   if (Sys.info()["sysname"] == "Windows") {
-    options(rf.cores = 1, mc.cores = 1)
+    old_opts <- options(rf.cores = 1, mc.cores = 1)
+    on.exit(options(old_opts), add = TRUE)
   }
   if (length(family) != 1) {
     stop("Specify any one of the four families")
@@ -393,6 +399,34 @@ boostmtree <- function(x,
     family, c("Continuous", "Binary", "Nominal", "Ordinal")
   )))) {
     stop("family must be any one from Continuous, Binary, Nominal or Ordinal")
+  }
+  if (missing(x)) {
+    stop("x is required")
+  }
+  if (missing(y)) {
+    stop("y is required")
+  }
+  n.obs <- NROW(x)
+  if (n.obs == 0) {
+    stop("x must contain at least one observation")
+  }
+  if (length(y) != n.obs) {
+    stop("length of y must equal the number of rows in x")
+  }
+  if (!missing(id) && length(id) != n.obs) {
+    stop("length of id must equal the number of rows in x")
+  }
+  if (!missing(tm) && length(tm) != n.obs) {
+    stop("length of tm must equal the number of rows in x")
+  }
+  if (!is.numeric(M) || length(M) != 1 || !is.finite(M) || M < 1 || M != floor(M)) {
+    stop("M must be a positive integer")
+  }
+  if (!is.numeric(nu) || length(nu) != 1 || !is.finite(nu) || nu <= 0) {
+    stop("nu must be a positive number")
+  }
+  if (!is.numeric(K) || length(K) != 1 || !is.finite(K) || K < 1 || K != floor(K)) {
+    stop("K must be a positive integer")
   }
   univariate <- FALSE
   if (missing(tm)) {
@@ -415,20 +449,36 @@ boostmtree <- function(x,
     # Added the following if statement because binary/nominal/ordinal response
     # could be a factor or a character.
     #---------------------------------------------------------------------------
+    y_levels_original <- NULL
     if (!is.numeric(y)) {
-      y <- as.numeric(factor(y))
+      y_factor <- factor(y)
+      y_levels_original <- levels(y_factor)
+      y <- as.numeric(y_factor)
     }
     y.unq <- sort(unique(y))
     Q   <- length(y.unq)
     if (family == "Nominal") {
+      display_levels <- if (!is.null(y_levels_original))
+        y_levels_original
+      else
+        sort(unique(y))
+      if (!is.null(y_reference) && !is.numeric(y_reference)) {
+        converted_ref <- match(y_reference, display_levels)
+        if (is.na(converted_ref)) {
+          stop(paste(
+            "y_reference must take any one of the following:",
+            paste(display_levels, collapse = " ")
+          ))
+        }
+        y_reference <- converted_ref
+      }
       if (is.null(y_reference)) {
         y_reference <- min(y.unq)
       } else {
         if (length(y_reference) != 1 || is.na(match(y_reference, y.unq))) {
           stop(paste(
             "y_reference must take any one of the following:",
-            y.unq,
-            sep = " "
+            paste(display_levels, collapse = " ")
           ))
         }
       }
@@ -449,31 +499,16 @@ boostmtree <- function(x,
   }
   user.option <- list(...)
   if (any(is.na(id)) || any(is.na(y)) || any(is.na(tm))) {
-    stop("missing values encountered y or id or tm:" +
-           " remove observations with missing values")
+    stop("missing values encountered in y, id, or tm: remove observations with missing values")
   }
   x <- as.data.frame(x)
-  X <- do.call(rbind, lapply(1:n, function(i) {
-    x[id == id.unq[i], , drop = FALSE][1, , drop = FALSE]
-  }))
-  x <- do.call(rbind, lapply(1:n, function(i) {
-    x[id == id.unq[i], , drop = FALSE]
-  }))
-  #-----------------------------------------------------------------------------
-  # Date: 06/04/2020
-  # Following comment added while editing for the nominal/ordinal response
-  # Added the below three lines so that id, tm and y are consistent with x (as
-  # described on the line above)
-  #-----------------------------------------------------------------------------
-  id <- unlist(lapply(1:n, function(i) {
-    id[id == id.unq[i]]
-  }))
-  tm <- unlist(lapply(1:n, function(i) {
-    tm[id == id.unq[i]]
-  }))
-  y <- unlist(lapply(1:n, function(i) {
-    y[id == id.unq[i]]
-  }))
+  # Group rows by subject (id.unq order); single stable reindex replaces O(n^2) per-subject scans.
+  reorder.idx <- order(match(id, id.unq), seq_along(id))
+  x  <- x[reorder.idx, , drop = FALSE]
+  id <- id[reorder.idx]
+  tm <- tm[reorder.idx]
+  y  <- y[reorder.idx]
+  X  <- x[!duplicated(id), , drop = FALSE]
   if (any(is.na(X))) {
     RemoveMiss.Obj <- RemoveMiss.Fun(X)
     X <- RemoveMiss.Obj$X
@@ -492,18 +527,13 @@ boostmtree <- function(x,
       id.remove <- id.unq[id_na]
       id.unq <- setdiff(id.unq, id.remove)
       n <- length(id.unq)
-      tm <- unlist(lapply(1:n, function(i) {
-        tm[id == id.unq[i]]
-      }))
-      y <- unlist(lapply(1:n, function(i) {
-        y[id == id.unq[i]]
-      }))
-      x <- do.call(rbind, lapply(1:n, function(i) {
-        x[id == id.unq[i], , drop = FALSE]
-      }))
-      id <- unlist(lapply(1:n, function(i) {
-        id[id == id.unq[i]]
-      }))
+      # Data is already grouped by id.unq order, so dropping whole subjects is
+      # a simple order-preserving filter.
+      keep <- id %in% id.unq
+      x  <- x[keep, , drop = FALSE]
+      id <- id[keep]
+      tm <- tm[keep]
+      y  <- y[keep]
     }
   }
   p <- ncol(X)
@@ -538,8 +568,7 @@ boostmtree <- function(x,
     tm[id == id.unq[i]]
   })
   if (nknots < 0) {
-    warning("bsplines require a positive number of knots: " +
-              " eliminating b-spline fitting")
+    warning("bsplines require a positive number of knots: eliminating b-spline fitting")
     d <- 0
   }
   if (d >= 1) {
@@ -682,7 +711,7 @@ boostmtree <- function(x,
     }
   }
   pen.lsq.matx <- penBSderiv(df.D - 1, pen.ord)
-  if (!univariate && ntree == 1 && 
+  if (!univariate && ntree == 1 &&
       (missing(lambda) || lambda < 0)) {
     if (df.D >= (pen.ord + 2)) {
       lambda.est.flag <- TRUE
@@ -696,8 +725,7 @@ boostmtree <- function(x,
       pen.inv.sqrt.matx <- svd.pen$v %*% (t(svd.pen$v) * d.inv.sqrt)
       lambda <- rep(0, n.Q)
     } else {
-      warning("not enough degrees of freedom to estimate lambda:" +
-                " setting lambda to zero\n")
+      warning("not enough degrees of freedom to estimate lambda: setting lambda to zero")
       lambda <- rep(0, n.Q)
     }
   }
@@ -758,16 +786,11 @@ boostmtree <- function(x,
   sigma <- phi <- rep(1, n.Q)
   if (!lambda.est.flag) {
     sigma <- unlist(lapply(1:n.Q, function(q) {
-      sigma.robust(lambda[q], rho[q])
+      .sigma_robust(lambda[q], rho[q])
     }))
   }
-  Y.names <- paste("Y", 1:df.D, sep = "")
-  rfsrc.f <- as.formula(paste(
-    "Multivar(",
-    paste(Y.names, collapse = ","),
-    paste(") ~ ."),
-    sep = ""
-  ))
+  Y.names <- paste0("Y", 1:df.D)
+  rfsrc.f <- as.formula(paste0("Multivar(", paste(Y.names, collapse = ","), ") ~ ."))
   cv.flag <- cv.flag && (ntree == 1)
   cv.lambda.flag <- cv.flag &&
     is.hidden.CVlambda(user.option) && lambda.est.flag
@@ -899,6 +922,7 @@ boostmtree <- function(x,
         out <- tryCatch({
           qr.solve(VMat[[i]])
         }, error = function(ex) {
+          message("qr.solve failed (VMat): ", conditionMessage(ex))
           NULL
         })
         if (is.null(out)) {
@@ -936,7 +960,8 @@ boostmtree <- function(x,
           xvar.wt = xvar.wt,
           case.wt = case.wt,
           forest.wt = TRUE,
-          memebership = TRUE
+          membership = TRUE,
+          seed = seed.value
         )
         Kmax <- max(rfsrc.obj$leaf.count, na.rm = TRUE)
         baselearner[[m]] <- list(forest = rfsrc.obj)
@@ -1046,7 +1071,7 @@ boostmtree <- function(x,
             lambda.hat <- min(lambda.hat, lambda.max)
           }
           lambda[q] <- lambda.hat
-          sigma[q] <- sigma.robust(lambda[q], rho[q])
+          sigma[q] <- .sigma_robust(lambda[q], rho[q])
         }
         gamma <- lapply(1:Kmax, function(k) {
           pt.k <- (membership == k)
@@ -1063,8 +1088,7 @@ boostmtree <- function(x,
                 out
               })
               CalD.i <- lapply(seq.pt.k, function(i) {
-                out_H_Mat <- Transform_H(Mu = mu.NR.update[[i]],
-                                         Family = family)
+                out_H_Mat <- Transform_H(Mu = mu.NR.update[[i]], Family = family)
                 out <- out_H_Mat %*% D[[which.pt.k[i]]]
                 out
               })
@@ -1081,6 +1105,7 @@ boostmtree <- function(x,
               qr.obj <- tryCatch({
                 qr.solve(HesMat, ScoreVec)
               }, error = function(ex) {
+                message("qr.solve failed (Hessian NR): ", conditionMessage(ex))
                 NULL
               })
               if (!is.null(qr.obj)) {
@@ -1097,9 +1122,7 @@ boostmtree <- function(x,
         })
         gamma.matx <- matrix(0, Kmax, df.D + 1)
         gamma.matx[, 1] <- sort(unique(membership.org))
-        gamma.matx[, 2:(df.D + 1)] <- matrix(unlist(gamma),
-                                             ncol = df.D,
-                                             byrow = TRUE)
+        gamma.matx[, 2:(df.D + 1)] <- matrix(unlist(gamma), ncol = df.D, byrow = TRUE)
         gamma.list[[q]][[m]] <- gamma.matx
         bhat <- t(matrix(unlist(lapply(1:n, function(i) {
           gamma[[membership[i]]]
@@ -1144,8 +1167,7 @@ boostmtree <- function(x,
                       out
                     })
                     CalD.i <- lapply(seq.pt.k, function(j) {
-                      out_H_Mat <- Transform_H(Mu = mu.NR.update[[j]],
-                                               Family = family)
+                      out_H_Mat <- Transform_H(Mu = mu.NR.update[[j]], Family = family)
                       out <- out_H_Mat %*% D[[which.pt.k[j]]]
                       out
                     })
@@ -1163,6 +1185,7 @@ boostmtree <- function(x,
                     qr.obj <- tryCatch({
                       qr.solve(HesMat, ScoreVec)
                     }, error = function(ex) {
+                      message("qr.solve failed (Hessian NR): ", conditionMessage(ex))
                       NULL
                     })
                     if (!is.null(qr.obj)) {
@@ -1229,6 +1252,7 @@ boostmtree <- function(x,
             qr.obj <- tryCatch({
               qr.solve(XnewSum, YnewSum)
             }, error = function(ex) {
+              message("qr.solve failed (WLS step): ", conditionMessage(ex))
               NULL
             })
             if (!is.null(qr.obj)) {
@@ -1278,8 +1302,7 @@ boostmtree <- function(x,
           GetMu(Linear_Predictor = l_pred.cv.org[[i]], Family = family)
         })
         mu.cv.list[[q]][[m]] <- mu.cv.org
-        err.rate[[q]][m, ] <- c(l1Dist(Yorg[[q]], mu.cv.org),
-                                l2Dist(Yorg[[q]], mu.cv.org))
+        err.rate[[q]][m, ] <- c(l1Dist(Yorg[[q]], mu.cv.org), l2Dist(Yorg[[q]], mu.cv.org))
       }
     } else {
       if (family == "Nominal") {
@@ -1337,6 +1360,7 @@ boostmtree <- function(x,
               correlation = corCompSymm(form = ~ 1 |
                                           id))
         }, error = function(ex) {
+          message("gls (full model) failed: ", conditionMessage(ex))
           NULL
         })
         if (is.null(gls.obj)) {
@@ -1346,13 +1370,13 @@ boostmtree <- function(x,
                 correlation = corCompSymm(form = ~ 1 |
                                             id))
           }, error = function(ex) {
+            message("gls (intercept-only) failed: ", conditionMessage(ex))
             NULL
           })
         }
         if (!is.null(gls.obj)) {
           phi[q] <- gls.obj$sigma^2
-          rho_temp <- as.numeric(coef(gls.obj$modelStruct$corStruc,
-                                      unconstrained = FALSE))
+          rho_temp <- as.numeric(coef(gls.obj$modelStruct$corStruc, unconstrained = FALSE))
           rho[q] <- max(min(0.999, rho_temp, na.rm = TRUE), -0.999)
         }
       }
@@ -1361,7 +1385,7 @@ boostmtree <- function(x,
         rho.mat[m, q] <- rho[q]
       }
       if (!univariate) {
-        sigma[q] <- sigma.robust(lambda[q], rho[q])
+        sigma[q] <- .sigma_robust(lambda[q], rho[q])
         lambda.mat[m, q] <- lambda[q]
       }
     }
@@ -1371,8 +1395,9 @@ boostmtree <- function(x,
       diff.err <- abs(err.rate[[q]][, "l2"] -
                         min(err.rate[[q]][, "l2"], na.rm = TRUE))
       diff.err[is.na(diff.err)] <- 1
-      if (sum(diff.err < Ysd * eps) > 0) {
-        Mopt[q] <<- min(which(diff.err < eps))
+      tol <- Ysd * eps
+      if (sum(diff.err < tol) > 0) {
+        Mopt[q] <<- min(which(diff.err < tol))
       } else {
         Mopt[q] <<- M
       }

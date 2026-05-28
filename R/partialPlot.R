@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -73,15 +73,15 @@
 
 
 #' Partial plot analysis
-#' 
+#'
 #' Partial dependence plot of x against adjusted predicted y.
-#' 
+#'
 #' Partial dependence plot (Friedman, 2001) of x values specified by
 #' \code{xvar.names} against the adjusted predicted y-values over a set of time
 #' points specified by \code{tm.unq}.  Analysis can be restricted to a subset
 #' of the data using \code{subset}. Further conditioning can be imposed using
 #' \code{conditional.xvars}.
-#' 
+#'
 #' @param object A boosting object of class \code{(boostmtree, grow)}.
 #' @param M Fixed value for the boosting step number. If NULL, then use Mopt if
 #' it is available from the object, else use M
@@ -119,64 +119,67 @@
 #' @references Friedman J.H. Greedy function approximation: a gradient boosting
 #' machine, \emph{Ann. of Statist.}, 5:1189-1232, 2001.
 #' @keywords plot
+#' @export
 #' @examples
-#' 
-#' \dontrun{
+#'
+#' \donttest{
 #' ##------------------------------------------------------------
 #' ## Synthetic example (Response is continuous)
 #' ## high correlation, quadratic time with quadratic interaction
 #' ##-------------------------------------------------------------
 #' #simulate the data
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
-#' 
+#'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 300)
-#' 
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continuous",M = 20)
+#'
 #' #plot results
 #' #x1 has a linear main effect
 #' #x2 is quadratic with quadratic time trend
 #' pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
 #' pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
-#' 
+#'
 #' #partial plot using "x2" as the conditional variable
 #' pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
 #'                       conditional.xvar = "x2", conditional.values = 1,plot.it = TRUE)
 #' pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
 #'                       conditional.xvar = "x2", conditional.values = 2,plot.it = TRUE)
-#' 
+#'
 #' ##------------------------------------------------------------
 #' ## Synthetic example (Response is binary)
 #' ## high correlation, quadratic time with quadratic interaction
 #' ##-------------------------------------------------------------
 #' #simulate the data
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Binary")$dtaL
-#' 
+#'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary",M = 300)
-#' 
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary",M = 20)
+#'
 #' #plot results
 #' #x1 has a linear main effect
 #' #x2 is quadratic with quadratic time trend
 #' pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
 #' pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
-#' 
+#' }
+#'
+#' \dontrun{
 #' ##----------------------------------------------------------------------------
 #' ## spirometry data
 #' ##----------------------------------------------------------------------------
 #' data(spirometry, package = "boostmtree")
-#' 
+#'
 #' #boosting call: cubic B-splines with 15 knots
 #' spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spirometry$y,
 #'             family = "Continuous",M = 300, nu = .025, nknots = 15)
-#' 
+#'
 #' #partial plot of double-lung group at 5 years
 #' dltx <- partialPlot(object = spr.obj, xvar.names = "AGE",
 #'                     tm.unq = 5, subset=spr.obj$x$DOUBLE==1,plot.it = TRUE)
-#' 
+#'
 #' #partial plot of single-lung group at 5 years
 #' sltx <- partialPlot(object = spr.obj, xvar.names = "AGE",
 #'                     tm.unq = 5, subset=spr.obj$x$DOUBLE==0,plot.it = TRUE)
-#' 
+#'
 #' #combine the two plots: we use lowess smoothed values
 #' dltx <- dltx$l.obj[[1]]
 #' sltx <- sltx$l.obj[[1]]
@@ -186,7 +189,7 @@
 #' lines(sltx[, 1], sltx[, -1], lty = 1, lwd = 2, col = "blue")
 #' legend("topright", legend = c("DLTx", "SLTx"), lty = 1, fill = c(2,4))
 #' }
-#' 
+#'
 partialPlot <- function(object,
                         M = NULL,
                         xvar.names,
@@ -216,7 +219,7 @@ partialPlot <- function(object,
   n.xvar <- length(xvar.names)
   if (!is.null(conditional.xvars) && !is.null(conditional.values)) {
     if (length(conditional.xvars) != length(conditional.values)) {
-      stop("conditional x-variable and conditional value vectors "+"are not of same length")
+      stop("conditional x-variable and conditional value vectors are not of same length")
     }
     for (i in seq_along(conditional.xvars)) {
       if (is.factor(object$x[, conditional.xvars[i]])) {
@@ -283,14 +286,14 @@ partialPlot <- function(object,
   }
   if (n.Q > 1) {
     names(p.obj) <- unlist(lapply(1:n.Q, function(q) {
-      paste("y = ", Q_set[q], sep = "")
+      paste0("y = ", Q_set[q])
     }))
   }
   if (plot.it) {
     l.obj <- vector("list", n.Q)
     if (n.Q > 1) {
       names(l.obj) <- unlist(lapply(1:n.Q, function(q) {
-        paste("y = ", Q_set[q], sep = "")
+        paste0("y = ", Q_set[q])
       }))
     }
   }
@@ -356,7 +359,7 @@ partialPlot <- function(object,
         })), na.rm = TRUE)
         c(xu, mn.x)
       }))
-      colnames(rObj) <- c("x", paste("y.", seq_along(tm.pt), sep = ""))
+      colnames(rObj) <- c("x", paste0("y.", seq_along(tm.pt)))
       rObj
     })
     names(p.obj[[q]]) <- xvar.names
@@ -367,43 +370,42 @@ partialPlot <- function(object,
       Plot_Name <- if (n.Q == 1)
         "PartialPlot.pdf"
       else
-        paste("PartialPlot_Prob(y = ", Q_set[q], ")", ".pdf", sep = "")
-      pdf(
-        file = paste(path_saveplot, "/", Plot_Name, sep = ""),
-        width = 10,
-        height = 10
-      )
-      l.obj[[q]] <- lapply(p.obj[[q]], function(pp) {
-        x <- pp[, 1]
-        y <- apply(pp[, -1, drop = FALSE], 2, function(yy) {
-          lowess(x, yy)$y
+        paste0("PartialPlot_Prob(y = ", Q_set[q], ").pdf")
+      pdf_path <- file.path(path_saveplot, Plot_Name)
+      pdf(file = pdf_path, width = 10, height = 10)
+      tryCatch({
+        def.par <- par(no.readonly = TRUE)
+        l.obj[[q]] <- lapply(p.obj[[q]], function(pp) {
+          x <- pp[, 1]
+          y <- apply(pp[, -1, drop = FALSE], 2, function(yy) {
+            lowess(x, yy)$y
+          })
+          rObj <- cbind(x, y)
+          colnames(rObj) <- c("x", paste0("y.", seq_along(tm.pt)))
+          rObj
         })
-        rObj <- cbind(x, y)
-        colnames(rObj) <- c("x", paste("y.", seq_along(tm.pt), sep = ""))
-        rObj
-      })
-      names(l.obj[[q]]) <- xvar.names
-      def.par <- par(no.readonly = TRUE)
-      for (k in 1:n.xvar) {
-        plot(
-          range(l.obj[[q]][[k]][, 1], na.rm = TRUE),
-          range(l.obj[[q]][[k]][, -1], na.rm = TRUE),
-          type = "n",
-          xlab = xvar.names[k],
-          ylab = "predicted y (adjusted)"
-        )
-        for (l in 1:n.tm) {
-          lines(l.obj[[q]][[k]][, 1],
-                l.obj[[q]][[k]][, -1, drop = FALSE][, l],
-                type = "l",
-                ,
-                col = l)
+        names(l.obj[[q]]) <- xvar.names
+        for (k in 1:n.xvar) {
+          plot(
+            range(l.obj[[q]][[k]][, 1], na.rm = TRUE),
+            range(l.obj[[q]][[k]][, -1], na.rm = TRUE),
+            type = "n",
+            xlab = xvar.names[k],
+            ylab = "predicted y (adjusted)"
+          )
+          for (l in 1:n.tm) {
+            lines(l.obj[[q]][[k]][, 1],
+                  l.obj[[q]][[k]][, -1, drop = FALSE][, l],
+                  type = "l",
+                  col = l)
+          }
         }
-      }
-      par(def.par)
-      dev.off()
+        par(def.par)
+      }, finally = {
+        dev.off()
+      })
       if (Verbose) {
-        cat("Plot will be saved at:", path_saveplot, sep = "", "\n")
+        message("Plot saved to: ", pdf_path)
       }
     }
   }

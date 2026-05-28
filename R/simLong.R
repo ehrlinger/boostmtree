@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -73,10 +73,10 @@
 
 
 #' Simulate longitudinal data
-#' 
+#'
 #' Simulates longitudinal data with continuous or binary response from models
 #' with increasing complexity of covariate-time interactions.
-#' 
+#'
 #' Simulates longitudinal data with 3 main effects and (possibly) a
 #' covariate-time interaction.  Complexity of the model is specified using the
 #' option \code{model}: \enumerate{ \item \emph{\code{model=0}:} Linear with no
@@ -85,15 +85,15 @@
 #' time-quadratic covariate interaction.  \item \emph{\code{model=3}:}
 #' Quadratic time-quadratic two-way covariate interaction.  } For details see
 #' Pande et al. (2017).
-#' 
+#'
 #' @param n Requested training sample size.
 #' @param ntest Requested test sample size.
 #' @param N Parameter controlling number of time points per subject.
 #' @param rho Correlation parameter.
 #' @param type Type of correlation matrix.
 #' @param model Requested simulation model.
-#' @param family Family of response \code{y}. Use any one from {"Continuous",
-#' "Binary"} based on the scale of \code{y}.
+#' @param family Family of response \code{y}. Use \code{"Continuous"} or
+#' \code{"Binary"} based on the scale of \code{y}.
 #' @param phi Variance of measurement error.
 #' @param q Number of zero-signal variables (i.e., variables unrelated to y).
 #' @param ... Further arguments passed to or from other methods.
@@ -107,44 +107,45 @@
 #' Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
 #' longitudinal data, \emph{Machine Learning}, 106(2): 277--305.
 #' @keywords simulation variable selection
+#' @export
 #' @examples
-#' 
-#' \dontrun{
+#'
+#' \donttest{
 #' ##------------------------------------------------------------
 #' ##  Response is continuous
 #' ##----------------------------------------------------------------------------
-#' 
+#'
 #' ## set the number of boosting iterations
-#' M <- 500
-#' 
+#' M <- 20
+#'
 #' ## simulation 0: only main effects (x1, x3, x4)
-#' dta <- simLong(n = 100, ntest = 100, model = 0, family = "Continuous", q = 5)
+#' dta <- simLong(n = 20, ntest = 5, model = 0, family = "Continuous", q = 5)
 #' trn <- dta$trn
 #' dtaL <- dta$dtaL
 #' dta <- dta$dta
-#' obj.0 <-  boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn], 
+#' obj.0 <-  boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
 #'           family = "Continuous", M = M)
 #' pred.0 <- predict(obj.0, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
-#' 
-#' 
-#' 
+#'
+#'
+#'
 #' ##------------------------------------------------------------
 #' ##  Response is binary
 #' ##----------------------------------------------------------------------------
-#' 
+#'
 #' ## set the number of boosting iterations
-#' M <- 500
-#' 
+#' M <- 20
+#'
 #' ## simulation 0: only main effects (x1, x3, x4)
-#' dta <- simLong(n = 100, ntest = 100, model = 0, family = "Binary", q = 5)
+#' dta <- simLong(n = 20, ntest = 5, model = 0, family = "Binary", q = 5)
 #' trn <- dta$trn
 #' dtaL <- dta$dtaL
 #' dta <- dta$dta
-#' obj.0 <-  boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn], 
+#' obj.0 <-  boostmtree(dtaL$features[trn, ], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
 #'           family = "Binary", M = M)
 #' pred.0 <- predict(obj.0, dtaL$features[-trn, ], dtaL$time[-trn], dtaL$id[-trn], dtaL$y[-trn])
 #' }
-#' 
+#'
 simLong <-  function(n = 100,
                      ntest = 0,
                      N = 5,
@@ -230,7 +231,7 @@ simLong <-  function(n = 100,
     y)
   })))
   d <- q + 4
-  colnames(dta) <- c(paste("x", 1:d, sep = ""), "time", "id", "y")
+  colnames(dta) <- c(paste0("x", 1:d), "time", "id", "y")
   dtaL <- list(
     features = dta[, 1:d],
     time = dta$time,

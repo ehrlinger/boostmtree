@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -74,10 +74,10 @@
 
 
 #' Print Summary Output
-#' 
+#'
 #' Print summary output from the boosting analysis.
-#' 
-#' 
+#'
+#'
 #' @param x An object of class \code{(boostmtree, grow)} or \code{(boostmtree,
 #' predict)}.
 #' @param ... Further arguments passed to or from other methods.
@@ -86,15 +86,17 @@
 #' Blackstone E.H., Ishwaran H. (2017).  Boosted multivariate trees for
 #' longitudinal data, \emph{Machine Learning}, 106(2): 277--305.
 #' @keywords print
+#' @export
 print.boostmtree <- function(x, ...) {
   if (sum(inherits(x, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2 &&
       sum(inherits(x, c("boostmtree", "predict"), TRUE) == c(1, 2)) != 2) {
     stop(
-      "this function only works for objects of class `(boostmtree, grow)' or "+"'(boostmtree, predict)'"
+      "this function only works for objects of class `(boostmtree, grow)' or '(boostmtree, predict)'"
     )
   }
   if (sum(inherits(x, c("boostmtree", "grow"), TRUE) == c(1, 2)) == 2) {
     univariate <- length(x$id) == length(unique(x$id))
+    cat("boostmtree summary\n")
     cat("model                       :", class(x)[3], "\n")
     cat("fitting mode                :", class(x)[2], "\n")
     cat("Family                      :", x$family, "\n")
@@ -151,6 +153,7 @@ print.boostmtree <- function(x, ...) {
     }
   } else {
     univariate <- length(x$boost.obj$id) == length(unique(x$boost.obj$id))
+    cat("boostmtree summary\n")
     cat("model                       :", class(x)[3], "\n")
     cat("fitting mode                :", class(x)[2], "\n")
     cat("Family                      :", x$family, "\n")
@@ -200,4 +203,5 @@ print.boostmtree <- function(x, ...) {
       cat("univariate family           :", TRUE, "\n")
     }
   }
+  invisible(x)
 }

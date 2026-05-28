@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -73,17 +73,17 @@
 
 
 #' Marginal plot analysis
-#' 
+#'
 #' Marginal plot of x against the unadjusted predicted y. This is mainly used
 #' to obtain marginal relationships between x and the unadjusted predicted y.
 #' Marginal plots have a faster execution compared to partial plots (Friedman,
 #' 2001).
-#' 
+#'
 #' Marginal plot of x values specified by \code{xvar.names} against the
 #' unadjusted predicted y-values over a set of time points specified by
 #' \code{tm.unq}.  Analysis can be restricted to a subset of the data using
 #' \code{subset}.
-#' 
+#'
 #' @param object A boosting object of class \code{(boostmtree, grow)}.
 #' @param xvar.names Names of the x-variables to be used.  By default, all
 #' variables are plotted.
@@ -102,77 +102,80 @@
 #' @references Friedman J.H. Greedy function approximation: a gradient boosting
 #' machine, \emph{Ann. of Statist.}, 5:1189-1232, 2001.
 #' @keywords plot
+#' @export
 #' @examples
-#' 
-#' \dontrun{
+#'
+#' \donttest{
 #' ##------------------------------------------------------------
 #' ## Synthetic example (Response is continuous)
 #' ## High correlation, quadratic time with quadratic interaction
 #' ##-------------------------------------------------------------
 #' #simulate the data
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
-#' 
+#'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Continuous", M = 300)
-#' 
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Continuous", M = 20)
+#'
 #' #plot results
 #' #x1 has a linear main effect
 #' #x2 is quadratic with quadratic time trend
 #' marginalPlot(boost.grow, "x1",plot.it = TRUE)
 #' marginalPlot(boost.grow, "x2",plot.it = TRUE)
-#' 
+#'
 #' #Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"
 #' # in the current working directory.
 #' marginalPlot(boost.grow,plot.it = TRUE)
-#' 
-#' 
+#'
+#'
 #' ##------------------------------------------------------------
 #' ## Synthetic example (Response is binary)
 #' ## High correlation, quadratic time with quadratic interaction
 #' ##-------------------------------------------------------------
 #' #simulate the data
 #' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Binary")$dtaL
-#' 
+#'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Binary", M = 300)
-#' 
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Binary", M = 20)
+#'
 #' #plot results
 #' #x1 has a linear main effect
 #' #x2 is quadratic with quadratic time trend
 #' marginalPlot(boost.grow, "x1",plot.it = TRUE)
 #' marginalPlot(boost.grow, "x2",plot.it = TRUE)
-#' 
+#'
 #' #Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"
 #' # in the current working directory.
 #' marginalPlot(boost.grow,plot.it = TRUE)
-#' 
+#' }
+#'
+#' \dontrun{
 #' ##----------------------------------------------------------------------------
 #' ## spirometry data
 #' ##----------------------------------------------------------------------------
 #' data(spirometry, package = "boostmtree")
-#' 
+#'
 #' #boosting call: cubic B-splines with 15 knots
 #' spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spirometry$y,
 #'             family = "Continuous",M = 300, nu = .025, nknots = 15)
-#' 
+#'
 #' #marginal plot of double-lung group at 5 years
 #' dltx <- marginalPlot(spr.obj, "AGE", tm.unq = 5, subset = spr.obj$x$DOUBLE==1,plot.it = TRUE)
-#' 
+#'
 #' #marginal plot of single-lung group at 5 years
 #' sltx <- marginalPlot(spr.obj, "AGE", tm.unq = 5, subset = spr.obj$x$DOUBLE==0,plot.it = TRUE)
-#' 
+#'
 #' #combine the two plots
 #' dltx <- dltx[[2]][[1]]
 #' sltx <- sltx[[2]][[1]]
 #' plot(range(c(dltx[[1]][, 1], sltx[[1]][, 1])), range(c(dltx[[1]][, -1], sltx[[1]][, -1])),
 #'      xlab = "age", ylab = "predicted y", type = "n")
-#' lines(dltx[[1]][, 1][order(dltx[[1]][, 1]) ], dltx[[1]][, -1][order(dltx[[1]][, 1]) ], 
+#' lines(dltx[[1]][, 1][order(dltx[[1]][, 1]) ], dltx[[1]][, -1][order(dltx[[1]][, 1]) ],
 #'       lty = 1, lwd = 2, col = "red")
-#' lines(sltx[[1]][, 1][order(sltx[[1]][, 1]) ], sltx[[1]][, -1][order(sltx[[1]][, 1]) ], 
+#' lines(sltx[[1]][, 1][order(sltx[[1]][, 1]) ], sltx[[1]][, -1][order(sltx[[1]][, 1]) ],
 #'       lty = 1, lwd = 2, col = "blue")
 #' legend("topright", legend = c("DLTx", "SLTx"), lty = 1, fill = c(2,4))
 #' }
-#' 
+#'
 marginalPlot <- function(object,
                          xvar.names,
                          tm.unq,
@@ -216,14 +219,14 @@ marginalPlot <- function(object,
   p.obj <- vector("list", n.Q)
   if (n.Q > 1) {
     names(p.obj) <- unlist(lapply(1:n.Q, function(q) {
-      paste("y = ", Q_set[q], sep = "")
+      paste0("y = ", Q_set[q])
     }))
   }
   if (plot.it) {
     l.obj <- vector("list", n.Q)
     if (n.Q > 1) {
       names(l.obj) <- unlist(lapply(1:n.Q, function(q) {
-        paste("y = ", Q_set[q], sep = "")
+        paste0("y = ", Q_set[q])
       }))
     }
   }
@@ -258,7 +261,7 @@ marginalPlot <- function(object,
       RawDt <- lapply(1:n.tm, function(nt) {
         cbind(x, muhat[, nt])
       })
-      names(RawDt) <- paste("time = ", tm.unq, sep = "")
+      names(RawDt) <- paste0("time = ", tm.unq)
       RawDt
     })
     names(p.obj[[q]]) <- xvar.names
@@ -269,54 +272,48 @@ marginalPlot <- function(object,
       Plot_Name <- if (n.Q == 1)
         "MarginalPlot.pdf"
       else
-        paste("MarginalPlot_Prob(y = ", Q_set[q], ")", ".pdf", sep = "")
-      pdf(
-        file = paste(path_saveplot, "/", Plot_Name, sep = ""),
-        width = 10,
-        height = 10
-      )
-      l.obj[[q]] <- lapply(1:n.xvar, function(nm) {
-        x <- object$x[, xvar.names[nm]]
-        lo.fit <- lapply(1:n.tm, function(nt) {
-          fit <- lowess(x, muhat[, nt])
-          cbind(fit$x, fit$y)
+        paste0("MarginalPlot_Prob(y = ", Q_set[q], ").pdf")
+      pdf_path <- file.path(path_saveplot, Plot_Name)
+      pdf(file = pdf_path, width = 10, height = 10)
+      tryCatch({
+        def.par <- par(no.readonly = TRUE)
+        l.obj[[q]] <- lapply(1:n.xvar, function(nm) {
+          x <- object$x[, xvar.names[nm]]
+          lo.fit <- lapply(1:n.tm, function(nt) {
+            fit <- lowess(x, muhat[, nt])
+            cbind(fit$x, fit$y)
+          })
+          names(lo.fit) <- paste0("time = ", tm.unq)
+          lo.fit
         })
-        names(lo.fit) <- paste("time = ", tm.unq, sep = "")
-        lo.fit
-      })
-      names(l.obj[[q]]) <- xvar.names
-      for (pp in 1:n.xvar) {
-        xmin <- min(unlist(lapply(1:n.tm, function(nn) {
-          l.obj[[q]][[pp]][[nn]][, 1]
-        })))
-        xmax <- max(unlist(lapply(1:n.tm, function(nn) {
-          l.obj[[q]][[pp]][[nn]][, 1]
-        })))
-        ymin <- min(unlist(lapply(1:n.tm, function(nn) {
-          l.obj[[q]][[pp]][[nn]][, 2]
-        })))
-        ymax <- max(unlist(lapply(1:n.tm, function(nn) {
-          l.obj[[q]][[pp]][[nn]][, 2]
-        })))
-        plot(
-          l.obj[[q]][[pp]][[1]][, 1],
-          l.obj[[q]][[pp]][[1]][, 2],
-          type = "n",
-          xlim = c(xmin, xmax),
-          ylim = c(ymin, ymax),
-          xlab = xvar.names[pp],
-          ylab = "Predicted response"
-        )
-        for (nn in 1:n.tm) {
-          lines(l.obj[[q]][[pp]][[nn]][, 1],
-                l.obj[[q]][[pp]][[nn]][, 2],
-                type = "l",
-                col = nn)
+        names(l.obj[[q]]) <- xvar.names
+        for (pp in 1:n.xvar) {
+          xmin <- min(unlist(lapply(1:n.tm, function(nn) l.obj[[q]][[pp]][[nn]][, 1])))
+          xmax <- max(unlist(lapply(1:n.tm, function(nn) l.obj[[q]][[pp]][[nn]][, 1])))
+          ymin <- min(unlist(lapply(1:n.tm, function(nn) l.obj[[q]][[pp]][[nn]][, 2])))
+          ymax <- max(unlist(lapply(1:n.tm, function(nn) l.obj[[q]][[pp]][[nn]][, 2])))
+          plot(
+            l.obj[[q]][[pp]][[1]][, 1],
+            l.obj[[q]][[pp]][[1]][, 2],
+            type = "n",
+            xlim = c(xmin, xmax),
+            ylim = c(ymin, ymax),
+            xlab = xvar.names[pp],
+            ylab = "Predicted response"
+          )
+          for (nn in 1:n.tm) {
+            lines(l.obj[[q]][[pp]][[nn]][, 1],
+                  l.obj[[q]][[pp]][[nn]][, 2],
+                  type = "l",
+                  col = nn)
+          }
         }
-      }
-      dev.off()
+        par(def.par)
+      }, finally = {
+        dev.off()
+      })
       if (Verbose) {
-        cat("Plot will be saved at:", path_saveplot, sep = "", "\n")
+        message("Plot saved to: ", pdf_path)
       }
     }
   }

@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -249,6 +249,7 @@ blup.solve <- function(transf.data, membership, sigma, Kmax) {
     fix.eff <- tryCatch({
       qr.solve(A, b)
     }, error = function(ex) {
+      message("qr.solve failed (fixed effects): ", conditionMessage(ex))
       NULL
     })
     if (is.null(fix.eff)) {
@@ -257,6 +258,7 @@ blup.solve <- function(transf.data, membership, sigma, Kmax) {
     rnd.eff <- tryCatch({
       qr.solve(Q, ZY - t(XZ) %*% fix.eff)
     }, error = function(ex) {
+      message("qr.solve failed (random effects): ", conditionMessage(ex))
       NULL
     })
     if (is.null(rnd.eff)) {
@@ -432,25 +434,7 @@ lowess.mod <- function(x, y, ...) {
     lowess(x[!na.pt], y[!na.pt], ...)
   }
 }
-parse.depth <- function(obj) {
-  obj <- stat.split(obj)[[1]]
-  depth <- unlist(lapply(seq_along(obj), function(k) {
-    if (!is.null(obj[[k]])) {
-      min(obj[[k]][, "dpthID"], na.rm = TRUE)
-    } else {
-      NA
-    }
-  }))
-  if (!all(is.na(depth))) {
-    treeDepth <- max(unlist(lapply(seq_along(obj), function(k) {
-      if (!is.null(obj[[k]])) {
-        max(obj[[k]][, "dpthID"], na.rm = TRUE)
-      }
-    })), na.rm = TRUE)
-    depth[is.na(depth)] <- treeDepth + 1
-  }
-  depth
-}
+
 penBS <- function(d, pen.ord = 2) {
   if (d >= (pen.ord + 1)) {
     D <- diag(d)
@@ -468,7 +452,7 @@ penBSderiv <- function(d, pen.ord = 2) {
       cbind(0, rbind(0, pen.matx))
     } else {
       warning(
-        "not enough degrees of freedom for differencing penalty matrix: "+"setting penalty to zero\n"
+        "not enough degrees of freedom for differencing penalty matrix: setting penalty to zero"
       )
       pen.matx <- diag(1, d + 1)
       pen.matx[1, 1] <- 0
@@ -479,13 +463,16 @@ penBSderiv <- function(d, pen.ord = 2) {
   }
 }
 
-plot.profile.prx <- function(obj,
+#' @exportS3Method plot profile.prx
+plot.profile.prx <- function(x,
                              col = NULL,
                              rnd.case = NULL,
                              cut = .95,
-                             restrictX = TRUE) {
+                             restrictX = TRUE,
+                             ...) {
+  obj <- x
   if (is.null(obj$proximity)) {
-    stop("this functionrequires proximity = TRUE in the predict call")
+    stop("this function requires proximity = TRUE in the predict call")
   }
   prx <- obj$proximity
   time <- obj$boost.obj$time
@@ -602,7 +589,7 @@ rho.inv.sqrt <- function(ni, rho, tol = 1e-2) {
     as.numeric(Re(polyroot(c(ri, -2, ni))))[1]
   }
 }
-sigma.robust <- function(lambda, rho) {
+.sigma_robust <- function(lambda, rho) {
   lambda
 }
 papply <- function(X,

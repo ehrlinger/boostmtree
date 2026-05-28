@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -73,76 +73,85 @@
 
 
 #' Variable Importance
-#' 
+#'
 #' Calculate VIMP score for each of the individual covariates or a joint VIMP
 #' of multiple covariates.
-#' 
-#' Variable Importance (VIMP) is calcuated for each of the covariates
-#' individually or a joint VIMP is calulated for all the covariates specfied in
+#'
+#' Variable Importance (VIMP) is calculated for each of the covariates
+#' individually or a joint VIMP is calculated for all the covariates specified in
 #' \code{x.names}.
-#' 
+#'
 #' @param object A boosting object of class \code{(boostmtree, grow)} or class
 #' \code{(boostmtree, predict)}.
 #' @param x.names Names of the x-variables for which VIMP is requested. If
-#' NULL, VIMP is calcuated for all the covariates
-#' @param joint Estimate individual VIMP for each covariate from \code{x.names}
-#' or a joint VIMP for all covariates combine.
+#' \code{NULL}, VIMP is calculated for all covariates.
+#' @param joint Logical. If \code{FALSE} (default), individual VIMP is returned
+#' for each covariate in \code{x.names}. If \code{TRUE}, a single joint VIMP
+#' is computed for all covariates combined.
+#' @return A list with three components: \item{vimp.main}{Matrix of main-effect
+#' VIMP scores (rows = variables, columns = response classes).}
+#' \item{vimp.int}{Matrix of covariate-time interaction VIMP scores.}
+#' \item{vimp.time}{Numeric vector of pure time-effect VIMP scores.}
+#' For cross-sectional (univariate) data, only \code{vimp.main} is populated.
 #' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
+#' @seealso \code{\link{vimpPlot}}, \code{\link{boostmtree}},
+#' \code{\link{predict.boostmtree}}
 #' @references Friedman J.H. Greedy function approximation: a gradient boosting
 #' machine, \emph{Ann. of Statist.}, 5:1189-1232, 2001.
-#' @keywords plot
+#' @keywords variable-importance
+#' @export
 #' @examples
-#' 
-#' \dontrun{
+#'
+#' \donttest{
 #' ##------------------------------------------------------------
 #' ## Synthetic example (Response is continuous)
 #' ## VIMP is based on in-sample CV using out of bag data
 #' ##-------------------------------------------------------------
 #' #simulate the data
-#' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
-#' 
+#' dta <- simLong(n = 20, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
+#'
 #' #basic boosting call
 #' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
-#'               family = "Continuous", M = 300,cv.flag = TRUE)
+#'               family = "Continuous", M = 20,cv.flag = TRUE)
 #' vimp.grow <- vimp.boostmtree(object = boost.grow,x.names=c("x1","x2"),joint = FALSE)
 #' vimp.joint.grow <- vimp.boostmtree(object = boost.grow,x.names=c("x1","x2"),joint = TRUE)
-#' 
+#'
 #' ##------------------------------------------------------------
 #' ## Synthetic example (Response is continuous)
 #' ## VIMP is based on test data
 #' ##-------------------------------------------------------------
 #' #simulate the data
-#' dtaO <- simLong(n = 100, ntest = 100, N = 5, rho =.80, model = 2, family = "Continuous")
-#' 
+#' dtaO <- simLong(n = 20, ntest = 10, N = 5, rho =.80, model = 2, family = "Continuous")
+#'
 #' ## save the data as both a list and data frame
 #' dtaL <- dtaO$dtaL
 #' dta <- dtaO$dta
-#' 
+#'
 #' ## get the training data
 #' trn <- dtaO$trn
-#' 
+#'
 #' #basic boosting call
 #' boost.grow <- boostmtree(dtaL$features[trn,], dtaL$time[trn], dtaL$id[trn], dtaL$y[trn],
-#'               family = "Continuous", M = 300)
+#'               family = "Continuous", M = 20)
 #' boost.pred <- predict(boost.grow,dtaL$features[-trn,], dtaL$time[-trn], dtaL$id[-trn],
 #'               dtaL$y[-trn])
 #' vimp.pred <- vimp.boostmtree(object = boost.pred,x.names=c("x1","x2"),joint = FALSE)
 #' vimp.joint.pred <- vimp.boostmtree(object = boost.pred,x.names=c("x1","x2"),joint = TRUE)
-#' 
+#'
 #' }
-#' 
+#'
 vimp.boostmtree <- function(object,
                             x.names = NULL,
                             joint = FALSE) {
   if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) != 2 &&
       sum(inherits(object, c("boostmtree", "predict"), TRUE) == c(1, 2)) != 2) {
     stop(
-      "This function only works for objects of class `(boostmtree, grow)' "+"or '(boostmtree, predict)'"
+      "This function only works for objects of class `(boostmtree, grow)' or '(boostmtree, predict)'"
     )
   }
   if (sum(inherits(object, c("boostmtree", "grow"), TRUE) == c(1, 2)) == 2) {
     if (!object$cv.flag) {
-      stop("The grow object of boostmtree does not include "+"in-sample CV estimates")
+      stop("The grow object of boostmtree does not include in-sample CV estimates")
     }
     X <- object$x
     P <- ncol(X)
@@ -528,7 +537,8 @@ vimp.boostmtree <- function(object,
           }
           X.k
         }))
-        options(rf.cores = 1, mc.cores = 1)
+        old_opts <- options(rf.cores = 1, mc.cores = 1)
+        on.exit(options(old_opts), add = TRUE)
         c(
           predict.rfsrc(
             baselearner[[q]][[m]],

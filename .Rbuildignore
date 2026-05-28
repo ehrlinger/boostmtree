@@ -4,3 +4,12 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.git$
+^\.gitignore$
+^\.Rhistory$
+^\.RData$
+^\.Ruserdata$
+^.*\.[Rr]check$
+^vignettes/.*_cache$
+^vignettes/_freeze$
+^vignettes/_quarto\.yml$

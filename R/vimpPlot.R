@@ -2,7 +2,7 @@
 ####**********************************************************************
 ####
 ####  BOOSTED MULTIVARIATE TREES FOR LONGITUDINAL DATA (BOOSTMTREE)
-####  Version 1.5.1 (_PROJECT_BUILD_ID_)
+####  Version 2.0.0
 ####
 ####  Copyright 2016, University of Miami
 ####
@@ -63,25 +63,14 @@
 ####**********************************************************************
 ####**********************************************************************
 
-
-
-
-
-
-
-
-
-
 #' Variable Importance (VIMP) plot
-#' 
-#' Barplot displaying VIMP.
-#' 
+#'
 #' Barplot displaying VIMP. If the analysis is for the univariate case, VIMP is
 #' displayed above the x-axis. If the analysis is for the longitudinal case,
 #' VIMP for covariates (main effects) are shown above the x-axis while VIMP for
 #' covariate-time interactions (time interaction effects) are shown below the
 #' x-axis. In either case, negative vimp value is set to zero.
-#' 
+#'
 #' @param vimp VIMP values.
 #' @param Q_set Provide names for various levels of nominal or ordinal
 #' response.
@@ -129,27 +118,28 @@
 #' @param Verbose Display the path where the plot is saved?
 #' @author Hemant Ishwaran, Amol Pande and Udaya B. Kogalur
 #' @keywords plot
+#' @export
 #' @examples
-#' 
-#' \dontrun{
+#'
+#' \donttest{
 #' ##------------------------------------------------------------
 #' ## Synthetic example
 #' ## high correlation, quadratic time with quadratic interaction
 #' ##-------------------------------------------------------------
 #' #simulate the data
-#' dta <- simLong(n = 50, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
-#' 
+#' dta <- simLong(n = 20, N = 5, rho =.80, model = 2,family = "Continuous")$dtaL
+#'
 #' #basic boosting call
-#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, 
-#'               family = "Continuous",M = 300, cv.flag = TRUE)
-#' vimp.grow <- vimp.boostmtree(object = boost.grow)              
-#' 
+#' boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
+#'               family = "Continuous",M = 20, cv.flag = TRUE)
+#' vimp.grow <- vimp.boostmtree(object = boost.grow)
+#'
 #' # VIMP plot
 #' vimpPlot(vimp = vimp.grow, ymaxlim = 20, ymaxtimelim = 20,
 #'          xaxishead = c(3,3), yaxishead = c(65,65),
 #'          cex.xlab = 1, subhead.cexval = 1.2)
 #' }
-#' 
+#'
 vimpPlot <- function(vimp,
                      Q_set = NULL,
                      Time_Interaction = TRUE,
@@ -180,14 +170,14 @@ vimpPlot <- function(vimp,
     p <- nrow(vimp)
   }
   if (is.null(xvar.names)) {
-    xvar.names <- paste("x", 1:p, sep = "")
+    xvar.names <- paste0("x", 1:p)
   }
   vimp <- lapply(vimp, function(v) {
     v * 100
   })
   n.Q <- ncol(vimp[[1]])
   if (is.null(Q_set)) {
-    Q_set <- paste("V", seq(n.Q), sep = "")
+    Q_set <- paste0("V", seq(n.Q))
   }
   for (q in 1:n.Q) {
     if (is.null(path_saveplot)) {
@@ -196,106 +186,93 @@ vimpPlot <- function(vimp,
     Plot_Name <- if (n.Q == 1)
       "VIMPplot.pdf"
     else
-      paste("VIMPplot_Prob(y = ", Q_set[q], ")", ".pdf", sep = "")
-    pdf(
-      file = paste(path_saveplot, "/", Plot_Name, sep = ""),
-      width = 10,
-      height = 10
-    )
-    if (!Time_Interaction) {
-      ylim <- range(vimp[[1]][, q]) + c(-0, ymaxlim)
-      yaxs <- pretty(ylim)
-      yat <- abs(yaxs)
-      bp <- barplot(
-        pmax(as.matrix(vimp[[1]][, q]), 0),
-        beside = TRUE,
-        width = Width_Bar,
-        col = col,
-        ylim = ylim,
-        yaxt = "n",
-        main = main,
-        cex.lab = cex.lab
-      )
-      text(
-        c(bp),
-        pmax(as.matrix(vimp[[1]][, q]), 0) + eps,
-        rep(xvar.names, 3),
-        srt = 90,
-        adj = 0.0,
-        cex = if (!is.null(cex.xlab))
-          cex.xlab
-        else
-          1
-      )
-      axis(2, yaxs, yat)
-    } else {
-      vimp.x <- vimp[[1]][, q]
-      vimp.time <- vimp[[2]][, q]
-      ylim <- max(c(vimp.x, vimp.time)) * c(-1, 1) + c(-ymaxtimelim, ymaxlim)
-      if (ylbl) {
-        ylabel <- paste("Time-Interactions",
-                        "Main Effects",
-                        sep = if (!is.null(seplim))
-                          seplim
-                        else
-                          "                   ")
+      paste0("VIMPplot_Prob(y = ", Q_set[q], ").pdf")
+    pdf_path <- file.path(path_saveplot, Plot_Name)
+    pdf(file = pdf_path, width = 10, height = 10)
+    tryCatch({
+      def.par <- par(no.readonly = TRUE)
+      if (!Time_Interaction) {
+        ylim <- range(vimp[[1]][, q]) + c(-0, ymaxlim)
+        yaxs <- pretty(ylim)
+        yat <- abs(yaxs)
+        bp <- barplot(
+          pmax(as.matrix(vimp[[1]][, q]), 0),
+          beside = TRUE,
+          width = Width_Bar,
+          col = col,
+          ylim = ylim,
+          yaxt = "n",
+          main = main,
+          cex.lab = cex.lab
+        )
+        text(
+          c(bp),
+          pmax(as.matrix(vimp[[1]][, q]), 0) + eps,
+          rep(xvar.names, 3),
+          srt = 90,
+          adj = 0.0,
+          cex = if (!is.null(cex.xlab)) cex.xlab else 1
+        )
+        axis(2, yaxs, yat)
       } else {
-        ylabel <- ""
+        vimp.x <- vimp[[1]][, q]
+        vimp.time <- vimp[[2]][, q]
+        ylim <- max(c(vimp.x, vimp.time)) * c(-1, 1) + c(-ymaxtimelim, ymaxlim)
+        if (ylbl) {
+          ylabel <- paste("Time-Interactions",
+                          "Main Effects",
+                          sep = if (!is.null(seplim)) seplim else "                   ")
+        } else {
+          ylabel <- ""
+        }
+        yaxs <- pretty(ylim)
+        yat <- abs(yaxs)
+        if (is.null(yaxishead)) {
+          yaxishead <- c(-ylim[1], ylim[2])
+        }
+        if (is.null(xaxishead)) {
+          xaxishead <- c(floor(p / 4), floor(p / 4))
+        }
+        bp1 <- barplot(
+          pmax(as.matrix(vimp.x), 0),
+          width = Width_Bar,
+          horiz = FALSE,
+          beside = TRUE,
+          col = col,
+          ylim = ylim,
+          yaxt = "n",
+          ylab = ylabel,
+          cex.lab = cex.lab,
+          main = main
+        )
+        text(
+          c(bp1),
+          pmax(as.matrix(vimp.x), 0) + eps,
+          rep(xvar.names, 3),
+          srt = 90,
+          adj = 0.0,
+          cex = if (!is.null(cex.xlab)) cex.xlab else 1
+        )
+        text(xaxishead[2], yaxishead[2], labels = subhead.labels[2], cex = subhead.cexval)
+        bp2 <- barplot(
+          -pmax(as.matrix(vimp.time), 0) - eps,
+          width = Width_Bar,
+          horiz = FALSE,
+          beside = TRUE,
+          col = col,
+          add = TRUE,
+          yaxt = "n"
+        )
+        text(xaxishead[1], -yaxishead[1], labels = subhead.labels[1], cex = subhead.cexval)
+        axis(2, yaxs, yat)
       }
-      yaxs <- pretty(ylim)
-      yat <- abs(yaxs)
-      if (is.null(yaxishead)) {
-        yaxishead <- c(-ylim[1], ylim[2])
-      }
-      if (is.null(xaxishead)) {
-        xaxishead <- c(floor(p / 4), floor(p / 4))
-      }
-      bp1 <- barplot(
-        pmax(as.matrix(vimp.x), 0),
-        width = Width_Bar,
-        horiz = FALSE,
-        beside = TRUE,
-        col = col,
-        ylim = ylim,
-        yaxt = "n",
-        ylab = ylabel,
-        cex.lab = cex.lab,
-        main = main
-      )
-      text(
-        c(bp1),
-        pmax(as.matrix(vimp.x), 0) + eps,
-        rep(xvar.names, 3),
-        srt = 90,
-        adj = 0.0,
-        cex = if (!is.null(cex.xlab))
-          cex.xlab
-        else
-          1
-      )
-      text(xaxishead[2],
-           yaxishead[2],
-           labels = subhead.labels[2],
-           cex = subhead.cexval)
-      bp2 <- barplot(
-        -pmax(as.matrix(vimp.time), 0) - eps,
-        width = Width_Bar,
-        horiz = FALSE,
-        beside = TRUE,
-        col = col,
-        add = TRUE,
-        yaxt = "n"
-      )
-      # text(c(bp2), -4, rep(xvar.names, 3),srt=270,adj= 0,
-      # yaxt="n",cex=if(!is.null(cex.xlab)) cex.xlab else 1)
-      text(xaxishead[1],-yaxishead[1],
-           labels = subhead.labels[1],
-           cex = subhead.cexval)
-      axis(2, yaxs, yat)
-    }
-    dev.off()
+      par(def.par)
+    }, finally = {
+      dev.off()
+    })
     if (Verbose) {
-      cat("Plot will be saved at:", path_saveplot, sep = "", "\n")
+      message("Plot saved to: ", pdf_path)
     }
   }
+  invisible(vimp)
 }

@@ -1,15 +1,55 @@
 Package: boostmtree
-Version: 1.5.2
-Date: 2025-06-10
+Version: 2.0.0.9000
+Date: 2026-03-24
 Title: Boosted Multivariate Trees for Longitudinal Data
-Author: Hemant Ishwaran <hemant.ishwaran@gmail.com>, Amol Pande <amoljpande@gmail.com>
-Maintainer: Udaya B. Kogalur <ubk@kogalur.com>
-Depends: R (>= 3.5.0)
+Authors@R:
+    c(person(given = "Hemant",
+          family = "Ishwaran",
+          role = "aut",
+          email = "hemant.ishwaran@gmail.com"),
+      person(given = "Amol",
+          family = "Pande",
+          role = "aut",
+          email = "amoljpande@gmail.com"),
+      person(given = c("Udaya", "B."),
+          family = "Kogalur",
+          role = "aut",
+          email = "ubk@kogalur.com"),
+      person(given = "John",
+          family = "Ehrlinger",
+          role = c("aut", "cre"),
+          email = "ehrlinj@ccf.org",
+          comment = c(ORCID = "0000-0002-5340-5154")))
+Maintainer: John Ehrlinger <ehrlinj@ccf.org>
+Depends: R (>= 4.1.0)
 Imports: randomForestSRC (>= 2.9.0), parallel, splines, nlme
-Description: Implements Friedman's gradient descent boosting algorithm for modeling longitudinal response using multivariate tree base learners. Longitudinal response could be continuous, binary, nominal or ordinal.  A time-covariate interaction effect is modeled using penalized B-splines (P-splines) with estimated adaptive smoothing parameter. Although the package is design for longitudinal data, it can handle cross-sectional data as well. Implementation details are provided in Pande et al. (2017), Mach Learn <DOI:10.1007/s10994-016-5597-1>. 
+Description: Implements Friedman's gradient descent boosting algorithm for
+    modeling longitudinal response using multivariate tree base learners.
+    Longitudinal response could be continuous, binary, nominal or ordinal.
+    A time-covariate interaction effect is modeled using penalized B-splines
+    (P-splines) with estimated adaptive smoothing parameter. Although the
+    package is designed for longitudinal data, it can handle cross-sectional
+    data as well. Implementation details are provided in Pande et al. (2017),
+    Mach Learn <DOI:10.1007/s10994-016-5597-1>.
 License: GPL (>= 3)
-URL: https://ishwaran.org/ishwaran.html, https://ehrlinger.github.io/boostmtree/
+URL: https://ehrlinger.github.io/boostmtree/, https://github.com/ehrlinger/boostmtree
+BugReports: https://github.com/ehrlinger/boostmtree/issues
 NeedsCompilation: no
-Suggests: 
-    testthat (>= 3.0.0)
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    quarto,
+    ggplot2,
+    ggRandomForests,
+    hvtiPlotR,
+    hvtiRutilities,
+    mlbench
+Remotes:
+    ehrlinger/ggRandomForests,
+    ehrlinger/hvtiPlotR,
+    ehrlinger/hvtiRutilities
 Config/testthat/edition: 3
+VignetteBuilder: quarto
+Encoding: UTF-8
+Config/roxygen2/version: 8.0.0
