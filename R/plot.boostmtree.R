@@ -147,6 +147,7 @@ plot.boostmtree <- function(x,
       pdf(file = pdf_path, width = 10, height = 10)
       tryCatch({
         def.par <- par(no.readonly = TRUE)
+        on.exit(par(def.par), add = TRUE)
         n <- x$n
         M <- x$M
         univariate <- length(x$id) == length(unique(x$id))
@@ -259,7 +260,6 @@ plot.boostmtree <- function(x,
           )
           lines(lowess.mod(1:M, x$lambda[, q], f = 5 / 10))
         }
-        par(def.par)
       }, finally = {
         dev.off()
       })
@@ -301,6 +301,7 @@ plot.boostmtree <- function(x,
       pdf(file = pdf_path, width = 10, height = 10)
       tryCatch({
         def.par <- par(no.readonly = TRUE)
+        on.exit(par(def.par), add = TRUE)
         univariate <- length(x$boost.obj$id) == length(unique(x$boost.obj$id))
         if (!univariate && is.null(x$err.rate)) {
           plot(
@@ -392,7 +393,6 @@ plot.boostmtree <- function(x,
             abline(v = Mopt[q], lty = 2, col = 2, lwd = 2)
           }
         }
-        par(def.par)
       }, finally = {
         dev.off()
       })

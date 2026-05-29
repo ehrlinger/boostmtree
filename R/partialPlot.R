@@ -379,6 +379,7 @@ partialPlot <- function(object,
       pdf(file = pdf_path, width = 10, height = 10)
       tryCatch({
         def.par <- par(no.readonly = TRUE)
+        on.exit(par(def.par), add = TRUE)
         l.obj[[q]] <- lapply(p.obj[[q]], function(pp) {
           x <- pp[, 1]
           y <- apply(pp[, -1, drop = FALSE], 2, function(yy) {
@@ -404,7 +405,6 @@ partialPlot <- function(object,
                   col = l)
           }
         }
-        par(def.par)
       }, finally = {
         dev.off()
       })
