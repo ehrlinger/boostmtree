@@ -262,6 +262,6 @@ vimpPlot(vimp = vimp.grow, ymaxlim = 20, ymaxtimelim = 20,
          cex.xlab = 1, subhead.cexval = 1.2)
 #> Warning: length(labels) > max(length(x), length(y));
 #> 'labels' truncated to length 4
-#> Plot saved to: /tmp/RtmpAxyv8H/VIMPplot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/VIMPplot.pdf
 # }
 ```

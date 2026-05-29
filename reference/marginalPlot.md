@@ -110,14 +110,14 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Contin
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 marginalPlot(boost.grow, "x1",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpAxyv8H/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/MarginalPlot.pdf
 marginalPlot(boost.grow, "x2",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpAxyv8H/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/MarginalPlot.pdf
 
 #Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"
 # in the current working directory.
 marginalPlot(boost.grow,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpAxyv8H/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/MarginalPlot.pdf
 
 
 ##------------------------------------------------------------
@@ -168,14 +168,14 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y, family = "Binary
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 marginalPlot(boost.grow, "x1",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpAxyv8H/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/MarginalPlot.pdf
 marginalPlot(boost.grow, "x2",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpAxyv8H/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/MarginalPlot.pdf
 
 #Plot of all covariates. The plot will be stored as the "MarginalPlot.pdf"
 # in the current working directory.
 marginalPlot(boost.grow,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpAxyv8H/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/MarginalPlot.pdf
 # }
 
 # \donttest{
@@ -678,11 +678,11 @@ spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spiro
 
 #marginal plot of double-lung group at 5 years
 dltx <- marginalPlot(spr.obj, "AGE", tm.unq = 5, subset = spr.obj$x$DOUBLE==1,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpAxyv8H/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/MarginalPlot.pdf
 
 #marginal plot of single-lung group at 5 years
 sltx <- marginalPlot(spr.obj, "AGE", tm.unq = 5, subset = spr.obj$x$DOUBLE==0,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpAxyv8H/MarginalPlot.pdf
+#> Plot saved to: /tmp/RtmpqfjjJY/MarginalPlot.pdf
 
 #combine the two plots
 dltx <- dltx[[2]][[1]]
