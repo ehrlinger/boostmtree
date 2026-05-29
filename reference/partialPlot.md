@@ -154,17 +154,17 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Continu
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpqfjjJY/PartialPlot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpqfjjJY/PartialPlot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/PartialPlot.pdf
 
 #partial plot using "x2" as the conditional variable
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
                       conditional.xvar = "x2", conditional.values = 1,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpqfjjJY/PartialPlot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",
                       conditional.xvar = "x2", conditional.values = 2,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpqfjjJY/PartialPlot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/PartialPlot.pdf
 
 ##------------------------------------------------------------
 ## Synthetic example (Response is binary)
@@ -207,9 +207,9 @@ boost.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,family = "Binary"
 #x1 has a linear main effect
 #x2 is quadratic with quadratic time trend
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x1",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpqfjjJY/PartialPlot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/PartialPlot.pdf
 pp.obj <- partialPlot(object = boost.grow, xvar.names = "x2",plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpqfjjJY/PartialPlot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/PartialPlot.pdf
 # }
 
 # \donttest{
@@ -709,12 +709,12 @@ spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spiro
 #partial plot of double-lung group at 5 years
 dltx <- partialPlot(object = spr.obj, xvar.names = "AGE",
                     tm.unq = 5, subset=spr.obj$x$DOUBLE==1,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpqfjjJY/PartialPlot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/PartialPlot.pdf
 
 #partial plot of single-lung group at 5 years
 sltx <- partialPlot(object = spr.obj, xvar.names = "AGE",
                     tm.unq = 5, subset=spr.obj$x$DOUBLE==0,plot.it = TRUE)
-#> Plot saved to: /tmp/RtmpqfjjJY/PartialPlot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/PartialPlot.pdf
 
 #combine the two plots: we use lowess smoothed values
 dltx <- dltx$l.obj[[1]]

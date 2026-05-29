@@ -483,7 +483,7 @@ print(boost.grow)
 
 #plot.results
 plot(boost.grow)
-#> Plot saved to: /tmp/RtmpqfjjJY/boostmtree_plot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/boostmtree_plot.pdf
 
 ##------------------------------------------------------------
 ## synthetic example (Response y is binary)
@@ -559,7 +559,7 @@ print(boost.grow)
 
 #plot.results
 plot(boost.grow)
-#> Plot saved to: /tmp/RtmpqfjjJY/boostmtree_plot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/boostmtree_plot.pdf
 
 # \donttest{
 ##------------------------------------------------------------
@@ -694,7 +694,7 @@ boost.cv.grow <- boostmtree(dta$features, dta$time, dta$id, dta$y,
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 #> qr.solve failed (Hessian NR): singular matrix 'a' in solve
 plot(boost.cv.grow)
-#> Plot saved to: /tmp/RtmpqfjjJY/boostmtree_plot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/boostmtree_plot.pdf
 print(boost.cv.grow)
 #> boostmtree summary
 #> model                       : mtree-Pspline learner 
@@ -940,7 +940,7 @@ spr.obj <- boostmtree(spirometry$features, spirometry$time, spirometry$id, spiro
 #>   |                                                                              |======================================================================| 100%
 #> gls (full model) failed: computed "gls" fit is singular, rank 25
 plot(spr.obj)
-#> Plot saved to: /tmp/RtmpqfjjJY/boostmtree_plot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/boostmtree_plot.pdf
 
 
 ##----------------------------------------------------------------------------
@@ -1191,7 +1191,7 @@ AF.obj <- boostmtree(AF$feature, AF$time, AF$id, AF$y,
 #>   |                                                                              |======================================================================| 100%
 #> gls (full model) failed: missing values in object
 plot(AF.obj)
-#> Plot saved to: /tmp/RtmpqfjjJY/boostmtree_plot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/boostmtree_plot.pdf
 
 
 ##----------------------------------------------------------------------------
@@ -1228,7 +1228,7 @@ if (library("mlbench", logical.return = TRUE)) {
 #> number of variables         : 13 
 #> univariate family           : TRUE 
 #> boosting iterations         : 20 
-#> Plot saved to: /tmp/RtmpqfjjJY/boostmtree_plot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/boostmtree_plot.pdf
 #>   |                                                                              |                                                                      |   0%  |                                                                              |====                                                                  |   5%  |                                                                              |=======                                                               |  10%  |                                                                              |==========                                                            |  15%  |                                                                              |==============                                                        |  20%  |                                                                              |==================                                                    |  25%  |                                                                              |=====================                                                 |  30%  |                                                                              |========================                                              |  35%  |                                                                              |============================                                          |  40%  |                                                                              |================================                                      |  45%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================                                |  55%  |                                                                              |==========================================                            |  60%  |                                                                              |==============================================                        |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |====================================================                  |  75%  |                                                                              |========================================================              |  80%  |                                                                              |============================================================          |  85%  |                                                                              |===============================================================       |  90%  |                                                                              |==================================================================    |  95%  |                                                                              |======================================================================| 100%
 #> boostmtree summary
 #> model                       : tree learner 
@@ -1242,7 +1242,7 @@ if (library("mlbench", logical.return = TRUE)) {
 #> boosting iterations         : 20 
 #> optimized number iterations : 20 
 #> OOB cv RMSE                 : 0.8209 
-#> Plot saved to: /tmp/RtmpqfjjJY/boostmtree_plot.pdf
+#> Plot saved to: /tmp/Rtmp6dBw9y/boostmtree_plot.pdf
 
 # }
 ```
