@@ -28,10 +28,10 @@ home:
           [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)<br>
           ![GitHub version](https://img.shields.io/github/r-package/v/ehrlinger/boostmtree)
       links:
-        - text: Browse source code
-          href: https://github.com/ehrlinger/boostmtree
-        - text: Report a bug
-          href: https://github.com/ehrlinger/boostmtree/issues
+        title: Links
+        text: |
+          [Browse source code](https://github.com/ehrlinger/boostmtree)<br>
+          [Report a bug](https://github.com/ehrlinger/boostmtree/issues)
 
 navbar:
   structure:
