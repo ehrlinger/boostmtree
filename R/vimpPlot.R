@@ -191,8 +191,6 @@ vimpPlot <- function(vimp,
     pdf_path <- file.path(path_saveplot, Plot_Name)
     pdf(file = pdf_path, width = 10, height = 10)
     tryCatch({
-      def.par <- par(no.readonly = TRUE)
-      on.exit(par(def.par), add = TRUE)
       if (!Time_Interaction) {
         ylim <- range(vimp[[1]][, q]) + c(-0, ymaxlim)
         yaxs <- pretty(ylim)

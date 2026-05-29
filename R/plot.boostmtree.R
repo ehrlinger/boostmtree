@@ -146,8 +146,6 @@ plot.boostmtree <- function(x,
       pdf_path <- file.path(path_saveplot, Plot_Name)
       pdf(file = pdf_path, width = 10, height = 10)
       tryCatch({
-        def.par <- par(no.readonly = TRUE)
-        on.exit(par(def.par), add = TRUE)
         n <- x$n
         M <- x$M
         univariate <- length(x$id) == length(unique(x$id))
@@ -300,8 +298,6 @@ plot.boostmtree <- function(x,
       pdf_path <- file.path(path_saveplot, Plot_Name)
       pdf(file = pdf_path, width = 10, height = 10)
       tryCatch({
-        def.par <- par(no.readonly = TRUE)
-        on.exit(par(def.par), add = TRUE)
         univariate <- length(x$boost.obj$id) == length(unique(x$boost.obj$id))
         if (!univariate && is.null(x$err.rate)) {
           plot(
