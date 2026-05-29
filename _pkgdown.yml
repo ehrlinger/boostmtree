@@ -22,12 +22,16 @@ home:
       badges:
         title: Package Status
         text: |
-          [![CRAN](https://www.r-pkg.org/badges/version/boostmtree)](https://cran.r-project.org/package=boostmtree)<br>
           [![R-CMD-check](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ehrlinger/boostmtree/actions/workflows/R-CMD-check.yaml)<br>
           [![codecov](https://codecov.io/gh/ehrlinger/boostmtree/graph/badge.svg)](https://app.codecov.io/gh/ehrlinger/boostmtree)<br>
           [![License: GPL (&gt;= 3)](https://img.shields.io/badge/License-GPL%20(%3E%3D%203)-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)<br>
           [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)<br>
           ![GitHub version](https://img.shields.io/github/r-package/v/ehrlinger/boostmtree)
+      links:
+        title: Links
+        text: |
+          [Browse source code](https://github.com/ehrlinger/boostmtree)<br>
+          [Report a bug](https://github.com/ehrlinger/boostmtree/issues)
 
 navbar:
   structure:

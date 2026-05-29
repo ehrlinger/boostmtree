@@ -280,7 +280,6 @@ marginalPlot <- function(object,
       pdf_path <- file.path(path_saveplot, Plot_Name)
       pdf(file = pdf_path, width = 10, height = 10)
       tryCatch({
-        def.par <- par(no.readonly = TRUE)
         l.obj[[q]] <- lapply(1:n.xvar, function(nm) {
           x <- object$x[, xvar.names[nm]]
           lo.fit <- lapply(1:n.tm, function(nt) {
@@ -312,7 +311,6 @@ marginalPlot <- function(object,
                   col = nn)
           }
         }
-        par(def.par)
       }, finally = {
         dev.off()
       })
